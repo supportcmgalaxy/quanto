@@ -13,9 +13,23 @@ if ( ! function_exists( 'cmr_custom_cart_shortcode' ) ) {
         ob_start();
         ?>
         <style>
+            /* Reset excessive top gap from theme and Elementor containers */
+            body.woocommerce-cart .quanto-cart-wrapper,
+            body.woocommerce-cart .quanto-section-padding,
+            body.woocommerce-cart .blog-details,
+            body.woocommerce-cart .page--item,
+            body.woocommerce-cart .page--content,
+            body.woocommerce-cart .elementor-8936,
+            body.woocommerce-cart .elementor-element-1adeab12,
+            body.woocommerce-cart .elementor-element-1adeab12 > .e-con-inner {
+                margin-top: 0 !important;
+                padding-top: 0 !important;
+                --margin-top: 0px !important;
+            }
+
             .cmr-cart-wrapper {
                 max-width: 1280px;
-                margin: 40px auto;
+                margin: 20px auto 40px !important;
                 padding: 0 20px;
                 font-family: 'Instrument Sans', sans-serif !important;
                 color: #111827;

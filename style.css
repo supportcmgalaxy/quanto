@@ -11299,8 +11299,8 @@ body[class*="single-quanto_team"] #smooth-content {
 /* ==========================================================================
    Header Nav Icons (Search, Cart, User Profile) Hover Effect (Identical to Search)
    ========================================================================== */
-.cmr-nav-search-container,
-.cmr-nav-search-trigger,
+.cmr-nav-search-container:not(.cmr-nav-search-black),
+.cmr-nav-search-container:not(.cmr-nav-search-black) .cmr-nav-search-trigger,
 .cmr-nav-cart-container,
 .cmr-cart-icon-link,
 header .elementor-widget-icon a,
@@ -11316,6 +11316,26 @@ header a.lrm-login,
 [data-elementor-type="header"] a.lrm-login {
     color: #ffffff !important;
     transition: color 0.3s ease, stroke 0.3s ease !important;
+}
+
+/* Nav search trigger for light / white header backgrounds */
+.cmr-nav-search-container.cmr-nav-search-black,
+.cmr-nav-search-container.cmr-nav-search-black .cmr-nav-search-trigger,
+.cmr-nav-search-container.cmr-nav-search-black .cmr-nav-search-trigger svg,
+body:not(.home) .cmr-nav-search-container .cmr-nav-search-trigger,
+body:not(.home) .cmr-nav-search-container .cmr-nav-search-trigger svg {
+    color: #1A1C1E !important;
+    stroke: #1A1C1E !important;
+}
+
+.cmr-nav-search-container.cmr-nav-search-black:hover,
+.cmr-nav-search-container.cmr-nav-search-black:hover .cmr-nav-search-trigger,
+.cmr-nav-search-container.cmr-nav-search-black .cmr-nav-search-trigger:hover,
+.cmr-nav-search-container.cmr-nav-search-black .cmr-nav-search-trigger:hover svg,
+body:not(.home) .cmr-nav-search-container:hover .cmr-nav-search-trigger,
+body:not(.home) .cmr-nav-search-container .cmr-nav-search-trigger:hover svg {
+    color: #4820B0 !important;
+    stroke: #4820B0 !important;
 }
 
 header .elementor-widget-icon a svg,
@@ -13744,3 +13764,29 @@ button.cmr-arrow-fixed .cmr-arrow-icon {
 .cmr-wwt-card-link:hover svg {
     transform: translate(2px, -2px) !important;
 }
+
+/* ==========================================================================
+   Fix WooCommerce Cart & Checkout Excessive Top Spacing
+   ========================================================================== */
+body.woocommerce-cart .quanto-cart-wrapper,
+body.woocommerce-cart .quanto-section-padding,
+body.woocommerce-cart .blog-details,
+body.woocommerce-cart .page--item,
+body.woocommerce-cart .page--content,
+body.woocommerce-cart .elementor-8936,
+body.woocommerce-cart .elementor-element-1adeab12,
+body.woocommerce-cart .elementor-element-1adeab12 > .e-con-inner,
+body.woocommerce-checkout .quanto-checkout-wrapper,
+body.woocommerce-checkout .quanto-section-padding,
+body.woocommerce-checkout .blog-details,
+body.woocommerce-checkout .page--item,
+body.woocommerce-checkout .page--content {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    --margin-top: 0px !important;
+}
+
+body.woocommerce-cart .cmr-cart-wrapper {
+    margin-top: 20px !important;
+}
+

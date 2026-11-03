@@ -2430,11 +2430,11 @@
 
             if( is_page( 'cart' ) ){
 
-                $section_class = "quanto-cart-wrapper quanto-section-padding blog-details";
+                $section_class = "quanto-cart-wrapper blog-details";
 
             }elseif( is_page( 'checkout' ) ){
 
-                $section_class = "quanto-checkout-wrapper quanto-section-padding blog-details";
+                $section_class = "quanto-checkout-wrapper blog-details";
 
             }else{
 

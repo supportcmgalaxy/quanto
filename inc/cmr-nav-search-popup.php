@@ -90,8 +90,13 @@ function cmr_nav_search_shortcode($atts = array()) {
             color: #fff; /* White on load */
         }
         
-        .cmr-nav-search-container.cmr-nav-search-black {
-            color: #333 !important; /* Force black */
+        .cmr-nav-search-container.cmr-nav-search-black,
+        .cmr-nav-search-container.cmr-nav-search-black .cmr-nav-search-trigger,
+        .cmr-nav-search-container.cmr-nav-search-black .cmr-nav-search-trigger svg,
+        body:not(.home) .cmr-nav-search-container .cmr-nav-search-trigger,
+        body:not(.home) .cmr-nav-search-container .cmr-nav-search-trigger svg {
+            color: #1A1C1E !important; /* Force black on light headers */
+            stroke: #1A1C1E !important;
         }
         
         .cmr-nav-search-trigger {
@@ -121,12 +126,30 @@ function cmr_nav_search_shortcode($atts = array()) {
             color: #d1d1d1;
         }
         
+        .cmr-nav-search-container.cmr-nav-search-black .cmr-nav-search-trigger:hover,
+        .cmr-nav-search-container.cmr-nav-search-black:hover .cmr-nav-search-trigger,
+        body:not(.home) .cmr-nav-search-container .cmr-nav-search-trigger:hover,
+        body:not(.home) .cmr-nav-search-container:hover .cmr-nav-search-trigger {
+            color: #4820B0 !important;
+            stroke: #4820B0 !important;
+        }
+        
         /* Change to black when header is sticky */
         .elementor-sticky--effects .cmr-nav-search-container:not(.cmr-nav-search-black),
         .is-sticky .cmr-nav-search-container:not(.cmr-nav-search-black),
         header.sticky .cmr-nav-search-container:not(.cmr-nav-search-black),
-        .intel-nav-fixed-js .cmr-nav-search-container:not(.cmr-nav-search-black) {
-            color: #333;
+        .intel-nav-fixed-js .cmr-nav-search-container:not(.cmr-nav-search-black),
+        .elementor-sticky--effects .cmr-nav-search-trigger,
+        .is-sticky .cmr-nav-search-trigger,
+        header.sticky .cmr-nav-search-trigger,
+        .intel-nav-fixed-js .cmr-nav-search-trigger {
+            color: #1A1C1E !important;
+        }
+        .elementor-sticky--effects .cmr-nav-search-trigger svg,
+        .is-sticky .cmr-nav-search-trigger svg,
+        header.sticky .cmr-nav-search-trigger svg,
+        .intel-nav-fixed-js .cmr-nav-search-trigger svg {
+            stroke: #1A1C1E !important;
         }
 
         .cmr-search-overlay-wrapper {
@@ -558,22 +581,24 @@ function cmr_nav_search_shortcode($atts = array()) {
             }
         });
         
-        // Window scroll for icon color (kept from previous code)
-        window.addEventListener('scroll', function() {
+        // Update search icon color based on header mode (immediately and on scroll)
+        function cmrUpdateSearchNavColor() {
             var triggers = document.querySelectorAll('.cmr-nav-search-trigger');
             triggers.forEach(function(trigger) {
-                if (trigger.closest('.cmr-nav-search-black')) {
-                    trigger.style.setProperty('color', '#333', 'important');
+                if (trigger.closest('.cmr-nav-search-black') || !document.body.classList.contains('home')) {
+                    trigger.style.setProperty('color', '#1A1C1E', 'important');
                     return;
                 }
                 
                 if (window.scrollY > 50) {
-                    trigger.style.setProperty('color', '#333', 'important');
+                    trigger.style.setProperty('color', '#1A1C1E', 'important');
                 } else {
                     trigger.style.setProperty('color', '#fff', 'important');
                 }
             });
-        });
+        }
+        cmrUpdateSearchNavColor();
+        window.addEventListener('scroll', cmrUpdateSearchNavColor);
         </script>
         <?php
     }
