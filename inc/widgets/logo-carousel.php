@@ -163,13 +163,12 @@ class Quanto_Logo_Carousel_Widget extends \Elementor\Widget_Base {
             return !empty($classes) ? ' ' . implode(' ', $classes) : '';
         };
 
-        // Ensure enough slides for a completely seamless loop in continuous mode
-        $group_items = $gallery_items;
-        if ($is_continuous) {
-            while (count($group_items) < max(10, $slides_count * 2)) {
-                $group_items = array_merge($group_items, $gallery_items);
+        // Ensure the initial items list has enough slides to fill the viewport if fewer than visible count are uploaded
+        $display_items = $gallery_items;
+        if ($is_continuous && count($display_items) <= $slides_count) {
+            while (count($display_items) <= ($slides_count + 1)) {
+                $display_items = array_merge($display_items, $gallery_items);
             }
-            $duration = max(20, count($group_items) * 3.5);
         }
         ?>
         
@@ -282,25 +281,9 @@ class Quanto_Logo_Carousel_Widget extends \Elementor\Widget_Base {
             }
             #<?php echo esc_attr($uid); ?> .quanto-logo-marquee-track {
                 display: flex;
+                align-items: center;
                 width: max-content;
                 will-change: transform;
-                animation: quantoMarquee_<?php echo $uid_safe; ?> <?php echo $duration; ?>s linear infinite;
-            }
-            #<?php echo esc_attr($uid); ?>:hover .quanto-logo-marquee-track {
-                animation-play-state: paused;
-            }
-            @keyframes quantoMarquee_<?php echo $uid_safe; ?> {
-                0% {
-                    transform: translate3d(0, 0, 0);
-                }
-                100% {
-                    transform: translate3d(-50%, 0, 0);
-                }
-            }
-            #<?php echo esc_attr($uid); ?> .quanto-logo-marquee-group {
-                display: flex;
-                align-items: center;
-                flex-shrink: 0;
             }
             #<?php echo esc_attr($uid); ?> .quanto-logo-slide {
                 width: calc(var(--carousel-width, 100vw) / var(--slides-visible));
@@ -317,30 +300,24 @@ class Quanto_Logo_Carousel_Widget extends \Elementor\Widget_Base {
         <?php if ($is_continuous): ?>
         <div class="quanto-logo-carousel-container quanto-logo-marquee" id="<?php echo esc_attr($uid); ?>">
             <div class="quanto-logo-marquee-track">
-                <div class="quanto-logo-marquee-group">
-                    <?php foreach ($group_items as $img_url): ?>
-                        <div class="quanto-logo-slide<?php echo $get_logo_item_classes($img_url); ?>">
-                            <img src="<?php echo esc_url($img_url); ?>" alt="Logo">
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-                <div class="quanto-logo-marquee-group" aria-hidden="true">
-                    <?php foreach ($group_items as $img_url): ?>
-                        <div class="quanto-logo-slide<?php echo $get_logo_item_classes($img_url); ?>">
-                            <img src="<?php echo esc_url($img_url); ?>" alt="Logo">
-                        </div>
-                    <?php endforeach; ?>
-                </div>
+                <?php foreach ($display_items as $img_url): ?>
+                    <div class="quanto-logo-slide<?php echo $get_logo_item_classes($img_url); ?>">
+                        <img src="<?php echo esc_url($img_url); ?>" alt="Logo">
+                    </div>
+                <?php endforeach; ?>
             </div>
         </div>
 
         <script>
         (function() {
-            var el = document.getElementById("<?php echo esc_js($uid); ?>");
-            if (!el) return;
+            var container = document.getElementById("<?php echo esc_js($uid); ?>");
+            if (!container) return;
+            var track = container.querySelector(".quanto-logo-marquee-track");
+            if (!track) return;
+
             function updateWidth() {
-                if (el && el.offsetWidth) {
-                    el.style.setProperty('--carousel-width', el.offsetWidth + 'px');
+                if (container && container.offsetWidth) {
+                    container.style.setProperty('--carousel-width', container.offsetWidth + 'px');
                 }
             }
             updateWidth();
@@ -350,11 +327,52 @@ class Quanto_Logo_Carousel_Widget extends \Elementor\Widget_Base {
                     new ResizeObserver(function(entries) {
                         for (var i = 0; i < entries.length; i++) {
                             var w = entries[i].contentRect ? entries[i].contentRect.width : entries[i].target.offsetWidth;
-                            if (w && el) el.style.setProperty('--carousel-width', w + 'px');
+                            if (w && container) container.style.setProperty('--carousel-width', w + 'px');
                         }
-                    }).observe(el);
+                    }).observe(container);
                 } catch(e) {}
             }
+
+            var offset = 0;
+            var speed = 55; // pixels per second for silky smooth continuous movement
+            var isPaused = false;
+            var lastTime = null;
+
+            container.addEventListener('mouseenter', function() { isPaused = true; });
+            container.addEventListener('mouseleave', function() { isPaused = false; });
+            container.addEventListener('touchstart', function() { isPaused = true; }, { passive: true });
+            container.addEventListener('touchend', function() { isPaused = false; }, { passive: true });
+
+            function tick(now) {
+                if (!lastTime) lastTime = now;
+                var dt = (now - lastTime) / 1000;
+                lastTime = now;
+                if (dt > 0.1) dt = 0.1; // Clamp large time delta (e.g., when switching tabs)
+
+                if (!isPaused && dt > 0) {
+                    offset += speed * dt;
+
+                    // Reparenting: once the first element scrolls completely out of view,
+                    // cut it from front and append it to the end of the track without recreating DOM
+                    while (track.firstElementChild) {
+                        var firstChild = track.firstElementChild;
+                        var w = firstChild.getBoundingClientRect().width || firstChild.offsetWidth;
+                        if (w > 0 && offset >= w) {
+                            offset -= w;
+                            track.appendChild(firstChild);
+                        } else {
+                            break;
+                        }
+                    }
+
+                    track.style.transform = 'translate3d(' + (-offset) + 'px, 0, 0)';
+                }
+
+                requestAnimationFrame(tick);
+            }
+
+            requestAnimationFrame(tick);
+
             if (window.jQuery) {
                 jQuery(window).on('elementor/frontend/init', function() {
                     if (window.elementorFrontend && elementorFrontend.hooks) {

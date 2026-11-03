@@ -48,8 +48,8 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./dist/quanto/
-        server-dir: /wp-content/themes/quanto/
-        #server-dir: /qai8358l95-staging.onrocket.site/wp-content/themes/quanto/
+        # server-dir: /wp-content/themes/quanto/
+        server-dir: /qai8358l95-staging.onrocket.site/wp-content/themes/quanto/
 
         
     - name: Upload to Release
