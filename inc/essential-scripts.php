@@ -72,7 +72,9 @@ function quanto_essential_scripts() {
 
     // Enqueue homepage Elementor CSS anywhere we inject homepage Elementor sections,
     // including WooCommerce product pages rendered via custom template helpers.
-    if ( ( is_home() || is_archive() || is_page() || is_singular( array( 'post', 'cmr_news', 'cmr_media_release', 'cmr_quarterly', 'product' ) ) ) && class_exists( '\\Elementor\\Core\\Files\\CSS\\Post' ) ) {
+    // Skip on Cart, Checkout, and Account pages to prevent downloading 20+ unused stylesheets and blocking paint.
+    $is_ecommerce_cart_checkout = function_exists( 'is_cart' ) && ( is_cart() || is_checkout() || is_account_page() );
+    if ( ! $is_ecommerce_cart_checkout && ( is_home() || is_archive() || is_page() || is_singular( array( 'post', 'cmr_news', 'cmr_media_release', 'cmr_quarterly', 'product' ) ) ) && class_exists( '\\Elementor\\Core\\Files\\CSS\\Post' ) ) {
         $homepage_id = get_option( 'page_on_front' );
         if ( ! $homepage_id ) {
             $homepage_id = 14; // Fallback
@@ -221,6 +223,19 @@ function quanto_optimize_homepage_performance() {
         wp_dequeue_script( 'flexslider' );
         wp_dequeue_script( 'photoswipe' );
         wp_dequeue_script( 'photoswipe-ui-default' );
+    }
+
+    // 3. Conditional Cart/Checkout Optimization: Dequeue unused news, animations, & popup assets on Cart & Checkout
+    if ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() ) ) {
+        wp_dequeue_style( 'cmr-news-style' );
+        wp_dequeue_style( 'cmr-industry-intelligence' );
+        wp_dequeue_style( 'odometer-style' );
+        wp_dequeue_style( 'magnific-popup-style' );
+        wp_dequeue_script( 'odometer-min-script' );
+        wp_dequeue_script( 'jquery-mixitup' );
+        wp_dequeue_script( 'magnific-popup' );
+        wp_dequeue_script( 'gsap-scroll-smoother-script' );
+        wp_dequeue_script( 'scroll-smoother' );
     }
 }
 

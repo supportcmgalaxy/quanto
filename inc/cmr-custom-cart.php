@@ -739,12 +739,12 @@ function cmr_get_cart_html() {
             <div class="cmr-safe-checkout">
                 <p>Guaranteed safe checkout</p>
                 <div class="cmr-payment-icons">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg" alt="Apple Pay" style="height:24px;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="Google Pay" style="height:24px;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" style="height:24px;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex" style="height:24px;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" style="height:24px;">
-                    <img src="https://cmrindia.com/wp-content/uploads/2026/05/Visa.svg" alt="Visa" style="height:24px;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg" alt="Apple Pay" loading="lazy" decoding="async" width="40" height="24" style="height:24px;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="Google Pay" loading="lazy" decoding="async" width="40" height="24" style="height:24px;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" loading="lazy" decoding="async" width="40" height="24" style="height:24px;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex" loading="lazy" decoding="async" width="40" height="24" style="height:24px;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" loading="lazy" decoding="async" width="40" height="24" style="height:24px;">
+                    <img src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/05/Visa.svg' ) ); ?>" alt="Visa" loading="lazy" decoding="async" width="40" height="24" style="height:24px;">
                 </div>
             </div>
 

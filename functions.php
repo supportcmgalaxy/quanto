@@ -1585,6 +1585,9 @@ add_shortcode('cmr_testimonials', function() {
 // Global CSS for Testimonials (Desktop 2-column wide layout matching Image 1 + Mobile centered layout)
 add_action('wp_head', 'cmr_testimonials_global_mobile_css', 9999);
 function cmr_testimonials_global_mobile_css() {
+    if ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() || is_account_page() ) ) {
+        return;
+    }
     ?>
     <style id="cmr-testimonials-global-mobile-css">
     /* ==========================================
@@ -3232,6 +3235,9 @@ function cmr_testimonials_global_mobile_css() {
 // Global Mobile & Tablet Swiper Reconfiguration for Testimonials Slider (Single slide swipe, touch enabled, zero offset drift)
 add_action('wp_footer', 'cmr_testimonials_global_mobile_js', 99999);
 function cmr_testimonials_global_mobile_js() {
+    if ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() || is_account_page() ) ) {
+        return;
+    }
     ?>
     <script id="cmr-testimonials-global-fix">
     (function() {

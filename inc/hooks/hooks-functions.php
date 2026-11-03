@@ -3151,13 +3151,17 @@
 
 
     add_action( 'quanto_before_content', function () {
-
+        if ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() || is_account_page() ) ) {
+            return;
+        }
         echo '<div id="smooth-wrapper"><div id="smooth-content">';
 
     } );
 
     add_action( 'quanto_after_content', function () {
-
+        if ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() || is_account_page() ) ) {
+            return;
+        }
         echo '</div></div>';
 
     } );
