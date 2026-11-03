@@ -35,8 +35,8 @@ function quanto_essential_scripts() {
     // remixicon Style
     wp_enqueue_style( 'remixicon-style', get_theme_file_uri( '/assets/css/remixicon.css' ), array(), '2.0' );
 
-    // Bootstrap Icons Style
-    wp_enqueue_style( 'bootstrap-icons-style', get_theme_file_uri( '/assets/css/bootstrap-icons.min.css' ), array(), '1.11.3' );
+    // Bootstrap Icons Style - Removed (0 icons used in the project, saves ~300KB font files)
+    // wp_enqueue_style( 'bootstrap-icons-style', get_theme_file_uri( '/assets/css/bootstrap-icons.min.css' ), array(), '1.11.3' );
 
     // magnific popup Style
     wp_enqueue_style( 'magnific-popup-style', get_theme_file_uri( '/assets/css/magnific-popup.css' ), array(), $quanto_theme_ver );
@@ -62,7 +62,9 @@ function quanto_essential_scripts() {
     
     // CMR Common Modal Styles
     wp_enqueue_style( 'cmr-modal-style', get_theme_file_uri('/assets/css/cmr-modal.css'), array(), $quanto_theme_ver );
-    wp_enqueue_style( 'cmr-checkout-block', get_theme_file_uri('/assets/css/cmr-checkout-block.css') ,array(), $quanto_theme_ver );
+    if ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() || is_account_page() ) ) {
+        wp_enqueue_style( 'cmr-checkout-block', get_theme_file_uri('/assets/css/cmr-checkout-block.css') ,array(), $quanto_theme_ver );
+    }
     wp_register_style( 'cmr-latest-insights', get_theme_file_uri('/assets/css/cmr-latest-insights.css'), array(), $quanto_theme_ver );
     wp_enqueue_style( 'cmr-industry-intelligence', get_theme_file_uri('/assets/css/cmr-industry-intelligence.css'), array(), $quanto_theme_ver );
     wp_register_style( 'cmr-explore-sectors', get_theme_file_uri('/assets/css/cmr-explore-sectors.css'), array(), $quanto_theme_ver );
@@ -79,13 +81,15 @@ function quanto_essential_scripts() {
         if ( function_exists( 'quanto_enqueue_elementor_post_assets' ) ) {
             quanto_enqueue_elementor_post_assets( $homepage_id );
             
-            // Enqueue Similar Reports page assets so they are loaded in <head>
-            $target_page = get_page_by_path( 'similar-reports-by-industry' );
-            if ( ! $target_page ) {
-                $target_page = get_page_by_path( 'test' );
-            }
-            if ( $target_page ) {
-                quanto_enqueue_elementor_post_assets( $target_page->ID );
+            // Only enqueue Similar Reports page assets on single report/product pages
+            if ( is_singular( array( 'product', 'cmr_media_release', 'cmr_quarterly' ) ) ) {
+                $target_page = get_page_by_path( 'similar-reports-by-industry' );
+                if ( ! $target_page ) {
+                    $target_page = get_page_by_path( 'test' );
+                }
+                if ( $target_page ) {
+                    quanto_enqueue_elementor_post_assets( $target_page->ID );
+                }
             }
         } else {
             $upload_dir = wp_upload_dir();
@@ -150,14 +154,18 @@ function quanto_essential_scripts() {
     // Bootstrap
     wp_enqueue_script( 'bootstrap-bundle', get_theme_file_uri( '/assets/js/bootstrap.bundle.min.js' ), array( 'jquery' ), '5.3.3', true );
 
-    // jquery mixitup
-    wp_enqueue_script( 'jquery-mixitup', get_theme_file_uri( '/assets/js/jquery.mixitup.min.js' ), array('jquery'), '2.1.11', true );
+    // jquery mixitup (avoid double load if already enqueued)
+    if ( ! wp_script_is( 'mixitup', 'enqueued' ) ) {
+        wp_enqueue_script( 'jquery-mixitup', get_theme_file_uri( '/assets/js/jquery.mixitup.min.js' ), array('jquery'), '2.1.11', true );
+    }
 
     // swiper bundle
     wp_enqueue_script( 'swiper-bundle', get_theme_file_uri( '/assets/js/swiper-bundle.min.js' ), array('jquery'), '7.0.8', true );
 
-    // magnific popup
-    wp_enqueue_script( 'magnific-popup', get_theme_file_uri( '/assets/js/jquery.magnific-popup.min.js' ), array('jquery'), '1.1.0', true );
+    // magnific popup (avoid double load if already enqueued)
+    if ( ! wp_script_is( 'magnific-popup', 'enqueued' ) ) {
+        wp_enqueue_script( 'magnific-popup', get_theme_file_uri( '/assets/js/jquery.magnific-popup.min.js' ), array('jquery'), '1.1.0', true );
+    }
 
     // Odometer JS
     wp_enqueue_script( 'odometer-min-script', get_theme_file_uri( '/assets/js/odometer.min.js' ), array( 'jquery' ), '0.4.8', true );
@@ -166,12 +174,14 @@ function quanto_essential_scripts() {
     // Meanmenu JS
     wp_enqueue_script( 'jquery-meanmenu', get_theme_file_uri( '/assets/js/jquery.meanmenu.min.js' ), array('jquery'), $quanto_theme_ver, true );
 
-    //  gsap JS 
-    wp_enqueue_script( 'gsap-script', get_theme_file_uri( '/assets/js/gsap.js' ), array( 'jquery' ), '3.11.4', true );
-    wp_enqueue_script( 'gsap-scroll-smoother-script', get_theme_file_uri( '/assets/js/gsap-scroll-smoother.js' ), array( 'jquery' ), '3.11.4', true );
-    wp_enqueue_script( 'gsap-scroll-to-plugin-script', get_theme_file_uri( '/assets/js/gsap-scroll-to-plugin.js' ), array( 'jquery' ), '3.11.4', true );
-    wp_enqueue_script( 'gsap-scroll-trigger-script', get_theme_file_uri( '/assets/js/gsap-scroll-trigger.js' ), array( 'jquery' ), '3.11.4', true );
-    wp_enqueue_script( 'gsap-split-text-script', get_theme_file_uri( '/assets/js/gsap-split-text.js' ), array( 'jquery' ), '3.11.2', true );
+    // gsap JS: only enqueue theme copy if mas-animation plugin has not loaded it
+    if ( ! wp_script_is( 'gsap', 'enqueued' ) ) {
+        wp_enqueue_script( 'gsap-script', get_theme_file_uri( '/assets/js/gsap.js' ), array( 'jquery' ), '3.11.4', true );
+        wp_enqueue_script( 'gsap-scroll-smoother-script', get_theme_file_uri( '/assets/js/gsap-scroll-smoother.js' ), array( 'jquery' ), '3.11.4', true );
+        wp_enqueue_script( 'gsap-scroll-to-plugin-script', get_theme_file_uri( '/assets/js/gsap-scroll-to-plugin.js' ), array( 'jquery' ), '3.11.4', true );
+        wp_enqueue_script( 'gsap-scroll-trigger-script', get_theme_file_uri( '/assets/js/gsap-scroll-trigger.js' ), array( 'jquery' ), '3.11.4', true );
+        wp_enqueue_script( 'gsap-split-text-script', get_theme_file_uri( '/assets/js/gsap-split-text.js' ), array( 'jquery' ), '3.11.2', true );
+    }
 
     // main script
     wp_enqueue_script( 'quanto-main-script', get_theme_file_uri( '/assets/js/main.js' ), array('jquery'), $quanto_theme_ver, true );
@@ -181,7 +191,65 @@ function quanto_essential_scripts() {
 		wp_enqueue_script( 'comment-reply' );
 	}
 }
-add_action( 'wp_enqueue_scripts', 'quanto_essential_scripts',99 );
+add_action( 'wp_enqueue_scripts', 'quanto_essential_scripts', 99 );
+
+/**
+ * High-Priority Asset Optimization & Deduplication Hook
+ * Removes duplicate GSAP/Animation scripts and unneeded WooCommerce assets on the Homepage
+ */
+add_action( 'wp_enqueue_scripts', 'quanto_optimize_homepage_performance', 999 );
+function quanto_optimize_homepage_performance() {
+    // 1. Deduplicate GSAP scripts if mas-animation plugin already loaded GSAP
+    if ( wp_script_is( 'gsap', 'enqueued' ) ) {
+        wp_dequeue_script( 'gsap-script' );
+        wp_dequeue_script( 'gsap-scroll-smoother-script' );
+        wp_dequeue_script( 'gsap-scroll-to-plugin-script' );
+        wp_dequeue_script( 'gsap-scroll-trigger-script' );
+        wp_dequeue_script( 'gsap-split-text-script' );
+    }
+    if ( wp_script_is( 'mixitup', 'enqueued' ) ) {
+        wp_dequeue_script( 'jquery-mixitup' );
+    }
+
+    // 2. Conditional WooCommerce asset loading: On Homepage, dequeue unused cart/product scripts
+    if ( ( is_front_page() || is_home() ) && class_exists( 'WooCommerce' ) ) {
+        wp_dequeue_style( 'woocommerce-layout' );
+        wp_dequeue_style( 'woocommerce-smallscreen' );
+        wp_dequeue_style( 'woocommerce_frontend_styles' );
+        wp_dequeue_script( 'wc-add-to-cart' );
+        wp_dequeue_script( 'zoom' );
+        wp_dequeue_script( 'flexslider' );
+        wp_dequeue_script( 'photoswipe' );
+        wp_dequeue_script( 'photoswipe-ui-default' );
+    }
+}
+
+/**
+ * Defer non-critical scripts for faster First Contentful Paint (FCP)
+ */
+add_filter( 'script_loader_tag', 'quanto_defer_non_critical_scripts', 10, 2 );
+function quanto_defer_non_critical_scripts( $tag, $handle ) {
+    // Do not defer in admin or Elementor editor
+    if ( is_admin() || ( function_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance ) && \Elementor\Plugin::$instance->editor && \Elementor\Plugin::$instance->editor->is_edit_mode() ) ) {
+        return $tag;
+    }
+
+    $defer_handles = array(
+        'odometer-min-script',
+        'viewport-jquery-script',
+        'cmr-cart-badge-sync',
+        'swiper-bundle',
+        'bootstrap-bundle',
+        'quanto-main-script',
+        'jquery-meanmenu',
+    );
+
+    if ( in_array( $handle, $defer_handles, true ) && false === strpos( $tag, 'defer' ) ) {
+        return str_replace( ' src', ' defer="defer" src', $tag );
+    }
+
+    return $tag;
+}
 
 
 function quanto_block_editor_assets( ) {
