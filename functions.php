@@ -1476,7 +1476,7 @@ if ( ! function_exists('cmr_print_elementor_css') ) {
                     echo '<style id="elementor-local-' . intval($post_id) . '-' . $device . '-inline-css">' . $d_content . '</style>' . "\n";
                     continue;
                 }
-                if ( in_array( $device, array( 'desktop', 'mobile' ), true ) && ! empty( $upload_dir['baseurl'] ) ) {
+                if ( file_exists( $local_file ) && in_array( $device, array( 'desktop', 'mobile' ), true ) && ! empty( $upload_dir['baseurl'] ) ) {
                     $local_url = trailingslashit( $upload_dir['baseurl'] ) . 'elementor/css/local-' . intval($post_id) . '-frontend-' . $device . '.css';
                     echo '<link rel="stylesheet" id="local-' . intval($post_id) . '-frontend-' . $device . '-css" href="' . esc_url($local_url) . '" type="text/css" media="all">' . "\n";
                 }

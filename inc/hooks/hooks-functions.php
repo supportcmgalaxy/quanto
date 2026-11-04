@@ -1078,7 +1078,91 @@
 
     add_action( 'wp_head', 'cmr_inject_tab_css_inline_in_head', 99 );
 
+    if ( ! function_exists( 'quanto_fix_accessible_links' ) ) {
+        function quanto_fix_accessible_links( $html ) {
+            if ( empty( $html ) ) {
+                return $html;
+            }
 
+            return preg_replace_callback( '/<a\s+([^>]*?)>(.*?)<\/a>/is', function( $matches ) {
+                $attrs = $matches[1];
+                $inner = $matches[2];
+
+                // If aria-label or aria-labelledby is already present, leave untouched
+                if ( preg_match( '/\baria-label(ledby)?\s*=/i', $attrs ) ) {
+                    return $matches[0];
+                }
+
+                // Check for visible text
+                $text = trim( strip_tags( $inner ) );
+
+                // Check for <img> with non-empty alt
+                $has_img_alt = false;
+                if ( preg_match( '/<img\s+[^>]*?alt\s*=\s*["\']([^"\']+)["\']/i', $inner, $img_m ) ) {
+                    if ( ! empty( trim( $img_m[1] ) ) ) {
+                        $has_img_alt = true;
+                    }
+                }
+
+                // If link already has discernible text or image alt, keep as is
+                if ( ! empty( $text ) || $has_img_alt ) {
+                    return $matches[0];
+                }
+
+                // Discernible name is missing - compute appropriate label
+                $href = '';
+                if ( preg_match( '/href\s*=\s*["\']([^"\']+)["\']/i', $attrs, $href_m ) ) {
+                    $href = $href_m[1];
+                }
+
+                $label = '';
+                if ( preg_match( '/youtube/i', $href ) || preg_match( '/fa-youtube/i', $inner ) ) {
+                    $label = 'YouTube';
+                } elseif ( preg_match( '/linkedin/i', $href ) || preg_match( '/fa-linkedin/i', $inner ) ) {
+                    $label = 'LinkedIn';
+                } elseif ( preg_match( '/facebook/i', $href ) || preg_match( '/fa-facebook/i', $inner ) ) {
+                    $label = 'Facebook';
+                } elseif ( preg_match( '/(twitter|x\.com|xfotter)/i', $href ) || preg_match( '/(fa-x-twitter|fa-twitter|xfotter)/i', $inner ) ) {
+                    $label = 'X (Twitter)';
+                } elseif ( preg_match( '/instagram/i', $href ) || preg_match( '/fa-instagram/i', $inner ) ) {
+                    $label = 'Instagram';
+                } elseif ( preg_match( '/careers/i', $href ) ) {
+                    $label = 'Careers';
+                } elseif ( preg_match( '/enterprise-connect/i', $href ) ) {
+                    $label = 'Enterprise Connect';
+                } elseif ( preg_match( '/smb-connect/i', $href ) ) {
+                    $label = 'SMB Connect';
+                } elseif ( preg_match( '/channel-connect/i', $href ) ) {
+                    $label = 'Channel Connect';
+                } elseif ( preg_match( '/research-reports/i', $href ) ) {
+                    $label = 'Research Reports';
+                } elseif ( preg_match( '/market-updates/i', $href ) ) {
+                    $label = 'Market Updates';
+                } elseif ( preg_match( '/viewpoints/i', $href ) ) {
+                    $label = 'Viewpoints';
+                } elseif ( preg_match( '/contact/i', $href ) ) {
+                    $label = 'Contact Us';
+                } elseif ( preg_match( '/about/i', $href ) ) {
+                    $label = 'About Us';
+                } else {
+                    $path = trim( parse_url( $href, PHP_URL_PATH ) ?: '', '/' );
+                    if ( ! empty( $path ) ) {
+                        $segments = explode( '/', $path );
+                        $last_seg = end( $segments );
+                        $label = ucwords( str_replace( array( '-', '_' ), ' ', sanitize_title( $last_seg ) ) );
+                    }
+                    if ( empty( $label ) ) {
+                        $label = 'Learn more';
+                    }
+                }
+
+                // If inner HTML contains an empty alt <img alt="">, give the image the label too
+                $fixed_inner = preg_replace( '/<img\s+([^>]*?)alt\s*=\s*["\']\s*["\']([^>]*?)>/i', '<img $1alt="' . esc_attr( $label ) . '"$2>', $inner );
+
+                return '<a aria-label="' . esc_attr( $label ) . '" ' . $attrs . '>' . $fixed_inner . '</a>';
+            }, $html );
+        }
+    }
 
     if ( ! function_exists( 'quanto_render_elementor_footer' ) ) {
 
@@ -1144,7 +1228,7 @@
 
             echo '<div data-elementor-type="wp-post" data-elementor-id="' . esc_attr( $post_id ) . '" class="elementor elementor-' . esc_attr( $post_id ) . '">';
 
-            echo $content;
+            echo quanto_fix_accessible_links( $content );
 
             echo '</div>';
 

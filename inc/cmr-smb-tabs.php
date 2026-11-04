@@ -100,11 +100,11 @@ function cmr_smb_tabs_shortcode( $atts ) {
                     <?php 
                     $icon_url = '';
                     if ( $term->name == 'CMR In News' ) {
-                        $icon_url = 'https://cmrindia.com/wp-content/uploads/2026/05/airdrop.svg';
+                        $icon_url = get_theme_file_uri( '/assets/images/icons/airdrop.svg' );
                     } elseif ( $term->name == 'Media Releases' ) {
-                        $icon_url = 'https://cmrindia.com/wp-content/uploads/2026/05/Frame.svg';
+                        $icon_url = get_theme_file_uri( '/assets/images/icons/Frame.svg' );
                     } elseif ( $term->name == 'Quarterly Results' ) {
-                        $icon_url = 'https://cmrindia.com/wp-content/uploads/2026/05/quterly.svg';
+                        $icon_url = get_theme_file_uri( '/assets/images/icons/quterly.svg' );
                     }
                     if ( $icon_url ) {
                         echo '<span class="cmr-tab-icon" style="-webkit-mask-image: url(' . esc_url($icon_url) . '); mask-image: url(' . esc_url($icon_url) . ');"></span> ';

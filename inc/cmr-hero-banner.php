@@ -475,13 +475,17 @@ function cmr_hero_banner_shortcode($atts) {
         <a href="<?php echo esc_url( home_url( '/research-reports/' ) ); ?>" class="btn-primary">
           Get Report
           <img class="hero-arrow-button-white"
-               src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol-1.svg">
+               src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol-1.svg"
+               alt="Arrow"
+               aria-hidden="true">
         </a>
 
         <a href="#elementor-action%3Aaction%3Dpopup%3Aopen%26settings%3DeyJpZCI6Ijc2MzciLCJ0b2dnbGUiOmZhbHNlfQ%3D%3D" class="btn-outline open-popup" data-popup-id="7637">
           Connect with us
           <img class="hero-arrow-button"
-               src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol.svg">
+               src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol.svg"
+               alt="Arrow"
+               aria-hidden="true">
         </a>
       </div>
 
