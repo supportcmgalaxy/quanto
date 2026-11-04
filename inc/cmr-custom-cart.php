@@ -573,7 +573,7 @@ add_shortcode( 'cmr_custom_cart', 'cmr_custom_cart_shortcode' );
  * Helper to generate cart HTML
  */
 function cmr_get_cart_html() {
-    if ( WC()->cart->is_empty() ) {
+    if ( ! function_exists( 'WC' ) || ! WC()->cart || WC()->cart->is_empty() ) {
         ob_start();
         ?>
         <div class="cmr-cart-empty" style="text-align: center; padding: 100px 20px;">
@@ -798,7 +798,7 @@ add_action( 'wp_ajax_nopriv_cmr_cart_action', 'cmr_cart_action_handler' );
 function cmr_cart_action_handler() {
     $action = isset( $_POST['cart_action'] ) ? sanitize_text_field( $_POST['cart_action'] ) : '';
 
-    if ( ! WC()->cart ) {
+    if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
         wp_send_json_error( array( 'message' => 'Cart not initialized.' ) );
     }
 
