@@ -23,8 +23,8 @@ function quanto_essential_scripts() {
 	wp_enqueue_style( 'quanto-style', get_stylesheet_uri(), array(), $quanto_style_version );
     wp_enqueue_style( 'cmr-mobile-menu-css', get_theme_file_uri( '/assets/css/cmr-mobile-menu.css' ), array(), $quanto_theme_ver );
 
-    // google font
-    wp_enqueue_style( 'quanto-fonts', quanto_google_fonts() ,array(), wp_get_theme()->get( 'Version' ) );
+    // Instrument Sans (Self-hosted local font - 0 external network requests)
+    wp_enqueue_style( 'quanto-fonts', get_theme_file_uri( '/assets/css/instrument-sans.css' ), array(), $quanto_theme_ver );
 
     // Bootstrap Style
     wp_enqueue_style( 'bootstrap-style', get_theme_file_uri( '/assets/css/bootstrap.min.css' ), array(), '5.3.3' );
@@ -268,26 +268,54 @@ function quanto_defer_non_critical_scripts( $tag, $handle ) {
 
 
 function quanto_block_editor_assets( ) {
-    // Add custom fonts.
-	wp_enqueue_style( 'quanto-editor-fonts', quanto_google_fonts(), array(), null );
+    // Add custom fonts to Gutenberg editor
+    wp_enqueue_style( 'quanto-editor-fonts', get_theme_file_uri( '/assets/css/instrument-sans.css' ), array(), wp_get_theme()->get( 'Version' ) );
 }
 
 add_action( 'enqueue_block_editor_assets', 'quanto_block_editor_assets' );
  
 function quanto_google_fonts() {
-    $font_families = array(
-        'Instrument Sans:400,500,600,700','800','900',
-    );
-
-    $familyArgs = array(
-        'family' => urlencode( implode( '|', $font_families ) ),
-        'subset' => urlencode( 'latin,latin-ext' ),
-    );
-
-    $fontUrl = add_query_arg( $familyArgs, '//fonts.googleapis.com/css' );
-
-    return esc_url_raw( $fontUrl );
+    // Return self-hosted Instrument Sans stylesheet URI
+    return get_theme_file_uri( '/assets/css/instrument-sans.css' );
 }
+
+// Disable Elementor extra Google Fonts on front-end (keep normal when inside Elementor editor)
+add_filter( 'elementor/frontend/print_google_fonts', function( $print ) {
+    if ( is_admin() || ( class_exists( '\Elementor\Plugin' ) && \Elementor\Plugin::$instance->editor->is_edit_mode() ) ) {
+        return $print;
+    }
+    return false;
+} );
+
+// Safety net: dequeue any elementor-gf-* handles on front-end
+add_action( 'wp_enqueue_scripts', function() {
+    if ( is_admin() || ( class_exists( '\Elementor\Plugin' ) && \Elementor\Plugin::$instance->editor->is_edit_mode() ) ) {
+        return;
+    }
+    $extra_fonts = array(
+        'elementor-gf-roboto',
+        'elementor-gf-robotoslab',
+        'elementor-gf-poppins',
+        'elementor-gf-inter',
+        'elementor-gf-rubik',
+        'elementor-gf-manrope',
+        'elementor-gf-instrumentsans',
+    );
+    foreach ( $extra_fonts as $font_handle ) {
+        wp_dequeue_style( $font_handle );
+        wp_deregister_style( $font_handle );
+    }
+}, 999 );
+
+// Remove external Google Font prefetch/preconnect hints
+add_filter( 'wp_resource_hints', function( $urls, $relation_type ) {
+    if ( 'dns-prefetch' === $relation_type || 'preconnect' === $relation_type ) {
+        $urls = array_filter( $urls, function( $url ) {
+            return ( false === strpos( $url, 'fonts.googleapis.com' ) && false === strpos( $url, 'fonts.gstatic.com' ) );
+        } );
+    }
+    return $urls;
+}, 10, 2 );
 
 /**
  * Lightweight Modal Trigger & Scroll Lock Controller + HTML Entity Decoder

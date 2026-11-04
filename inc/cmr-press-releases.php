@@ -22,7 +22,7 @@ function cmr_render_press_releases_shortcode( $atts ) {
             display: flex !important;
             flex-direction: column !important;
             justify-content: center !important;
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Instrument Sans', -apple-system, sans-serif;
             overflow: hidden !important;
             position: relative !important;
             width: 100% !important;
