@@ -443,7 +443,7 @@ function cmr_nav_search_shortcode($atts = array()) {
 
                         <input name="s" required value="<?php echo esc_html( get_search_query() ); ?>" type="search" placeholder="Type here..." autocomplete="off">
                         
-                        <button type="button" class="clear-btn" style="<?php echo get_search_query() ? 'display:flex;' : 'display:none;'; ?>" onclick="var el=this.previousElementSibling; el.value=''; this.style.display='none'; el.focus(); el.dispatchEvent(new Event('input'));">
+                        <button type="button" class="clear-btn" aria-label="<?php esc_attr_e( 'Clear Search', 'quanto' ); ?>" style="<?php echo get_search_query() ? 'display:flex;' : 'display:none;'; ?>" onclick="var el=this.previousElementSibling; el.value=''; this.style.display='none'; el.focus(); el.dispatchEvent(new Event('input'));">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M18 6L6 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                 <path d="M6 6L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -452,7 +452,7 @@ function cmr_nav_search_shortcode($atts = array()) {
                         
                         <div class="results-badge" id="cmr-popup-results-badge">0 Results</div>
 
-                        <button type="submit" class="submit-btn" id="cmr-popup-search-btn">
+                        <button type="submit" class="submit-btn" id="cmr-popup-search-btn" aria-label="<?php esc_attr_e( 'Submit Search', 'quanto' ); ?>">
                             <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
                                 <path d="M20 20L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -465,7 +465,7 @@ function cmr_nav_search_shortcode($atts = array()) {
                         <div class="cmr-search-dropdown" id="cmr-popup-search-dropdown"></div>
                     </form>
 
-                    <button type="button" class="cmr-search-overlay-close" onclick="document.getElementById('cmr-search-overlay').classList.remove('active');">
+                    <button type="button" class="cmr-search-overlay-close" aria-label="<?php esc_attr_e( 'Close Search', 'quanto' ); ?>" onclick="document.getElementById('cmr-search-overlay').classList.remove('active');">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M18 6L6 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                             <path d="M6 6L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>

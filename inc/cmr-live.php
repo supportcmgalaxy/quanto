@@ -1552,7 +1552,7 @@ if ( ! function_exists( 'cmr_browse_recently_updated_shortcode' ) ) {
                 </div>
                 <div class="cmr-browse-search">
                     <input type="text" id="cmr-browse-search-input" placeholder="Search by name">
-                    <button id="cmr-browse-search-btn">
+                    <button id="cmr-browse-search-btn" aria-label="Search">
                         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     </button>
                 </div>

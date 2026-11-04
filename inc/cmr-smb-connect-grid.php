@@ -540,7 +540,7 @@ function cmr_smb_connect_grid_shortcode( $atts = array() ) {
             <div class="cmr-smbcgd-search">
                 <form id="cmr-smbcgd-search-form" onsubmit="return false;">
                     <input type="text" id="cmr-smbcgd-search-input" placeholder="Search by name">
-                    <button type="submit" class="cmr-smbcgd-search-btn">
+                    <button type="submit" class="cmr-smbcgd-search-btn" aria-label="Search">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     </button>
                 </form>

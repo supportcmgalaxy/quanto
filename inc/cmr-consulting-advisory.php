@@ -121,7 +121,7 @@ if ( ! function_exists( 'cmr_consulting_advisory_shortcode' ) ) {
                     <div class="intel-search">
                         <form id="intel-search-form" onsubmit="return false;" style="position: relative; display: flex; align-items: center; background: #fff; border: 1px solid #eaeaea; border-radius: 40px; padding: 4px 4px 4px 20px; width: 300px; height: 48px; box-sizing: border-box;">
                             <input type="text" id="intel-search-input" placeholder="Search by name" style="border: none; background: transparent; flex: 1; outline: none; font-size: 15px; color: #111; padding: 0;">
-                            <button type="submit" class="intel-search-btn" style="background: #5c24d3; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; color: #fff; width: 34px; height: 34px; border-radius: 50%; margin-left: 10px; flex-shrink: 0;">
+                            <button type="submit" class="intel-search-btn" aria-label="Search" style="background: #5c24d3; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; color: #fff; width: 34px; height: 34px; border-radius: 50%; margin-left: 10px; flex-shrink: 0;">
                                 <i class="fa-solid fa-magnifying-glass" style="font-size: 14px;"></i>
                             </button>
                         </form>

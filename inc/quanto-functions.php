@@ -1484,7 +1484,7 @@ function quanto_global_header_option() {
 
 
 
-                            echo '<button class="menuBar-toggle quanto-menu-toggle d-inline-block d-lg-none">';
+                            echo '<button class="menuBar-toggle quanto-menu-toggle d-inline-block d-lg-none" aria-label="' . esc_attr__( 'Toggle Mobile Menu', 'quanto' ) . '">';
 
 
 
@@ -1584,7 +1584,7 @@ if( ! function_exists( 'quanto_global_header' ) ){
 
 
 
-                    echo '<button class="quanto-menu-toggle mobile"><i class="ri-close-line"></i></button>';
+                    echo '<button class="quanto-menu-toggle mobile" aria-label="' . esc_attr__( 'Close Mobile Menu', 'quanto' ) . '"><i class="ri-close-line"></i></button>';
 
 
 

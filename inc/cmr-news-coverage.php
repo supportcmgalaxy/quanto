@@ -56,7 +56,7 @@ function cmr_media_coverage_shortcode( $atts ) {
             
             <div class="cmr-mc-search">
                 <input type="text" id="cmr-mc-search-input" placeholder="Search by name">
-                <button class="cmr-mc-search-btn" id="cmr-mc-search-btn">
+                <button class="cmr-mc-search-btn" id="cmr-mc-search-btn" aria-label="Search Coverage">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </button>
             </div>

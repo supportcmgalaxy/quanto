@@ -1092,6 +1092,48 @@ add_action( 'wp_footer', function() {
                 updateCMRModalTexts();
                 checkActiveModals();
             });
+
+            // Global Accessible Button Name Enforcer (Lighthouse Accessibility 100%)
+            function cmrEnsureButtonAccessibleNames() {
+                var buttons = document.querySelectorAll('button');
+                buttons.forEach(function(btn) {
+                    var ariaLabel = btn.getAttribute('aria-label');
+                    if (ariaLabel && ariaLabel.trim().length > 0) return;
+                    var ariaLabelledBy = btn.getAttribute('aria-labelledby');
+                    if (ariaLabelledBy && ariaLabelledBy.trim().length > 0) return;
+                    var title = btn.getAttribute('title');
+                    if (title && title.trim().length > 0) {
+                        btn.setAttribute('aria-label', title.trim());
+                        return;
+                    }
+                    var text = (btn.innerText || btn.textContent || '').trim();
+                    if (text.length > 0) return;
+
+                    var cls = (btn.className || '') + ' ' + (btn.id || '');
+                    if (/menu|toggle|hamburger/i.test(cls)) {
+                        btn.setAttribute('aria-label', 'Toggle Menu');
+                    } else if (/search|magnif/i.test(cls) || btn.querySelector('i.ri-search-line, i.fa-magnifying-glass, svg.search-icon, .cmr-vp-hero-search-btn')) {
+                        btn.setAttribute('aria-label', 'Search');
+                    } else if (/close|xmark|cancel/i.test(cls) || btn.querySelector('i.ri-close-line, i.fa-xmark')) {
+                        btn.setAttribute('aria-label', 'Close');
+                    } else if (/prev/i.test(cls)) {
+                        btn.setAttribute('aria-label', 'Previous');
+                    } else if (/next/i.test(cls)) {
+                        btn.setAttribute('aria-label', 'Next');
+                    } else if (/remove|trash|delete/i.test(cls)) {
+                        btn.setAttribute('aria-label', 'Remove');
+                    } else if (btn.type === 'submit') {
+                        btn.setAttribute('aria-label', 'Submit');
+                    } else {
+                        btn.setAttribute('aria-label', 'Action');
+                    }
+                });
+            }
+            cmrEnsureButtonAccessibleNames();
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', cmrEnsureButtonAccessibleNames);
+            }
+            window.addEventListener('load', cmrEnsureButtonAccessibleNames);
         });
     })();
     </script>

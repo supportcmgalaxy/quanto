@@ -629,7 +629,7 @@ function cmr_get_cart_html() {
                                 <div class="cmr-ci-price">
                                     <?php echo $price; ?>
                                 </div>
-                                <button class="cmr-ci-remove" data-cart-key="<?php echo esc_attr( $cart_item_key ); ?>">
+                                <button class="cmr-ci-remove" aria-label="Remove item" data-cart-key="<?php echo esc_attr( $cart_item_key ); ?>">
                                     <i class="fa-regular fa-trash-can"></i> Remove
                                 </button>
                             </div>

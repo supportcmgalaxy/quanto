@@ -262,7 +262,7 @@ if ( ! function_exists( 'cmr_research_reports_hero_shortcode' ) ) {
                         </div>
                         <input type="text" name="s" placeholder="Search..." value="<?php echo get_search_query(); ?>">
                         <input type="hidden" name="post_type" value="product" />
-                        <button type="submit" class="cmr-vp-hero-search-btn">
+                        <button type="submit" class="cmr-vp-hero-search-btn" aria-label="<?php esc_attr_e( 'Search Reports', 'quanto' ); ?>">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         </button>
                     </form>

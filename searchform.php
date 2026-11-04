@@ -106,7 +106,7 @@
     </div>
     <input name="s" required value="<?php echo esc_html( get_search_query() ); ?>" type="search" placeholder="Type here...">
     
-    <button type="button" class="clear-btn" onclick="this.previousElementSibling.value=''"><i class="ri-close-line"></i></button>
+    <button type="button" class="clear-btn" aria-label="<?php esc_attr_e( 'Clear Search Input', 'quanto' ); ?>" onclick="this.previousElementSibling.value=''"><i class="ri-close-line"></i></button>
     <div class="results-badge">17 Results</div>
-    <button type="submit" class="submit-btn"><i class="ri-search-line"></i></button>
+    <button type="submit" class="submit-btn" aria-label="<?php esc_attr_e( 'Submit Search', 'quanto' ); ?>"><i class="ri-search-line"></i></button>
 </form>

@@ -423,7 +423,7 @@ if ( ! function_exists( 'cmr_market_updates_hero_shortcode' ) ) {
                     <img src="https://cmrindia.com/wp-content/uploads/2026/06/cmrlogo-with-oly-c.svg" alt="CMR Logo" style="width: 24px; height: auto;">
                 </div>
                 <input type="text" name="s" placeholder="Search..." required>
-                <button type="submit" class="cmr-mu-hero-search-btn">
+                <button type="submit" class="cmr-mu-hero-search-btn" aria-label="<?php esc_attr_e( 'Search Market Updates', 'quanto' ); ?>">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </button>
             </form>

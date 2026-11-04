@@ -105,7 +105,7 @@ if ( ! function_exists( 'cmr_latest_insights_supply_shortcode' ) ) {
                     <div class="cmr-insights-search" style="margin: 0; flex: 0 0 auto;">
                         <form role="search" method="get" class="search-form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
                             <input type="search" class="search-field" placeholder="Search by name" value="<?php echo get_search_query(); ?>" name="s" />
-                            <button type="submit" class="search-submit">
+                            <button type="submit" class="search-submit" aria-label="Search">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                             </button>
                             <input type="hidden" name="post_type" value="cmr_news" />

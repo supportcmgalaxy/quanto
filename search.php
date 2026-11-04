@@ -323,7 +323,7 @@ $query = get_search_query();
                     <img src="https://cmrindia.com/wp-content/uploads/2026/06/cmrlogo-with-oly-c.svg" alt="CMR" style="height: 24px; width: auto;">
                 </div>
                 <input type="search" name="s" value="<?php echo esc_attr($query); ?>" placeholder="Search...">
-                <button type="submit"><i class="ri-search-line"></i></button>
+                <button type="submit" aria-label="<?php esc_attr_e( 'Submit Search', 'quanto' ); ?>"><i class="ri-search-line"></i></button>
             </form>
         </div>
 

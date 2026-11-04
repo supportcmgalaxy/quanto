@@ -454,7 +454,7 @@ if ( ! function_exists( 'cmr_latest_reports_shortcode' ) ) {
                     </div>
                     <div class="cmr-search-wrapper">
                         <input type="text" id="cmr-lr-search-<?php echo $uid; ?>" placeholder="Search by name">
-                        <button id="cmr-lr-search-btn-<?php echo $uid; ?>"><i class="fa-solid fa-magnifying-glass"></i></button>
+                        <button id="cmr-lr-search-btn-<?php echo $uid; ?>" aria-label="<?php esc_attr_e( 'Search Reports', 'quanto' ); ?>"><i class="fa-solid fa-magnifying-glass"></i></button>
                     </div>
                 </div>
             </div>
