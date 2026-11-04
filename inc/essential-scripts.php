@@ -317,6 +317,51 @@ add_filter( 'wp_resource_hints', function( $urls, $relation_type ) {
     return $urls;
 }, 10, 2 );
 
+// Fix Easy-Login WooCommerce Font: Force font-display: swap to eliminate render blocking
+add_action( 'wp_enqueue_scripts', function() {
+    wp_dequeue_style( 'xoo-el-fonts' );
+    wp_deregister_style( 'xoo-el-fonts' );
+
+    $plugin_fonts_url = content_url( '/plugins/easy-login-woocommerce/assets/fonts/' );
+    $easy_login_css = "@font-face {
+        font-family: 'Easy-Login';
+        src: url('{$plugin_fonts_url}Easy-Login.woff?oy4gsz') format('woff'),
+             url('{$plugin_fonts_url}Easy-Login.ttf?oy4gsz') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+    }
+    [class^=\"xoo-el-icon-\"], [class*=\" xoo-el-icon-\"] {
+        font-family: 'Easy-Login' !important;
+        speak: never;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    .xoo-el-icon-check-badge:before { content: \"\\e908\"; }
+    .xoo-el-icon-check-circle:before { content: \"\\e909\"; }
+    .xoo-el-icon-checkmark:before { content: \"\\e900\"; }
+    .xoo-el-icon-eye:before { content: \"\\e901\"; }
+    .xoo-el-icon-cross:before { content: \"\\e907\"; }
+    .xoo-el-icon-spinner8:before { content: \"\\e981\"; }
+    .xoo-el-icon-eye-blocked:before { content: \"\\e9d1\"; }
+    .xoo-el-icon-cancel-circle:before { content: \"\\ea0d\"; }
+    .xoo-el-icon-arrow-left2:before { content: \"\\ea40\"; }
+    .xoo-el-icon-user-plus:before { content: \"\\e904\"; }
+    .xoo-el-icon-user:before { content: \"\\e905\"; }
+    .xoo-el-icon-checkmark1:before { content: \"\\e906\"; }
+    .xoo-el-icon-notice:before { content: \"\\e902\"; }
+    .xoo-el-icon-notice1:before { content: \"\\e903\"; }";
+
+    wp_register_style( 'xoo-el-fonts', false );
+    wp_enqueue_style( 'xoo-el-fonts' );
+    wp_add_inline_style( 'xoo-el-fonts', $easy_login_css );
+}, 999 );
+
 /**
  * Lightweight Modal Trigger & Scroll Lock Controller + HTML Entity Decoder
  */
