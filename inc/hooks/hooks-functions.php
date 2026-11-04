@@ -1029,147 +1029,51 @@
     // Early footer CSS enqueue: runs during wp_enqueue_scripts so CSS lands in <head>
 
     if ( ! function_exists( 'quanto_enqueue_footer_css_early' ) ) {
-
         function quanto_enqueue_footer_css_early() {
-
             $footer_id = quanto_get_resolved_footer_id();
-
             if ( $footer_id ) {
-
                 quanto_enqueue_elementor_post_assets( $footer_id );
-
             }
 
-
-
-            // Also enqueue homepage CSS early on single posts, pages and products 
-
-            // so the pulled tail sections have their CSS loaded in <head>
-
-            if ( is_single() || is_page() || is_singular( 'product' ) || is_singular( 'post' ) ) {
-
+            // Also enqueue homepage CSS early only on front page or single posts
+            // (where homepage tail sections 'who we serve' & 'testimonials' are rendered)
+            if ( is_front_page() || is_home() || is_singular( 'post' ) ) {
                 $homepage_id = get_option( 'page_on_front' );
-
                 if ( ! $homepage_id ) {
-
                     $homepage_id = 14;
-
                 }
-
                 quanto_enqueue_elementor_post_assets( $homepage_id );
-
-
-
             }
 
-
-
-            // Enqueue Similar Reports page assets early
-
-            $target_page = get_page_by_path( 'similar-reports-by-industry' );
-
-            if ( ! $target_page ) {
-
-                $target_page = get_page_by_path( 'test' );
-
-            }
-
-            if ( $target_page ) {
-
-                quanto_enqueue_elementor_post_assets( $target_page->ID );
-
-            }
-
-            
-
-            // Enqueue ALL Quanto Builder template CSS early so shortcodes have CSS in <head>
-
-            $all_builder_posts = get_posts( array(
-
-                'post_type'      => array( 'quanto_tab_build', 'quanto_footer', 'quanto_header', 'quanto_off_canvas', 'quanto_offcanvas', 'quanto_archive', 'quanto_builder', 'quanto_single' ),
-
-                'posts_per_page' => -1,
-
-                'post_status'    => 'publish',
-
-            ) );
-
-            if ( ! empty( $all_builder_posts ) ) {
-
-                foreach ( $all_builder_posts as $bp ) {
-
-                    quanto_enqueue_elementor_post_assets( $bp->ID );
-
+            // Enqueue Similar Reports page assets early only on relevant single product / report pages
+            if ( is_singular( array( 'product', 'cmr_media_release', 'cmr_quarterly' ) ) ) {
+                $target_page = get_page_by_path( 'similar-reports-by-industry' );
+                if ( ! $target_page ) {
+                    $target_page = get_page_by_path( 'test' );
                 }
-
+                if ( $target_page ) {
+                    quanto_enqueue_elementor_post_assets( $target_page->ID );
+                }
             }
-
         }
-
     }
 
-
-
-    // Inject inline CSS for tab templates directly into <head> as a bulletproof fallback.
-
+    // Inject inline CSS for footer directly into <head> as a bulletproof fallback.
     // This runs after wp_enqueue_scripts but before body, so even if the external CSS
-
     // file is 404'd by CDN/server cache, the inline styles guarantee correct rendering.
-
     if ( ! function_exists( 'cmr_inject_tab_css_inline_in_head' ) ) {
-
         function cmr_inject_tab_css_inline_in_head() {
-
-            $all_builder_posts = get_posts( array(
-
-                'post_type'      => array( 'quanto_tab_build', 'quanto_footer', 'quanto_header', 'quanto_off_canvas', 'quanto_offcanvas', 'quanto_archive', 'quanto_builder', 'quanto_single' ),
-
-                'posts_per_page' => -1,
-
-                'post_status'    => 'publish',
-
-            ) );
-
-            if ( ! empty( $all_builder_posts ) ) {
-
-                foreach ( $all_builder_posts as $bp ) {
-
-                    $css = cmr_get_elementor_css_inline( $bp->ID );
-
-                    if ( ! empty( $css ) ) {
-
-                        echo '<style id="cmr-tab-' . esc_attr( $bp->ID ) . '-inline-css">' . $css . '</style>' . "\n";
-
-                    }
-
-                }
-
-            }
-
-
-
-            // Also inject footer CSS inline
-
+            // Inject footer CSS inline
             if ( function_exists( 'quanto_get_resolved_footer_id' ) ) {
-
                 $footer_id = quanto_get_resolved_footer_id();
-
                 if ( $footer_id ) {
-
                     $css = cmr_get_elementor_css_inline( $footer_id );
-
                     if ( ! empty( $css ) ) {
-
                         echo '<style id="cmr-footer-' . esc_attr( $footer_id ) . '-inline-css">' . $css . '</style>' . "\n";
-
                     }
-
                 }
-
             }
-
         }
-
     }
 
     add_action( 'wp_head', 'cmr_inject_tab_css_inline_in_head', 99 );

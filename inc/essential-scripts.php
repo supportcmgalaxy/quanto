@@ -38,8 +38,8 @@ function quanto_essential_scripts() {
     // Bootstrap Icons Style - Removed (0 icons used in the project, saves ~300KB font files)
     // wp_enqueue_style( 'bootstrap-icons-style', get_theme_file_uri( '/assets/css/bootstrap-icons.min.css' ), array(), '1.11.3' );
 
-    // magnific popup Style
-    wp_enqueue_style( 'magnific-popup-style', get_theme_file_uri( '/assets/css/magnific-popup.css' ), array(), $quanto_theme_ver );
+    // magnific popup Style - register instead of enqueue globally
+    wp_register_style( 'magnific-popup-style', get_theme_file_uri( '/assets/css/magnific-popup.css' ), array(), $quanto_theme_ver );
 
     // meanmenu min Style
     wp_enqueue_style( 'meanmenu-min-style', get_theme_file_uri( '/assets/css/meanmenu.min.css' ), array(), '2.0.7' );
@@ -57,8 +57,8 @@ function quanto_essential_scripts() {
     wp_enqueue_style( 'quanto-main-style', get_theme_file_uri('/assets/css/style.css') ,array(), $quanto_theme_ver );
     wp_enqueue_style( 'quanto-blog-style', get_theme_file_uri('/assets/css/blog-default.css') ,array(), $quanto_theme_ver );
     
-    // CMR News Style
-    wp_enqueue_style( 'cmr-news-style', get_theme_file_uri('/assets/css/cmr-news.css') ,array(), $quanto_theme_ver );
+    // CMR News Style - register so news/media components enqueue it when needed
+    wp_register_style( 'cmr-news-style', get_theme_file_uri('/assets/css/cmr-news.css') ,array(), $quanto_theme_ver );
     
     // CMR Common Modal Styles
     wp_enqueue_style( 'cmr-modal-style', get_theme_file_uri('/assets/css/cmr-modal.css'), array(), $quanto_theme_ver );
@@ -70,11 +70,10 @@ function quanto_essential_scripts() {
     wp_register_style( 'cmr-explore-sectors', get_theme_file_uri('/assets/css/cmr-explore-sectors.css'), array(), $quanto_theme_ver );
     wp_register_style( 'cmr-stay-updated', get_theme_file_uri('/assets/css/cmr-stay-updated.css'), array(), $quanto_theme_ver );
 
-    // Enqueue homepage Elementor CSS anywhere we inject homepage Elementor sections,
-    // including WooCommerce product pages rendered via custom template helpers.
-    // Skip on Cart, Checkout, and Account pages to prevent downloading 20+ unused stylesheets and blocking paint.
-    $is_ecommerce_cart_checkout = function_exists( 'is_cart' ) && ( is_cart() || is_checkout() || is_account_page() );
-    if ( ! $is_ecommerce_cart_checkout && ( is_home() || is_archive() || is_page() || is_singular( array( 'post', 'cmr_news', 'cmr_media_release', 'cmr_quarterly', 'product' ) ) ) && class_exists( '\\Elementor\\Core\\Files\\CSS\\Post' ) ) {
+    // Enqueue homepage Elementor CSS ONLY where homepage Elementor sections are actually rendered
+    // (Homepage and single blog posts via single.php tail sections).
+    $needs_homepage_css = ( is_front_page() || is_home() || is_singular( 'post' ) );
+    if ( $needs_homepage_css && class_exists( '\\Elementor\\Core\\Files\\CSS\\Post' ) ) {
         $homepage_id = get_option( 'page_on_front' );
         if ( ! $homepage_id ) {
             $homepage_id = 14; // Fallback
@@ -82,17 +81,6 @@ function quanto_essential_scripts() {
 
         if ( function_exists( 'quanto_enqueue_elementor_post_assets' ) ) {
             quanto_enqueue_elementor_post_assets( $homepage_id );
-            
-            // Only enqueue Similar Reports page assets on single report/product pages
-            if ( is_singular( array( 'product', 'cmr_media_release', 'cmr_quarterly' ) ) ) {
-                $target_page = get_page_by_path( 'similar-reports-by-industry' );
-                if ( ! $target_page ) {
-                    $target_page = get_page_by_path( 'test' );
-                }
-                if ( $target_page ) {
-                    quanto_enqueue_elementor_post_assets( $target_page->ID );
-                }
-            }
         } else {
             $upload_dir = wp_upload_dir();
             if ( ! empty( $upload_dir['basedir'] ) ) {
@@ -112,7 +100,6 @@ function quanto_essential_scripts() {
                 $css_file = new \Elementor\Core\Files\CSS\Post( $homepage_id );
                 $css_file->enqueue();
 
-                // 3. Enqueue responsive/optimized styles if present
                 $devices = array( 'desktop', 'laptop', 'tablet', 'mobile' );
                 
                 // base-*.css (responsive layout defaults)
@@ -132,6 +119,18 @@ function quanto_essential_scripts() {
                 }
             }
         }
+    }
+
+    // Only enqueue Similar Reports page assets on single report/product pages
+    if ( is_singular( array( 'product', 'cmr_media_release', 'cmr_quarterly' ) ) && function_exists( 'quanto_enqueue_elementor_post_assets' ) ) {
+        $target_page = get_page_by_path( 'similar-reports-by-industry' );
+        if ( ! $target_page ) {
+            $target_page = get_page_by_path( 'test' );
+        }
+        if ( $target_page ) {
+            quanto_enqueue_elementor_post_assets( $target_page->ID );
+        }
+    }
         
         // Aggressively force Elementor to load all core layout styles so the footer doesn't break
         if ( class_exists( '\Elementor\Plugin' ) ) {
@@ -147,9 +146,6 @@ function quanto_essential_scripts() {
             wp_enqueue_style( 'elementor-widget-divider' );
             wp_enqueue_style( 'elementor-widget-spacer' );
         }
-    }
-
-
 
     // Load Js
     
@@ -213,8 +209,9 @@ function quanto_optimize_homepage_performance() {
         wp_dequeue_script( 'jquery-mixitup' );
     }
 
-    // 2. Conditional WooCommerce asset loading: On Homepage, dequeue unused cart/product scripts
-    if ( ( is_front_page() || is_home() ) && class_exists( 'WooCommerce' ) ) {
+    // 2. Conditional WooCommerce asset loading: On pages that are not WooCommerce core/product pages, dequeue heavy default WooCommerce CSS & scripts
+    $is_wc_page = function_exists( 'is_woocommerce' ) && ( is_woocommerce() || is_cart() || is_checkout() || is_account_page() || is_singular( 'product' ) );
+    if ( ! $is_wc_page && class_exists( 'WooCommerce' ) ) {
         wp_dequeue_style( 'woocommerce-layout' );
         wp_dequeue_style( 'woocommerce-smallscreen' );
         wp_dequeue_style( 'woocommerce_frontend_styles' );
@@ -223,6 +220,14 @@ function quanto_optimize_homepage_performance() {
         wp_dequeue_script( 'flexslider' );
         wp_dequeue_script( 'photoswipe' );
         wp_dequeue_script( 'photoswipe-ui-default' );
+    }
+
+    // 2b. Dequeue Gutenberg block library CSS if page does not contain Gutenberg blocks
+    global $post;
+    if ( ! is_admin() && ( ! is_singular() || ( isset( $post->post_content ) && ! has_blocks( $post->post_content ) ) ) ) {
+        wp_dequeue_style( 'wp-block-library' );
+        wp_dequeue_style( 'wp-block-library-theme' );
+        wp_dequeue_style( 'wc-blocks-style' );
     }
 
     // 3. Conditional Cart/Checkout Optimization: Dequeue unused news, animations, & popup assets on Cart & Checkout
@@ -266,6 +271,15 @@ function quanto_defer_non_critical_scripts( $tag, $handle ) {
     return $tag;
 }
 
+// Remove jQuery Migrate on frontend to eliminate render-blocking JS request
+add_action( 'wp_default_scripts', function( $scripts ) {
+    if ( ! is_admin() && ! empty( $scripts->registered['jquery'] ) ) {
+        $script = $scripts->registered['jquery'];
+        if ( ! empty( $script->deps ) ) {
+            $script->deps = array_diff( $script->deps, array( 'jquery-migrate' ) );
+        }
+    }
+} );
 
 function quanto_block_editor_assets( ) {
     // Add custom fonts to Gutenberg editor

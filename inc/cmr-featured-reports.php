@@ -417,7 +417,7 @@ if ( ! function_exists( 'cmr_featured_reports_shortcode' ) ) {
                 <div class="cmr-fr-card cmr-fr-large" onclick="if(!event.target.closest('a.button, .add_to_cart_button, button, input')) { window.location.href='<?php echo esc_url( $product->get_permalink() ); ?>'; }">
                     <div class="cmr-fr-image-wrap">
                         <?php if ( function_exists( 'cmr_render_product_badge' ) ) { cmr_render_product_badge( $product, 'cmr-fr-badge' ); } ?>
-                        <img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $product->get_name() ); ?>">
+                        <img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $product->get_name() ); ?>" fetchpriority="high" loading="eager" decoding="async">
                     </div>
                     <div class="cmr-fr-large-content">
                         <div class="cmr-fr-large-bottom-wrap">
@@ -476,7 +476,7 @@ if ( ! function_exists( 'cmr_featured_reports_shortcode' ) ) {
                             <div class="cmr-fr-card cmr-fr-small" onclick="if(!event.target.closest('a.button, .add_to_cart_button, button, input')) { window.location.href='<?php echo esc_url( $product->get_permalink() ); ?>'; }">
                                 <div class="cmr-fr-image-wrap">
                                     <?php if ( function_exists( 'cmr_render_product_badge' ) ) { cmr_render_product_badge( $product, 'cmr-fr-badge' ); } ?>
-                                    <img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $product->get_name() ); ?>">
+                                    <img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $product->get_name() ); ?>" loading="lazy" decoding="async">
                                 </div>
                                 <div class="cmr-fr-small-content">
                                     <div class="cmr-fr-category">&mdash; <?php echo esc_html( $cat_name ); ?></div>

@@ -704,7 +704,7 @@ if ( ! function_exists( 'cmr_load_reports_ajax' ) ) {
             <div class="cmr-lr-card">
                 <div class="cmr-lr-image-wrap">
                     <?php if ( function_exists( 'cmr_render_product_badge' ) ) { cmr_render_product_badge( $product, 'cmr-lr-badge' ); } ?>
-                    <img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $product->get_name() ); ?>">
+                    <img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $product->get_name() ); ?>" loading="lazy" decoding="async">
                 </div>
                 <div class="cmr-lr-content">
                     <div class="cmr-lr-category">&mdash; <?php echo esc_html( $cat_name ); ?></div>

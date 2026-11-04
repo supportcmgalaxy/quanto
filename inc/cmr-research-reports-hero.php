@@ -21,7 +21,7 @@ if ( ! function_exists( 'cmr_research_reports_hero_shortcode' ) ) {
         <style>
             .cmr-research-hero {
                 background-color: #0a0a0a;
-                background-image: url('<?php echo esc_url($atts['bg_image']); ?>');
+                background-image: radial-gradient(circle at 50% 30%, rgba(30, 40, 70, 0.5) 0%, rgba(10, 10, 10, 0.95) 100%), url('<?php echo esc_url($atts['bg_image']); ?>');
                 background-size: cover;
                 background-position: center;
                 background-repeat: no-repeat;
