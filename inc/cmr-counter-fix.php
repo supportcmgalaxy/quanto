@@ -35,54 +35,120 @@ function cmr_fix_counter_br_script() {
             });
         }
 
-        // Bulletproof Odometer Counter Animator (IntersectionObserver)
-        function initOdometerCounterAnimation() {
-            var $counterItems = $('.counter-item');
-            if (!$counterItems.length) return;
+        // Real-Time Smooth Count-Up Engine (rAF + IntersectionObserver)
+        function initRealtimeCounterAnimation() {
+            var counterNodes = document.querySelectorAll('.counter-item, [data-odometer-final], .odometer');
+            if (!counterNodes.length) return;
 
-            function triggerSingleCounter(el) {
-                var $el = $(el);
-                var $odometers = $el.hasClass('odometer') ? $el : $el.find('.odometer');
-                $odometers.each(function() {
-                    var od = this;
-                    if (od.getAttribute('data-cmr-done')) return;
-                    var finalVal = od.getAttribute('data-odometer-final');
+            var targets = [];
+            counterNodes.forEach(function(node) {
+                if (node.hasAttribute('data-odometer-final')) {
+                    if (targets.indexOf(node) === -1) targets.push(node);
+                } else {
+                    var inner = node.querySelectorAll('[data-odometer-final], .odometer');
+                    inner.forEach(function(sub) {
+                        if (targets.indexOf(sub) === -1) targets.push(sub);
+                    });
+                }
+            });
+
+            // Set clean initial 0 state
+            targets.forEach(function(el) {
+                if (!el.getAttribute('data-cmr-counting') && !el.getAttribute('data-cmr-done')) {
+                    var finalVal = el.getAttribute('data-odometer-final');
                     if (finalVal) {
-                        od.setAttribute('data-cmr-done', 'true');
-                        // Clean numeric value for odometer rolling
-                        var cleanNum = finalVal.replace(/[^\d.,]/g, '').trim();
-                        if (window.Odometer && od.odometer) {
-                            od.odometer.update(cleanNum);
-                        } else {
-                            od.innerHTML = cleanNum;
-                        }
+                        el.innerHTML = '0';
                     }
-                });
+                }
+            });
+
+            function startCounting(el) {
+                if (el.getAttribute('data-cmr-counting') === 'true' || el.getAttribute('data-cmr-done') === 'true') {
+                    return;
+                }
+                el.setAttribute('data-cmr-counting', 'true');
+
+                var rawFinal = el.getAttribute('data-odometer-final') || el.innerText || '';
+                var cleanNumberStr = rawFinal.replace(/[^\d.,]/g, '').trim();
+                if (!cleanNumberStr) return;
+
+                var hasComma = cleanNumberStr.indexOf(',') !== -1;
+                var targetNumber = parseFloat(cleanNumberStr.replace(/,/g, ''));
+                if (isNaN(targetNumber) || targetNumber <= 0) {
+                    el.innerHTML = cleanNumberStr;
+                    el.setAttribute('data-cmr-done', 'true');
+                    return;
+                }
+
+                // 1.4s for smaller numbers, 1.8s for larger numbers
+                var duration = targetNumber > 100 ? 1800 : 1400;
+                var startTime = null;
+
+                function tick(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    var elapsed = timestamp - startTime;
+                    var progress = Math.min(elapsed / duration, 1);
+
+                    // Cubic ease-out: starts fast, slows down gently into final number
+                    var ease = 1 - Math.pow(1 - progress, 3);
+                    var current = Math.floor(ease * targetNumber);
+
+                    var displayStr = hasComma ? current.toLocaleString('en-US') : current.toString();
+                    el.innerHTML = displayStr;
+
+                    if (progress < 1) {
+                        window.requestAnimationFrame(tick);
+                    } else {
+                        var finalDisplay = hasComma ? Math.floor(targetNumber).toLocaleString('en-US') : Math.floor(targetNumber).toString();
+                        el.innerHTML = finalDisplay;
+                        el.setAttribute('data-cmr-done', 'true');
+                    }
+                }
+
+                window.requestAnimationFrame(tick);
+            }
+
+            function isElementInView(el) {
+                var rect = el.getBoundingClientRect();
+                return (
+                    rect.top < (window.innerHeight || document.documentElement.clientHeight) + 50 &&
+                    rect.bottom > 0
+                );
             }
 
             if ('IntersectionObserver' in window) {
                 var observer = new IntersectionObserver(function(entries) {
                     entries.forEach(function(entry) {
                         if (entry.isIntersecting) {
-                            triggerSingleCounter(entry.target);
+                            startCounting(entry.target);
                             observer.unobserve(entry.target);
                         }
                     });
-                }, { threshold: 0.1 });
-
-                $counterItems.each(function() {
-                    observer.observe(this);
+                }, {
+                    threshold: 0.05,
+                    rootMargin: '0px 0px 50px 0px'
                 });
-            } else {
-                $counterItems.each(function() {
-                    triggerSingleCounter(this);
+
+                targets.forEach(function(el) {
+                    observer.observe(el);
                 });
             }
+
+            function checkVisibleNow() {
+                targets.forEach(function(el) {
+                    if (isElementInView(el)) {
+                        startCounting(el);
+                    }
+                });
+            }
+
+            checkVisibleNow();
+            window.addEventListener('scroll', checkVisibleNow, { passive: true });
         }
 
         function runAllCounterFixes() {
             decodeCounterBr();
-            initOdometerCounterAnimation();
+            initRealtimeCounterAnimation();
         }
 
         $(document).ready(runAllCounterFixes);
