@@ -34,16 +34,67 @@ function cmr_fix_counter_br_script() {
                 }
             });
         }
-        $(document).ready(decodeCounterBr);
-        $(window).on('load', decodeCounterBr);
+
+        // Bulletproof Odometer Counter Animator (IntersectionObserver)
+        function initOdometerCounterAnimation() {
+            var $counterItems = $('.counter-item');
+            if (!$counterItems.length) return;
+
+            function triggerSingleCounter(el) {
+                var $el = $(el);
+                var $odometers = $el.hasClass('odometer') ? $el : $el.find('.odometer');
+                $odometers.each(function() {
+                    var od = this;
+                    if (od.getAttribute('data-cmr-done')) return;
+                    var finalVal = od.getAttribute('data-odometer-final');
+                    if (finalVal) {
+                        od.setAttribute('data-cmr-done', 'true');
+                        // Clean numeric value for odometer rolling
+                        var cleanNum = finalVal.replace(/[^\d.,]/g, '').trim();
+                        if (window.Odometer && od.odometer) {
+                            od.odometer.update(cleanNum);
+                        } else {
+                            od.innerHTML = cleanNum;
+                        }
+                    }
+                });
+            }
+
+            if ('IntersectionObserver' in window) {
+                var observer = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            triggerSingleCounter(entry.target);
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                $counterItems.each(function() {
+                    observer.observe(this);
+                });
+            } else {
+                $counterItems.each(function() {
+                    triggerSingleCounter(this);
+                });
+            }
+        }
+
+        function runAllCounterFixes() {
+            decodeCounterBr();
+            initOdometerCounterAnimation();
+        }
+
+        $(document).ready(runAllCounterFixes);
+        $(window).on('load', runAllCounterFixes);
         // Elementor live editor hook
         $(window).on('elementor/frontend/init', function() {
             if (window.elementorFrontend && elementorFrontend.hooks) {
                 elementorFrontend.hooks.addAction('frontend/element_ready/quanto_counter.default', function($scope) {
-                    decodeCounterBr();
+                    runAllCounterFixes();
                 });
                 elementorFrontend.hooks.addAction('frontend/element_ready/global', function() {
-                    decodeCounterBr();
+                    runAllCounterFixes();
                 });
             }
         });

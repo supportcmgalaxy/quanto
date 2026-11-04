@@ -255,8 +255,6 @@ function quanto_defer_non_critical_scripts( $tag, $handle ) {
     }
 
     $defer_handles = array(
-        'odometer-min-script',
-        'viewport-jquery-script',
         'cmr-cart-badge-sync',
         'swiper-bundle',
         'bootstrap-bundle',
