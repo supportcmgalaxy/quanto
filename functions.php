@@ -1024,28 +1024,126 @@ add_action('wp_head', function() {
             word-spacing: normal !important;
         }
 
-        /* 3. About Us Hero: Fix huge blank gap and eliminate layout shift */
-        .page-id-22037 .elementor-element-c432827,
-        .elementor-page-22037 .elementor-element-c432827,
-        .elementor .e-c432827-aa0a355 {
-            margin-block-start: 24px !important;
-            padding-block-start: 0 !important;
-            margin-block-end: 40px !important;
-            min-height: auto !important;
+        /* 3. Desktop Header Menu Buttons (Accessible Replacement for Non-link Anchors) */
+        .main-menu button.cmr-nav-btn,
+        .main-menu > ul > li > button.cmr-nav-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            white-space: nowrap !important;
+            font-size: 15px !important;
+            font-weight: 500 !important;
+            font-family: inherit !important;
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            cursor: pointer !important;
+            letter-spacing: -0.18px !important;
+            line-height: 144.444% !important;
+            padding: 32px 0 !important;
+            margin: 0 !important;
+            -webkit-appearance: none !important;
+            appearance: none !important;
+            vertical-align: middle !important;
+            box-shadow: none !important;
+            color: inherit !important;
         }
-        @media (max-width: 767px) {
-            .page-id-22037 .elementor-element-c432827,
-            .elementor-page-22037 .elementor-element-c432827,
-            .elementor .e-c432827-aa0a355 {
-                margin-block-start: 16px !important;
-                padding-block-start: 0 !important;
-                margin-block-end: 20px !important;
-                min-height: auto !important;
-            }
+
+        .main-menu > ul > li > button.cmr-nav-btn::before {
+            content: "" !important;
+            display: inline-block !important;
+            width: 4.5px !important;
+            height: 4.5px !important;
+            min-width: 4.5px !important;
+            border-radius: 50% !important;
+            background-color: currentColor !important;
+            margin-right: 6px !important;
+            flex-shrink: 0 !important;
+        }
+
+        .elementor-element-640d6ce .main-menu button.cmr-nav-btn,
+        .blog-header-wrapper .main-menu button.cmr-nav-btn {
+            color: #000000 !important;
+        }
+        .elementor-element-74164a6 .main-menu button.cmr-nav-btn,
+        .quanto-header.dark-header .main-menu button.cmr-nav-btn {
+            color: #ffffff !important;
         }
     </style>
     <?php
 });
+
+/**
+ * Convert desktop header menu items with no URL to accessible button elements
+ */
+add_filter('walker_nav_menu_start_el', function($item_output, $item, $depth, $args) {
+    $dropdown_titles = [
+        'who we are',
+        'what we do',
+        'who we serve',
+        'what we think',
+        'cmr connect',
+        'newsroom',
+    ];
+
+    $raw_title = strip_tags($item->title);
+    $title_clean = strtolower(trim($raw_title));
+
+    if (in_array($title_clean, $dropdown_titles, true)) {
+        $url = trim($item->url);
+        if (empty($url) || $url === '#' || strpos($url, 'javascript:') !== false) {
+            $label = esc_attr(trim($raw_title));
+            $item_output = preg_replace(
+                '/<a(\s+[^>]*)?>/i',
+                '<button type="button" class="elementor-item cmr-nav-btn" aria-label="' . $label . '"$1>',
+                $item_output,
+                1
+            );
+            $item_output = preg_replace('/(\s+)href=(["\'][^"\']*["\'])/i', '', $item_output);
+            $item_output = preg_replace('/<\/a>/i', '</button>', $item_output);
+        }
+    }
+    return $item_output;
+}, 20, 4);
+
+/**
+ * Client-side guarantee: swap any static/cached anchor elements to accessible buttons with aria-label
+ */
+add_action('wp_footer', function() {
+    ?>
+    <script id="cmr-desktop-nav-buttons">
+    (function() {
+        var dropdownTitles = ['who we are', 'what we do', 'who we serve', 'what we think', 'cmr connect', 'newsroom'];
+
+        function convertNavAnchorsToButtons() {
+            var links = document.querySelectorAll('.main-menu > ul > li > a, .quanto-mobile-menu > ul > li > a, .elementor-nav-menu > li > a');
+            links.forEach(function(link) {
+                var text = (link.textContent || '').trim().toLowerCase();
+                if (dropdownTitles.indexOf(text) !== -1) {
+                    var href = link.getAttribute('href');
+                    if (!href || href === '#' || href.indexOf('javascript:') !== -1) {
+                        var btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = (link.className ? link.className + ' ' : '') + 'elementor-item cmr-nav-btn';
+                        btn.setAttribute('aria-label', link.textContent.trim());
+                        btn.innerHTML = link.innerHTML;
+                        link.parentNode.replaceChild(btn, link);
+                    }
+                }
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', convertNavAnchorsToButtons);
+        } else {
+            convertNavAnchorsToButtons();
+        }
+        window.addEventListener('load', convertNavAnchorsToButtons);
+        setTimeout(convertNavAnchorsToButtons, 200);
+        setTimeout(convertNavAnchorsToButtons, 800);
+    })();
+    </script>
+    <?php
+}, 1);
 
 // Add custom class to CMR LIVE badge element to avoid Elementor CSS conflicts
 add_action('wp_footer', function() {

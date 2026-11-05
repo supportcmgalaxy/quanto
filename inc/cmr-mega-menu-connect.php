@@ -479,7 +479,7 @@ function cmr_inject_connect_mega_menu() {
 
             function injectMegaMenu() {
                 var found = false;
-                var navLinks = document.querySelectorAll('.menu-item > a, .elementor-item');
+                var navLinks = document.querySelectorAll('.menu-item > a, .menu-item > button, .elementor-item');
                 navLinks.forEach(function(link) {
                     var text = link.innerText.trim().toLowerCase();
                     if (text === 'connect' || text === 'cmr connect') {
@@ -513,7 +513,7 @@ function cmr_inject_connect_mega_menu() {
 
             document.addEventListener('click', function(e) {
                 if (window.innerWidth <= 1024) {
-                    var link = e.target.closest('a');
+                    var link = e.target.closest('a, button');
                     if (link) {
                         var text = link.innerText.trim().toLowerCase();
                         if (text === 'connect' || text === 'cmr connect') {

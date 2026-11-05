@@ -11371,26 +11371,53 @@ ul.key-parts-list li {
   transform: translate(2px, -2px) !important;
 }
 
-/* About Us Hero: Fix excessive blank gap and eliminate layout shift */
-.page-id-22037 .elementor-element-c432827,
-.elementor-page-22037 .elementor-element-c432827,
-.elementor .e-c432827-aa0a355 {
-  margin-block-start: 24px !important;
-  padding-block-start: 0 !important;
-  margin-block-end: 40px !important;
-  min-height: auto !important;
+/* Desktop Header Menu Buttons (Accessible Replacement for Non-link Anchors) */
+.main-menu button.cmr-nav-btn,
+.main-menu > ul > li > button.cmr-nav-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  font-family: inherit !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  cursor: pointer !important;
+  letter-spacing: -0.18px !important;
+  line-height: 144.444% !important;
+  padding: 32px 0 !important;
+  margin: 0 !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  vertical-align: middle !important;
+  box-shadow: none !important;
+  color: inherit !important;
 }
 
-@media (max-width: 767px) {
-  .page-id-22037 .elementor-element-c432827,
-  .elementor-page-22037 .elementor-element-c432827,
-  .elementor .e-c432827-aa0a355 {
-    margin-block-start: 16px !important;
-    padding-block-start: 0 !important;
-    margin-block-end: 20px !important;
-    min-height: auto !important;
-  }
+.main-menu > ul > li > button.cmr-nav-btn::before {
+  content: "" !important;
+  display: inline-block !important;
+  width: 4.5px !important;
+  height: 4.5px !important;
+  min-width: 4.5px !important;
+  border-radius: 50% !important;
+  background-color: currentColor !important;
+  margin-right: 6px !important;
+  flex-shrink: 0 !important;
 }
+
+.elementor-element-640d6ce .main-menu button.cmr-nav-btn,
+.blog-header-wrapper .main-menu button.cmr-nav-btn {
+  color: #000000 !important;
+}
+
+.elementor-element-74164a6 .main-menu button.cmr-nav-btn,
+.quanto-header.dark-header .main-menu button.cmr-nav-btn {
+  color: #ffffff !important;
+}
+
+
 
 
 
