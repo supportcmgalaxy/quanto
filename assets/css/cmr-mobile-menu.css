@@ -91,12 +91,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
+    background: none;
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
     padding: 20px 24px;
     font-size: 18px;
     font-weight: 600;
     color: #111;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
     text-decoration: none;
-    border-bottom: 1px solid #f0f0f0;
 }
 
 .cmr-mobile-nav-item svg {

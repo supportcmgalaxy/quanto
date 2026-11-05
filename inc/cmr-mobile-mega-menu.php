@@ -49,8 +49,11 @@ function cmr_inject_mobile_mega_menu() {
     .cmr-mobile-nav-panel-sub.cmr-active { transform: translateX(0); }
     .cmr-mobile-nav-item {
         display: flex; justify-content: space-between; align-items: center;
+        width: 100%;
+        background: none; border: none; border-bottom: 1px solid #f0f0f0;
         padding: 20px 24px; font-size: 18px; font-weight: 600; color: #111;
-        text-decoration: none; border-bottom: 1px solid #f0f0f0;
+        text-align: left; cursor: pointer; font-family: inherit;
+        text-decoration: none;
         transition: color 0.2s ease;
         -webkit-tap-highlight-color: transparent;
     }
@@ -241,30 +244,30 @@ function cmr_inject_mobile_mega_menu() {
             
             <!-- Main Menu List -->
             <div class="cmr-mobile-nav-panel cmr-mobile-nav-panel-main cmr-active" id="cmrPanelMain">
-                <a href="javascript:void(0)" class="cmr-mobile-nav-item" data-target="panel-who-we-are">
+                <button type="button" class="cmr-mobile-nav-item" data-target="panel-who-we-are">
                     Who we are
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </a>
-                <a href="javascript:void(0)" class="cmr-mobile-nav-item" data-target="panel-what-we-do">
+                </button>
+                <button type="button" class="cmr-mobile-nav-item" data-target="panel-what-we-do">
                     What we do
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </a>
-                <a href="javascript:void(0)" class="cmr-mobile-nav-item" data-target="panel-who-we-serve">
+                </button>
+                <button type="button" class="cmr-mobile-nav-item" data-target="panel-who-we-serve">
                     Who we serve
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </a>
-                <a href="javascript:void(0)" class="cmr-mobile-nav-item" data-target="panel-what-we-think">
+                </button>
+                <button type="button" class="cmr-mobile-nav-item" data-target="panel-what-we-think">
                     What we think
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </a>
-                <a href="javascript:void(0)" class="cmr-mobile-nav-item" data-target="panel-connect">
+                </button>
+                <button type="button" class="cmr-mobile-nav-item" data-target="panel-connect">
                     CMR Connect
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </a>
-                <a href="javascript:void(0)" class="cmr-mobile-nav-item" data-target="panel-newsroom">
+                </button>
+                <button type="button" class="cmr-mobile-nav-item" data-target="panel-newsroom">
                     Newsroom
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </a>
+                </button>
             </div>
 
             <!-- Sub Panel: Who We Are -->

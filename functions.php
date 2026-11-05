@@ -1023,6 +1023,26 @@ add_action('wp_head', function() {
             letter-spacing: -0.5px !important;
             word-spacing: normal !important;
         }
+
+        /* 3. About Us Hero: Fix huge blank gap and eliminate layout shift */
+        .page-id-22037 .elementor-element-c432827,
+        .elementor-page-22037 .elementor-element-c432827,
+        .elementor .e-c432827-aa0a355 {
+            margin-block-start: 24px !important;
+            padding-block-start: 0 !important;
+            margin-block-end: 40px !important;
+            min-height: auto !important;
+        }
+        @media (max-width: 767px) {
+            .page-id-22037 .elementor-element-c432827,
+            .elementor-page-22037 .elementor-element-c432827,
+            .elementor .e-c432827-aa0a355 {
+                margin-block-start: 16px !important;
+                padding-block-start: 0 !important;
+                margin-block-end: 20px !important;
+                min-height: auto !important;
+            }
+        }
     </style>
     <?php
 });

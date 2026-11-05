@@ -212,14 +212,23 @@ function quanto_optimize_homepage_performance() {
     // 2. Conditional WooCommerce asset loading: On pages that are not WooCommerce core/product pages, dequeue heavy default WooCommerce CSS & scripts
     $is_wc_page = function_exists( 'is_woocommerce' ) && ( is_woocommerce() || is_cart() || is_checkout() || is_account_page() || is_singular( 'product' ) );
     if ( ! $is_wc_page && class_exists( 'WooCommerce' ) ) {
+        wp_dequeue_style( 'woocommerce-general' );
         wp_dequeue_style( 'woocommerce-layout' );
         wp_dequeue_style( 'woocommerce-smallscreen' );
         wp_dequeue_style( 'woocommerce_frontend_styles' );
+        wp_dequeue_style( 'wc-blocks-style' );
         wp_dequeue_script( 'wc-add-to-cart' );
         wp_dequeue_script( 'zoom' );
         wp_dequeue_script( 'flexslider' );
         wp_dequeue_script( 'photoswipe' );
         wp_dequeue_script( 'photoswipe-ui-default' );
+    }
+
+    // 2a. Dequeue unneeded media & industry stylesheets on static pages (like About Us)
+    if ( ! is_singular( 'post' ) && ! is_page_template( 'template-news.php' ) && ! is_category() ) {
+        wp_dequeue_style( 'cmr-industry-intelligence' );
+        wp_dequeue_style( 'mediaelement' );
+        wp_dequeue_style( 'wp-mediaelement' );
     }
 
     // 2b. Dequeue Gutenberg block library CSS if page does not contain Gutenberg blocks
