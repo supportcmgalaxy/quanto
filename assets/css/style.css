@@ -11447,22 +11447,49 @@ ul.key-parts-list li {
   color: #6241ca !important;
 }
 
-/* About Us Hero */
+/* About Us Hero Clean Gaping & Alignment */
 .page-id-22037 .elementor-element-c432827,
 .elementor-page-22037 .elementor-element-c432827,
 .elementor .e-c432827-aa0a355 {
-  padding-block-start: 3rem !important;
-  margin-block-end: 40px !important;
+  margin-block-start: 7rem !important;
+  padding-block-start: 2rem !important;
+  padding-block-end: 0rem !important;
+  margin-block-end: 45px !important;
   min-height: auto !important;
 }
 
+/* Subtitle gap under About Us H1 */
+.page-id-22037 .e-dbed1d7-a65930c,
+.elementor-page-22037 .e-dbed1d7-a65930c,
+.elementor .e-dbed1d7-a65930c {
+  margin-block-start: 1rem !important;
+}
+
+/* Tablet breakpoint (768px - 1024px) where header wraps to two lines */
+@media (max-width: 1024px) and (min-width: 768px) {
+  .page-id-22037 .elementor-element-c432827,
+  .elementor-page-22037 .elementor-element-c432827,
+  .elementor .e-c432827-aa0a355 {
+    margin-block-start: 10.5rem !important;
+    padding-block-start: 1.5rem !important;
+    margin-block-end: 35px !important;
+  }
+}
+
+/* Mobile (< 768px) */
 @media (max-width: 767px) {
   .page-id-22037 .elementor-element-c432827,
   .elementor-page-22037 .elementor-element-c432827,
   .elementor .e-c432827-aa0a355 {
-    padding-block-start: 2rem !important;
-    margin-block-end: 20px !important;
+    margin-block-start: 1.25rem !important;
+    padding-block-start: 1.5rem !important;
+    margin-block-end: 25px !important;
     min-height: auto !important;
+  }
+  .page-id-22037 .e-dbed1d7-a65930c,
+  .elementor-page-22037 .e-dbed1d7-a65930c,
+  .elementor .e-dbed1d7-a65930c {
+    margin-block-start: 0.5rem !important;
   }
 }
 
