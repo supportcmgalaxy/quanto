@@ -11407,14 +11407,44 @@ ul.key-parts-list li {
   flex-shrink: 0 !important;
 }
 
-.elementor-element-640d6ce .main-menu button.cmr-nav-btn,
-.blog-header-wrapper .main-menu button.cmr-nav-btn {
+/* 1. Base / Default: Black for all navigation buttons */
+.main-menu button.cmr-nav-btn {
   color: #000000 !important;
 }
 
+/* 2. Top of Homepage (transparent dark header BEFORE scroll): White text */
 .elementor-element-74164a6 .main-menu button.cmr-nav-btn,
 .quanto-header.dark-header .main-menu button.cmr-nav-btn {
   color: #ffffff !important;
+}
+
+/* 3. Scrolled Sticky Header on homepage: High specificity rule to turn text Black */
+.mas-sticky-header .elementor-element-74164a6 .main-menu button.cmr-nav-btn,
+.mas-sticky-header .main-menu button.cmr-nav-btn,
+.mas-sticky-header .menu-item button.cmr-nav-btn,
+.sticky-menu .elementor-element-74164a6 .main-menu button.cmr-nav-btn,
+.sticky-menu .main-menu button.cmr-nav-btn {
+  color: #000000 !important;
+}
+
+/* 4. Hover states */
+/* Top of Homepage hover: light gray */
+.elementor-element-74164a6 .main-menu button.cmr-nav-btn:hover {
+  color: #d1d1d1 !important;
+}
+
+/* Sticky Header or Inner pages hover: Purple (#6241ca) */
+.main-menu button.cmr-nav-btn:hover,
+.mas-sticky-header .elementor-element-74164a6 .main-menu button.cmr-nav-btn:hover,
+.mas-sticky-header .main-menu button.cmr-nav-btn:hover,
+.elementor-element-640d6ce .main-menu button.cmr-nav-btn:hover,
+.cmr-has-mega-menu:hover > button.cmr-nav-btn,
+.cmr-has-mega-menu-do:hover > button.cmr-nav-btn,
+.cmr-has-mega-menu-serve:hover > button.cmr-nav-btn,
+.cmr-has-mega-menu-think:hover > button.cmr-nav-btn,
+.cmr-has-mega-menu-newsroom:hover > button.cmr-nav-btn,
+.cmr-has-mega-menu-connect:hover > button.cmr-nav-btn {
+  color: #6241ca !important;
 }
 
 /* About Us Hero */
