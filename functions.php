@@ -1024,6 +1024,24 @@ add_action('wp_head', function() {
             word-spacing: normal !important;
         }
 
+        /* About Us Hero */
+        .page-id-22037 .elementor-element-c432827,
+        .elementor-page-22037 .elementor-element-c432827,
+        .elementor .e-c432827-aa0a355 {
+            padding-block-start: 3rem !important;
+            margin-block-end: 40px !important;
+            min-height: auto !important;
+        }
+        @media (max-width: 767px) {
+            .page-id-22037 .elementor-element-c432827,
+            .elementor-page-22037 .elementor-element-c432827,
+            .elementor .e-c432827-aa0a355 {
+                padding-block-start: 2rem !important;
+                margin-block-end: 20px !important;
+                min-height: auto !important;
+            }
+        }
+
         /* 3. Desktop Header Menu Buttons (Accessible Replacement for Non-link Anchors) */
         .main-menu button.cmr-nav-btn,
         .main-menu > ul > li > button.cmr-nav-btn {
