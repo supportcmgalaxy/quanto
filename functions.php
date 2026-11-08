@@ -6650,4 +6650,30 @@ function cmr_enable_team_br_tags_js() {
     <?php
 }
 
+/**
+ * Performance Optimization:
+ * Strip heavy video tags from hidden legacy widgets (saves ~46 MB payload on homepage).
+ */
+add_action('template_redirect', function() {
+    if (is_admin()) return;
+    ob_start(function($html) {
+        if (empty($html) || strpos($html, '<video') === false) {
+            return $html;
+        }
+
+        // Remove <video> elements from completely hidden widgets (hidden on desktop + tablet + mobile)
+        return preg_replace_callback('/<div\b[^>]*class="[^"]*elementor-hidden-(?:desktop|mobile|tablet)[^"]*"[^>]*>.*?<\/div>/is', function($m) {
+            if (
+                strpos($m[0], 'elementor-hidden-desktop') !== false &&
+                strpos($m[0], 'elementor-hidden-tablet') !== false &&
+                strpos($m[0], 'elementor-hidden-mobile') !== false
+            ) {
+                return preg_replace('/<video\b[^>]*>.*?<\/video>/is', '', $m[0]);
+            }
+            return $m[0];
+        }, $html);
+    });
+});
+
+
 

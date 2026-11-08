@@ -670,28 +670,38 @@ function cmr_hero_banner_shortcode($atts) {
         }
       }
 
+      var alignRaf = null;
+      function requestAlign() {
+        if (alignRaf) return;
+        alignRaf = requestAnimationFrame(function() {
+          alignRaf = null;
+          alignHeroWithHeader();
+        });
+      }
+
       if (document.readyState === 'interactive' || document.readyState === 'complete') {
         initHeroBannerSlider();
-        alignHeroWithHeader();
+        requestAlign();
       } else {
         document.addEventListener('DOMContentLoaded', function() {
           initHeroBannerSlider();
-          alignHeroWithHeader();
+          requestAlign();
         });
       }
       window.addEventListener('load', function() {
         initHeroBannerSlider();
-        alignHeroWithHeader();
+        requestAlign();
       });
-      window.addEventListener('resize', alignHeroWithHeader);
+      window.addEventListener('resize', requestAlign);
 
       if (window.ResizeObserver) {
-        var ro = new ResizeObserver(function() {
-          alignHeroWithHeader();
-        });
-        ro.observe(document.body);
-        var headerEl = document.querySelector('#quanto-header-desktop, .header');
-        if (headerEl) ro.observe(headerEl);
+        var headerEl = document.querySelector('#quanto-header-desktop, .header, .elementor-location-header');
+        if (headerEl) {
+          var ro = new ResizeObserver(function() {
+            requestAlign();
+          });
+          ro.observe(headerEl);
+        }
       }
     })();
     </script>
