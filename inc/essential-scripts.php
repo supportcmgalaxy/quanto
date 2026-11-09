@@ -252,7 +252,7 @@ function quanto_optimize_homepage_performance() {
         wp_dequeue_script( 'scroll-smoother' );
     }
 
-    // 4. Homepage performance optimization: dequeue unused styles, scripts, trackers, and widgets
+    // 4. Homepage performance optimization: dequeue unused trackers and non-layout third-party assets
     if ( ( is_front_page() || is_home() ) && ! is_admin() && ( ! function_exists( '\Elementor\Plugin' ) || ! isset( \Elementor\Plugin::$instance->editor ) || ! \Elementor\Plugin::$instance->editor->is_edit_mode() ) ) {
         // Dequeue unneeded third-party trackers & attribution
         wp_dequeue_script( 'reddit_tracking' );
@@ -269,36 +269,6 @@ function quanto_optimize_homepage_performance() {
         // Dequeue Contact Form 7 scripts (Homepage has no CF7 form)
         wp_dequeue_script( 'contact-form-7' );
         wp_dequeue_script( 'swv' );
-
-        // Dequeue WooCommerce core frontend assets on homepage
-        wp_dequeue_script( 'woocommerce' );
-        wp_dequeue_script( 'wc-jquery-blockui' );
-        wp_dequeue_script( 'wc-js-cookie' );
-        wp_dequeue_script( 'wc-add-to-cart' );
-
-        // Dequeue Easy Login WooCommerce assets on homepage (Only needed on login trigger)
-        wp_dequeue_script( 'xoo-aff-js' );
-        wp_dequeue_script( 'xoo-el-js' );
-        wp_dequeue_style( 'xoo-aff-style' );
-        wp_dequeue_style( 'xoo-aff-font-awesome5' );
-        wp_dequeue_style( 'xoo-el-style' );
-
-        // Dequeue unused AnimeJS & ScrollMagic scripts
-        wp_dequeue_script( 'animejs-main' );
-        wp_dequeue_script( 'animejs-scrollmagic' );
-        wp_dequeue_script( 'animejs-data-attr-helper' );
-        wp_dequeue_script( 'animejs-helper' );
-
-        // Dequeue unused MAS Animation & heavy GSAP scripts (Every widget on homepage has mas-animation:none)
-        wp_dequeue_script( 'scrollSmoother' );
-        wp_dequeue_script( 'scrollTo' );
-        wp_dequeue_script( 'scrollTrigger' );
-        wp_dequeue_script( 'split-text' );
-        wp_dequeue_script( 'mixitup' );
-        wp_dequeue_script( 'mas-animation' );
-        wp_dequeue_script( 'quanto-slick-animation' );
-        wp_dequeue_script( 'quanto-hello-animai' );
-        wp_dequeue_style( 'mas-animation-ex' );
 
         // Dequeue Google reCAPTCHA v3 on staging/homepage to eliminate 189 KB payload and invalid domain error badge
         wp_dequeue_script( 'google-recaptcha' );
@@ -325,27 +295,14 @@ function quanto_optimize_homepage_performance() {
         // Dequeue Jetpack form layout CSS
         wp_dequeue_style( 'jetpack-forms-layout' );
 
-        // Dequeue unneeded starter animations & archive styles
-        wp_dequeue_style( 'aae-starter-animations' );
-        wp_dequeue_script( 'aae-starter-animations' );
-        wp_dequeue_style( 'cmr-latest-insights' );
-
         // Dequeue classic themes and block library
         wp_dequeue_style( 'classic-theme-styles' );
         wp_dequeue_style( 'wc-blocks-style' );
 
-        // Dequeue duplicate & unused icon packs on homepage
+        // Dequeue duplicate icon pack
         wp_dequeue_style( 'elementor-icons-shared-0' );
-        wp_dequeue_style( 'remixicon-style' );
-        wp_dequeue_style( 'odometer-style' );
-        wp_dequeue_script( 'odometer-min-script' );
     }
 }
-
-// Hook into wp_print_scripts & wp_print_styles to ensure late-registered styles/scripts are cleanly removed
-add_action( 'wp_print_scripts', 'quanto_optimize_homepage_performance', 99999 );
-add_action( 'wp_print_styles', 'quanto_optimize_homepage_performance', 99999 );
-add_action( 'elementor/frontend/after_enqueue_styles', 'quanto_optimize_homepage_performance', 99999 );
 
 /**
  * Preload primary web font and hero image for instant LCP rendering
@@ -353,9 +310,11 @@ add_action( 'elementor/frontend/after_enqueue_styles', 'quanto_optimize_homepage
 add_action( 'wp_head', 'quanto_preload_critical_assets', 1 );
 function quanto_preload_critical_assets() {
     $font_url = get_theme_file_uri( '/assets/fonts/instrument-sans/instrument-sans-latin-normal.woff2' );
-    echo '<link rel="preload" href="' . esc_url( $font_url ) . '" as="font" type="font/woff2" crossorigin>' . "\n";
+    echo '<link rel="preload" href="' . esc_url( $font_url ) . '" as="font" type="font/woff2" crossorigin>' . "
+";
     if ( is_front_page() || is_home() ) {
-        echo '<link rel="preload" as="image" href="https://cmrindia.com/wp-content/uploads/2026/10/CMR-Lead-Slider-1.jpg-2.jpeg" fetchpriority="high">' . "\n";
+        echo '<link rel="preload" as="image" href="https://cmrindia.com/wp-content/uploads/2026/10/CMR-Lead-Slider-1.jpg-2.jpeg" fetchpriority="high">' . "
+";
     }
 }
 
@@ -376,11 +335,7 @@ function quanto_defer_non_critical_scripts( $tag, $handle ) {
         'quanto-main-script',
         'jquery-meanmenu',
         'wcf--addons-js',
-        'wcf--slider',
         'aae-starter-animations-js',
-        'mas-animation',
-        'mixitup-js',
-        'jquery-mixitup',
         'odometer-min-script',
         'viewport-jquery-script',
         'cmr-news-script',
@@ -388,11 +343,6 @@ function quanto_defer_non_critical_scripts( $tag, $handle ) {
         'quanto-addon',
         'quanto-ajax-js',
         'magnific-popup',
-        'scroll-smoother',
-        'elementor-frontend-modules',
-        'elementor-frontend',
-        'elementor-pro-frontend',
-        'pro-elements-handlers',
     );
 
     if ( in_array( $handle, $defer_handles, true ) && false === strpos( $tag, 'defer' ) ) {
@@ -400,26 +350,6 @@ function quanto_defer_non_critical_scripts( $tag, $handle ) {
     }
 
     return $tag;
-}
-
-/**
- * Make non-critical stylesheets asynchronous on the Homepage to eliminate Render-Blocking
- */
-add_filter( 'style_loader_tag', 'quanto_optimize_stylesheet_loading', 10, 4 );
-function quanto_optimize_stylesheet_loading( $html, $handle, $href, $media ) {
-    if ( is_admin() || ( function_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->editor ) && \Elementor\Plugin::$instance->editor->is_edit_mode() ) ) {
-        return $html;
-    }
-
-    if ( ( is_front_page() || is_home() ) && in_array( $handle, array( 'fontawesome-style', 'meanmenu-min-style' ), true ) ) {
-        if ( false !== strpos( $html, "media='all'" ) ) {
-            return str_replace( "media='all'", "media='print' onload=\"this.media='all'\"", $html );
-        } elseif ( false !== strpos( $html, 'media="all"' ) ) {
-            return str_replace( 'media="all"', 'media="print" onload="this.media=\'all\'"', $html );
-        }
-    }
-
-    return $html;
 }
 
 /**
