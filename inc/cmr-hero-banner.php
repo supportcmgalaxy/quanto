@@ -654,7 +654,10 @@ function cmr_hero_banner_shortcode($atts) {
         if (headerLogo) {
           var logoRect = headerLogo.getBoundingClientRect();
           if (logoRect.left > 0) {
-            heroContent.style.paddingLeft = Math.round(logoRect.left) + 'px';
+            var newPad = Math.round(logoRect.left) + 'px';
+            if (heroContent.style.paddingLeft !== newPad) {
+              heroContent.style.paddingLeft = newPad;
+            }
           }
         }
 
@@ -664,7 +667,10 @@ function cmr_hero_banner_shortcode($atts) {
             var btnRect = headerBtn.getBoundingClientRect();
             var rightOffset = window.innerWidth - btnRect.right;
             if (rightOffset > 0) {
-              heroIndicators.style.right = Math.round(rightOffset) + 'px';
+              var newRight = Math.round(rightOffset) + 'px';
+              if (heroIndicators.style.right !== newRight) {
+                heroIndicators.style.right = newRight;
+              }
             }
           }
         }
@@ -693,16 +699,6 @@ function cmr_hero_banner_shortcode($atts) {
         requestAlign();
       });
       window.addEventListener('resize', requestAlign);
-
-      if (window.ResizeObserver) {
-        var headerEl = document.querySelector('#quanto-header-desktop, .header, .elementor-location-header');
-        if (headerEl) {
-          var ro = new ResizeObserver(function() {
-            requestAlign();
-          });
-          ro.observe(headerEl);
-        }
-      }
     })();
     </script>
     <?php

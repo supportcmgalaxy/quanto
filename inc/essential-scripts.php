@@ -251,6 +251,27 @@ function quanto_optimize_homepage_performance() {
         wp_dequeue_script( 'gsap-scroll-smoother-script' );
         wp_dequeue_script( 'scroll-smoother' );
     }
+
+    // 4. Homepage performance optimization: dequeue unused trackers and analytics
+    if ( is_front_page() || is_home() ) {
+        wp_dequeue_script( 'wc-order-attribution' );
+        wp_dequeue_script( 'sourcebuster-js' );
+        wp_dequeue_script( 'woocommerce-analytics' );
+        wp_dequeue_script( 'woocommerce-analytics-client' );
+        wp_dequeue_script( 'jp-tracks' );
+        wp_dequeue_script( 'jp-tracks-functions' );
+        wp_dequeue_script( 'reddit-for-woocommerce-tracking' );
+        wp_dequeue_script( 'snapchat-for-woocommerce-tracking' );
+    }
+}
+
+/**
+ * Preload primary web font for instant LCP rendering
+ */
+add_action( 'wp_head', 'quanto_preload_critical_assets', 1 );
+function quanto_preload_critical_assets() {
+    $font_url = get_theme_file_uri( '/assets/fonts/instrument-sans/instrument-sans-latin-normal.woff2' );
+    echo '<link rel="preload" href="' . esc_url( $font_url ) . '" as="font" type="font/woff2" crossorigin>' . "\n";
 }
 
 /**
@@ -269,6 +290,19 @@ function quanto_defer_non_critical_scripts( $tag, $handle ) {
         'bootstrap-bundle',
         'quanto-main-script',
         'jquery-meanmenu',
+        'wcf--addons-js',
+        'aae-starter-animations-js',
+        'mas-animation',
+        'mixitup-js',
+        'jquery-mixitup',
+        'odometer-min-script',
+        'viewport-jquery-script',
+        'cmr-news-script',
+        'quanto-core',
+        'quanto-addon',
+        'quanto-ajax-js',
+        'magnific-popup',
+        'scroll-smoother',
     );
 
     if ( in_array( $handle, $defer_handles, true ) && false === strpos( $tag, 'defer' ) ) {
