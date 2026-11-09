@@ -252,8 +252,9 @@ function quanto_optimize_homepage_performance() {
         wp_dequeue_script( 'scroll-smoother' );
     }
 
-    // 4. Homepage performance optimization: dequeue unused trackers and analytics
+    // 4. Homepage performance optimization: dequeue unused styles, scripts, trackers, and widgets
     if ( is_front_page() || is_home() ) {
+        // Dequeue unneeded third-party trackers & attribution
         wp_dequeue_script( 'wc-order-attribution' );
         wp_dequeue_script( 'sourcebuster-js' );
         wp_dequeue_script( 'woocommerce-analytics' );
@@ -262,6 +263,43 @@ function quanto_optimize_homepage_performance() {
         wp_dequeue_script( 'jp-tracks-functions' );
         wp_dequeue_script( 'reddit-for-woocommerce-tracking' );
         wp_dequeue_script( 'snapchat-for-woocommerce-tracking' );
+
+        // Dequeue Google reCAPTCHA v3 on staging/homepage to eliminate 189 KB payload and invalid domain error badge
+        wp_dequeue_script( 'google-recaptcha' );
+        wp_dequeue_script( 'wpcf7-recaptcha' );
+
+        // Dequeue unneeded ElementsKit Lite assets (~300 KB CSS + ~60 KB JS)
+        wp_dequeue_style( 'ekit-widget-common' );
+        wp_dequeue_style( 'ekit-nav-menu' );
+        wp_dequeue_style( 'ekit-header-search' );
+        wp_dequeue_style( 'ekit-header-offcanvas' );
+        wp_dequeue_style( 'ekit-header-info' );
+        wp_dequeue_style( 'elementor-icons-ekiticons' );
+        wp_dequeue_style( 'magnific-popup' );
+        wp_dequeue_script( 'ekit-core' );
+        wp_dequeue_script( 'ekit-nav-menu' );
+        wp_dequeue_script( 'ekit-menu' );
+        wp_dequeue_script( 'ekit-header-search' );
+        wp_dequeue_script( 'ekit-header-offcanvas' );
+        wp_dequeue_script( 'magnific-popup' );
+
+        // Dequeue TablePress styles & scripts
+        wp_dequeue_style( 'tablepress-default' );
+
+        // Dequeue Jetpack form layout CSS
+        wp_dequeue_style( 'jetpack-forms-layout' );
+
+        // Dequeue unneeded starter animations & archive styles
+        wp_dequeue_style( 'aae-starter-animations' );
+        wp_dequeue_script( 'aae-starter-animations' );
+        wp_dequeue_style( 'cmr-latest-insights' );
+
+        // Dequeue classic themes and block library
+        wp_dequeue_style( 'classic-theme-styles' );
+        wp_dequeue_style( 'wc-blocks-style' );
+
+        // Dequeue duplicate Remixicon handle
+        wp_dequeue_style( 'elementor-icons-shared-0' );
     }
 }
 
