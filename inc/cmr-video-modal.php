@@ -3,6 +3,7 @@
  * CMR Universal Video Popup (Lightbox Modal)
  * Ensures YouTube videos in Elementor video widgets (and action buttons)
  * open in a fast, lightweight modal popup on click instead of downloading 3.5MB scripts upfront.
+ * Works seamlessly in both live frontend and Elementor Editor preview.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -10,19 +11,34 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 add_action( 'wp_footer', 'cmr_render_video_modal_html', 99 );
+add_action( 'elementor/editor/footer', 'cmr_render_video_modal_html', 99 );
+
 function cmr_render_video_modal_html() {
+    static $rendered = false;
+    if ( $rendered ) {
+        return;
+    }
+    $rendered = true;
     ?>
     <style id="cmr-video-modal-css">
+    /* Prevent any inline iframe from ever rendering/playing inside the card frame */
+    .elementor-element-9b2ddd6 .elementor-video iframe,
+    .elementor-element-d713748 .elementor-video iframe,
+    .elementor-widget-video .elementor-video iframe {
+        display: none !important;
+        pointer-events: none !important;
+    }
+
     .cmr-vmodal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.88);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        z-index: 9999999;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: rgba(0, 0, 0, 0.88) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        z-index: 99999999 !important;
         display: none;
         align-items: center;
         justify-content: center;
@@ -32,8 +48,8 @@ function cmr_render_video_modal_html() {
         box-sizing: border-box;
     }
     .cmr-vmodal-overlay.active {
-        display: flex;
-        opacity: 1;
+        display: flex !important;
+        opacity: 1 !important;
     }
     .cmr-vmodal-wrap {
         position: relative;
@@ -147,63 +163,122 @@ function cmr_render_video_modal_html() {
             }
         });
 
-        // Intercept video clicks on Elementor Video widgets and card CTA buttons
-        function bindVideoClicks() {
-            // 1. Elementor Video widget overlay & play button
-            var videoWidgets = document.querySelectorAll('[data-widget_type="video.default"], .elementor-widget-video');
-            videoWidgets.forEach(function(widget) {
-                if (widget.dataset.cmrModalBound) return;
-                widget.dataset.cmrModalBound = 'true';
+        /**
+         * Global Capturing Event Listener
+         * Intercepts clicks at document root during capturing phase (useCapture = true).
+         * This runs BEFORE Elementor's native jQuery handlers, preventing inline iframe creation
+         * both on the live site and inside the Elementor Editor preview.
+         */
+        document.addEventListener('click', function(e) {
+            // Never intercept clicks on/inside the modal overlay or its close button
+            if (e.target.closest('#cmrVideoModalOverlay')) {
+                return;
+            }
 
-                widget.addEventListener('click', function(e) {
-                    var settingsStr = widget.getAttribute('data-settings');
-                    var ytUrl = '';
-                    if (settingsStr) {
-                        try {
-                            var settings = JSON.parse(settingsStr);
-                            ytUrl = settings.youtube_url || '';
-                        } catch (err) {}
-                    }
-                    if (!ytUrl) {
-                        var link = widget.querySelector('a');
-                        if (link && link.href) ytUrl = link.href;
-                    }
+            var widget = e.target.closest('[data-widget_type="video.default"], .elementor-widget-video, .elementor-element-9b2ddd6, .elementor-element-d713748');
+            var playTrigger = e.target.closest('.elementor-custom-embed-play, .elementor-custom-embed-image-overlay, .elementor-open-inline, .elementor-video, .elementor-video-play-icon');
+            var watchBtn = e.target.closest('a[href*="youtu.be"], a[href*="youtube.com/watch"], [data-id="93c603b"] a, [data-id="e8b38a1"] a, .cmr-video-btn');
 
-                    var vid = extractYouTubeId(ytUrl);
-                    if (vid) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        openVideoModal(vid);
-                    }
-                }, true); // Use capture phase so inline Elementor video embed is intercepted
-            });
+            if (!widget && !watchBtn) {
+                return;
+            }
 
-            // 2. Watch Insights / Play Episode buttons inside live video cards
-            var videoButtons = document.querySelectorAll('[data-id="ec16651"] a, [data-id="ed5537e"] a, [data-id="93c603b"] a, [data-id="e8b38a1"] a, a[href*="youtu.be"], a[href*="youtube.com/watch"]');
-            videoButtons.forEach(function(btn) {
-                if (btn.dataset.cmrModalBound) return;
-                var href = btn.getAttribute('href') || '';
-                var vid = extractYouTubeId(href);
-                if (vid) {
-                    btn.dataset.cmrModalBound = 'true';
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        openVideoModal(vid);
-                    });
+            // If it's a video widget, only intercept if clicking on the playTrigger / media area
+            if (widget && !watchBtn && !playTrigger) {
+                return;
+            }
+
+            var ytUrl = '';
+
+            // 1. Direct button link
+            if (watchBtn) {
+                ytUrl = watchBtn.getAttribute('href') || '';
+            }
+
+            // 2. Video widget settings & fallbacks
+            if (!ytUrl && widget) {
+                var settingsStr = widget.getAttribute('data-settings');
+                if (settingsStr) {
+                    try {
+                        var settings = JSON.parse(settingsStr);
+                        ytUrl = settings.youtube_url || '';
+                    } catch (err) {}
+                }
+
+                // Fallback: child anchor
+                if (!ytUrl) {
+                    var link = widget.querySelector('a[href*="youtu"]');
+                    if (link && link.href) ytUrl = link.href;
+                }
+
+                // Fallback: companion CTA button in same card/column
+                if (!ytUrl) {
+                    var card = widget.closest('.elementor-top-column, .e-con, .e-con-inner, .elementor-column');
+                    if (card) {
+                        var cardLink = card.querySelector('a[href*="youtu"]');
+                        if (cardLink && cardLink.href) ytUrl = cardLink.href;
+                    }
+                }
+
+                // Fallback: known widget IDs
+                if (!ytUrl) {
+                    if (widget.classList.contains('elementor-element-9b2ddd6') || widget.dataset.id === '9b2ddd6') {
+                        ytUrl = 'https://youtu.be/AOH5MO9Oim4';
+                    } else if (widget.classList.contains('elementor-element-d713748') || widget.dataset.id === 'd713748') {
+                        ytUrl = 'https://youtu.be/Nj79yA4cx9o';
+                    }
+                }
+            }
+
+            var vid = extractYouTubeId(ytUrl);
+            if (vid) {
+                // Intercept completely so Elementor's inline embed never executes
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+
+                // Clean up any inline iframe that Elementor may have injected
+                if (widget) {
+                    var purgeIframes = function() {
+                        var ifrs = widget.querySelectorAll('.elementor-video iframe, iframe');
+                        ifrs.forEach(function(ifr) {
+                            ifr.src = '';
+                            ifr.remove();
+                        });
+                    };
+                    purgeIframes();
+                    setTimeout(purgeIframes, 30);
+                    setTimeout(purgeIframes, 150);
+                }
+
+                openVideoModal(vid);
+            }
+        }, true); // useCapture = true is crucial!
+
+        /**
+         * Elementor Editor integration:
+         * When Elementor initializes or re-renders video widgets in the preview,
+         * unbind native Elementor inline click listeners on the image overlay.
+         */
+        function disableElementorNativeInlineVideo() {
+            if (window.jQuery) {
+                window.jQuery('.elementor-widget-video .elementor-custom-embed-image-overlay, .elementor-widget-video .elementor-custom-embed-play').off('click');
+            }
+        }
+
+        if (window.elementorFrontend && window.elementorFrontend.hooks) {
+            window.elementorFrontend.hooks.addAction('frontend/element_ready/video.default', function($scope) {
+                if (window.jQuery && $scope) {
+                    $scope.find('.elementor-custom-embed-image-overlay, .elementor-custom-embed-play').off('click');
                 }
             });
         }
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', bindVideoClicks);
-        } else {
-            bindVideoClicks();
-        }
-        window.addEventListener('load', bindVideoClicks);
-        document.addEventListener('elementor/frontend/init', bindVideoClicks);
+        window.addEventListener('load', disableElementorNativeInlineVideo);
+        document.addEventListener('DOMContentLoaded', disableElementorNativeInlineVideo);
     })();
     </script>
     <?php
 }
+
 
