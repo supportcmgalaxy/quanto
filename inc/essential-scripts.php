@@ -266,12 +266,15 @@ function quanto_optimize_homepage_performance() {
 }
 
 /**
- * Preload primary web font for instant LCP rendering
+ * Preload primary web font and hero image for instant LCP rendering
  */
 add_action( 'wp_head', 'quanto_preload_critical_assets', 1 );
 function quanto_preload_critical_assets() {
     $font_url = get_theme_file_uri( '/assets/fonts/instrument-sans/instrument-sans-latin-normal.woff2' );
     echo '<link rel="preload" href="' . esc_url( $font_url ) . '" as="font" type="font/woff2" crossorigin>' . "\n";
+    if ( is_front_page() || is_home() ) {
+        echo '<link rel="preload" as="image" href="https://cmrindia.com/wp-content/uploads/2026/10/CMR-Lead-Slider-1.jpg-2.jpeg" fetchpriority="high">' . "\n";
+    }
 }
 
 /**

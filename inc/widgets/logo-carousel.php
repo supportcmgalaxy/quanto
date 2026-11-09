@@ -297,93 +297,36 @@ class Quanto_Logo_Carousel_Widget extends \Elementor\Widget_Base {
             <?php endif; ?>
         </style>
 
-        <?php if ($is_continuous): ?>
+        <?php if ($is_continuous): 
+            // Duplicate array for seamless infinite marquee loop in CSS
+            $marquee_items = array_merge($display_items, $display_items);
+        ?>
+        <style>
+            @keyframes quantoMarquee_<?php echo esc_attr($uid_safe); ?> {
+                0% { transform: translate3d(0, 0, 0); }
+                100% { transform: translate3d(-50%, 0, 0); }
+            }
+            #<?php echo esc_attr($uid); ?> .quanto-logo-marquee-track {
+                display: flex;
+                align-items: center;
+                width: max-content;
+                animation: quantoMarquee_<?php echo esc_attr($uid_safe); ?> 40s linear infinite;
+                will-change: transform;
+            }
+            #<?php echo esc_attr($uid); ?>:hover .quanto-logo-marquee-track,
+            #<?php echo esc_attr($uid); ?>:active .quanto-logo-marquee-track {
+                animation-play-state: paused;
+            }
+        </style>
         <div class="quanto-logo-carousel-container quanto-logo-marquee" id="<?php echo esc_attr($uid); ?>">
             <div class="quanto-logo-marquee-track">
-                <?php foreach ($display_items as $img_url): ?>
+                <?php foreach ($marquee_items as $img_url): ?>
                     <div class="quanto-logo-slide<?php echo $get_logo_item_classes($img_url); ?>">
-                        <img src="<?php echo esc_url($img_url); ?>" alt="Logo">
+                        <img src="<?php echo esc_url($img_url); ?>" alt="Logo" loading="lazy" decoding="async">
                     </div>
                 <?php endforeach; ?>
             </div>
         </div>
-
-        <script>
-        (function() {
-            var container = document.getElementById("<?php echo esc_js($uid); ?>");
-            if (!container) return;
-            var track = container.querySelector(".quanto-logo-marquee-track");
-            if (!track) return;
-
-            function updateWidth() {
-                if (container && container.offsetWidth) {
-                    container.style.setProperty('--carousel-width', container.offsetWidth + 'px');
-                }
-            }
-            updateWidth();
-            window.addEventListener('resize', updateWidth, { passive: true });
-            if (window.ResizeObserver) {
-                try {
-                    new ResizeObserver(function(entries) {
-                        for (var i = 0; i < entries.length; i++) {
-                            var w = entries[i].contentRect ? entries[i].contentRect.width : entries[i].target.offsetWidth;
-                            if (w && container) container.style.setProperty('--carousel-width', w + 'px');
-                        }
-                    }).observe(container);
-                } catch(e) {}
-            }
-
-            var offset = 0;
-            var speed = 55; // pixels per second for silky smooth continuous movement
-            var isPaused = false;
-            var lastTime = null;
-
-            container.addEventListener('mouseenter', function() { isPaused = true; });
-            container.addEventListener('mouseleave', function() { isPaused = false; });
-            container.addEventListener('touchstart', function() { isPaused = true; }, { passive: true });
-            container.addEventListener('touchend', function() { isPaused = false; }, { passive: true });
-
-            function tick(now) {
-                if (!lastTime) lastTime = now;
-                var dt = (now - lastTime) / 1000;
-                lastTime = now;
-                if (dt > 0.1) dt = 0.1; // Clamp large time delta (e.g., when switching tabs)
-
-                if (!isPaused && dt > 0) {
-                    offset += speed * dt;
-
-                    // Reparenting: once the first element scrolls completely out of view,
-                    // cut it from front and append it to the end of the track without recreating DOM
-                    while (track.firstElementChild) {
-                        var firstChild = track.firstElementChild;
-                        var w = firstChild.getBoundingClientRect().width || firstChild.offsetWidth;
-                        if (w > 0 && offset >= w) {
-                            offset -= w;
-                            track.appendChild(firstChild);
-                        } else {
-                            break;
-                        }
-                    }
-
-                    track.style.transform = 'translate3d(' + (-offset) + 'px, 0, 0)';
-                }
-
-                requestAnimationFrame(tick);
-            }
-
-            requestAnimationFrame(tick);
-
-            if (window.jQuery) {
-                jQuery(window).on('elementor/frontend/init', function() {
-                    if (window.elementorFrontend && elementorFrontend.hooks) {
-                        elementorFrontend.hooks.addAction('frontend/element_ready/quanto_logo_carousel.default', function() {
-                            updateWidth();
-                        });
-                    }
-                });
-            }
-        })();
-        </script>
 
         <?php else: ?>
 

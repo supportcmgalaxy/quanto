@@ -3558,20 +3558,19 @@ add_action( 'wp_footer', function() {
 }, 999 );
 
 /**
- * Auto-sync enhanced Quanto_Process widget to quanto-core plugin
+ * Auto-sync enhanced Quanto widgets to quanto-core plugin
  */
-add_action( 'init', 'quanto_sync_process_widget_to_plugin', 1 );
-function quanto_sync_process_widget_to_plugin() {
-    $theme_widget = get_template_directory() . '/inc/widgets/process.php';
-    $plugin_widget = WP_PLUGIN_DIR . '/quanto-core/addons/widgets/process.php';
-
-    if ( file_exists( $theme_widget ) && file_exists( $plugin_widget ) ) {
-        $theme_content = file_get_contents( $theme_widget );
-        $plugin_content = file_get_contents( $plugin_widget );
-
-        if ( strpos( $plugin_content, 'card_bg_color' ) === false || md5( $theme_content ) !== md5( $plugin_content ) ) {
-            if ( is_writable( $plugin_widget ) ) {
-                @file_put_contents( $plugin_widget, $theme_content );
+add_action( 'init', 'quanto_sync_widgets_to_plugin', 1 );
+function quanto_sync_widgets_to_plugin() {
+    $widgets = array( 'process.php', 'logo-carousel.php' );
+    foreach ( $widgets as $w ) {
+        $theme_w = get_template_directory() . '/inc/widgets/' . $w;
+        $plugin_w = WP_PLUGIN_DIR . '/quanto-core/addons/widgets/' . $w;
+        if ( file_exists( $theme_w ) && file_exists( $plugin_w ) ) {
+            $t_content = file_get_contents( $theme_w );
+            $p_content = file_get_contents( $plugin_w );
+            if ( md5( $t_content ) !== md5( $p_content ) && is_writable( $plugin_w ) ) {
+                @file_put_contents( $plugin_w, $t_content );
             }
         }
     }
