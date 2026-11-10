@@ -55,18 +55,32 @@ function quanto_essential_scripts() {
 
     // quanto app style
     wp_enqueue_style( 'quanto-main-style', get_theme_file_uri('/assets/css/style.css') ,array(), $quanto_theme_ver );
-    wp_enqueue_style( 'quanto-blog-style', get_theme_file_uri('/assets/css/blog-default.css') ,array(), $quanto_theme_ver );
+    
+    // Blog styling: ONLY on blog posts / archives / search
+    if ( is_singular( 'post' ) || is_home() || is_archive() || is_search() ) {
+        wp_enqueue_style( 'quanto-blog-style', get_theme_file_uri('/assets/css/blog-default.css') ,array(), $quanto_theme_ver );
+    }
     
     // CMR News Style - register so news/media components enqueue it when needed
     wp_register_style( 'cmr-news-style', get_theme_file_uri('/assets/css/cmr-news.css') ,array(), $quanto_theme_ver );
     
-    // CMR Common Modal Styles
-    wp_enqueue_style( 'cmr-modal-style', get_theme_file_uri('/assets/css/cmr-modal.css'), array(), $quanto_theme_ver );
+    // CMR Common Modal Styles - register so modal components enqueue it when needed
+    wp_register_style( 'cmr-modal-style', get_theme_file_uri('/assets/css/cmr-modal.css'), array(), $quanto_theme_ver );
+    if ( ! is_front_page() && ! is_home() ) {
+        wp_enqueue_style( 'cmr-modal-style' );
+    }
+
     if ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() || is_account_page() ) ) {
         wp_enqueue_style( 'cmr-checkout-block', get_theme_file_uri('/assets/css/cmr-checkout-block.css') ,array(), $quanto_theme_ver );
     }
     wp_register_style( 'cmr-latest-insights', get_theme_file_uri('/assets/css/cmr-latest-insights.css'), array(), $quanto_theme_ver );
-    wp_enqueue_style( 'cmr-industry-intelligence', get_theme_file_uri('/assets/css/cmr-industry-intelligence.css'), array(), $quanto_theme_ver );
+
+    // Industry intelligence CSS: ONLY on industry pages
+    wp_register_style( 'cmr-industry-intelligence', get_theme_file_uri('/assets/css/cmr-industry-intelligence.css'), array(), $quanto_theme_ver );
+    if ( is_page( 'industry-intelligence' ) || is_page_template( 'template-industry.php' ) ) {
+        wp_enqueue_style( 'cmr-industry-intelligence' );
+    }
+
     wp_register_style( 'cmr-explore-sectors', get_theme_file_uri('/assets/css/cmr-explore-sectors.css'), array(), $quanto_theme_ver );
     wp_register_style( 'cmr-stay-updated', get_theme_file_uri('/assets/css/cmr-stay-updated.css'), array(), $quanto_theme_ver );
 
@@ -365,14 +379,51 @@ add_filter( 'wpcf7_load_css', function( $load ) {
     return ( $is_cmr_home && ! is_admin() ) ? false : $load;
 } );
 
-// Strip unneeded CSS & scripts directly from HTML output on homepage
+// Strip unneeded CSS & scripts directly from HTML output on homepage, and load non-critical CSS asynchronously
 add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
     $is_cmr_home = ( is_front_page() || is_home() || ( function_exists( 'get_queried_object_id' ) && (int) get_queried_object_id() === 14 ) || ( ! empty( $_SERVER['REQUEST_URI'] ) && ( $_SERVER['REQUEST_URI'] === '/' || strpos( $_SERVER['REQUEST_URI'], '/?' ) === 0 ) ) );
     $is_elementor_edit = function_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->editor ) && \Elementor\Plugin::$instance->editor->is_edit_mode();
 
     if ( $is_cmr_home && ! is_admin() && ! $is_elementor_edit ) {
-        if ( in_array( $handle, array( 'wc-blocks-style', 'wc-blocks-packages-style', 'elementor-icons-ekiticons', 'quanto-animate', 'aae-starter-animations', 'remixicon', 'swiper-bundle', 'quanto-blog-style' ), true ) || ( is_string( $html ) && ( strpos( $html, 'wc-blocks.css' ) !== false || strpos( $html, 'ekiticons.css' ) !== false || strpos( $html, 'animate.css' ) !== false || strpos( $html, 'quanto/assets/css/remixicon.css' ) !== false ) ) ) {
+        // 1. Completely unneeded on homepage: strip from output so they only load on pages where needed
+        $blocked_styles = array(
+            'wc-blocks-style',
+            'wc-blocks-packages-style',
+            'elementor-icons-ekiticons',
+            'quanto-animate',
+            'aae-starter-animations',
+            'remixicon',
+            'swiper-bundle',
+            'quanto-blog-style',
+            'tablepress-default',
+            'classic-theme-styles',
+            'cmr-sticky-nav-css',
+            'cmr-modal-style',
+            'wcf--addons',
+            'mas-animation-ex',
+            'e-popup',
+        );
+        if ( in_array( $handle, $blocked_styles, true ) || ( is_string( $html ) && ( strpos( $html, 'wc-blocks.css' ) !== false || strpos( $html, 'ekiticons.css' ) !== false || strpos( $html, 'animate.css' ) !== false || strpos( $html, 'quanto/assets/css/remixicon.css' ) !== false || strpos( $html, 'cmr-sticky-nav.css' ) !== false || strpos( $html, 'cmr-modal.css' ) !== false || strpos( $html, 'wcf-addons.min.css' ) !== false || strpos( $html, 'mas-animation.css' ) !== false ) ) ) {
             return '';
+        }
+
+        // 2. Below-the-fold stylesheets: load asynchronously to eliminate remaining render-blocking
+        $async_handles = array(
+            'cmr-live-css',
+            'cmr-testimonials-css',
+            'cmr-news-style',
+            'fontawesome-style',
+            'cmr-latest-insights',
+        );
+        if ( in_array( $handle, $async_handles, true ) ) {
+            $async_tag = str_replace( "media='all'", "media='print' onload=\"this.media='all'\"", $html );
+            if ( $async_tag === $html ) {
+                $async_tag = str_replace( 'media="all"', 'media="print" onload="this.media=\'all\'"', $html );
+            }
+            if ( $async_tag === $html ) {
+                $async_tag = str_replace( '/>', ' media="print" onload="this.media=\'all\'" />', $html );
+            }
+            return $async_tag . '<noscript><link rel="stylesheet" href="' . esc_url( $href ) . '"></noscript>' . "\n";
         }
     }
     return $html;

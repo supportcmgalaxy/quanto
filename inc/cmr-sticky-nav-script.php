@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 add_action( 'wp_enqueue_scripts', function() {
-    if ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() || is_account_page() ) ) {
+    if ( is_front_page() || is_home() || ( function_exists( 'get_queried_object_id' ) && (int) get_queried_object_id() === 14 ) || ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() || is_account_page() ) ) ) {
         return;
     }
     wp_enqueue_style( 'cmr-sticky-nav-css', get_template_directory_uri() . '/assets/css/cmr-sticky-nav.css', array(), '1.0.0' );
