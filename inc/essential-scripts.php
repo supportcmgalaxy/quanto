@@ -253,7 +253,10 @@ function quanto_optimize_homepage_performance() {
     }
 
     // 4. Homepage performance optimization: dequeue unused trackers and non-layout third-party assets
-    if ( ( is_front_page() || is_home() ) && ! is_admin() && ( ! function_exists( '\Elementor\Plugin' ) || ! isset( \Elementor\Plugin::$instance->editor ) || ! \Elementor\Plugin::$instance->editor->is_edit_mode() ) ) {
+    $is_cmr_home = ( is_front_page() || is_home() || ( function_exists( 'get_queried_object_id' ) && (int) get_queried_object_id() === 14 ) || ( ! empty( $_SERVER['REQUEST_URI'] ) && ( $_SERVER['REQUEST_URI'] === '/' || strpos( $_SERVER['REQUEST_URI'], '/?' ) === 0 ) ) );
+    $is_elementor_edit = function_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->editor ) && \Elementor\Plugin::$instance->editor->is_edit_mode();
+
+    if ( $is_cmr_home && ! is_admin() && ! $is_elementor_edit ) {
         // Dequeue unneeded third-party trackers & attribution
         wp_dequeue_script( 'reddit_tracking' );
         wp_dequeue_script( 'snapchat_tracking' );
@@ -338,7 +341,10 @@ function quanto_optimize_homepage_performance() {
 
 // Print styles hook to ensure late-registered block styles & ekiticons are dequeued on homepage
 add_action( 'wp_print_styles', function() {
-    if ( ( is_front_page() || is_home() ) && ! is_admin() && ( ! function_exists( '\Elementor\Plugin' ) || ! isset( \Elementor\Plugin::$instance->editor ) || ! \Elementor\Plugin::$instance->editor->is_edit_mode() ) ) {
+    $is_cmr_home = ( is_front_page() || is_home() || ( function_exists( 'get_queried_object_id' ) && (int) get_queried_object_id() === 14 ) || ( ! empty( $_SERVER['REQUEST_URI'] ) && ( $_SERVER['REQUEST_URI'] === '/' || strpos( $_SERVER['REQUEST_URI'], '/?' ) === 0 ) ) );
+    $is_elementor_edit = function_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->editor ) && \Elementor\Plugin::$instance->editor->is_edit_mode();
+
+    if ( $is_cmr_home && ! is_admin() && ! $is_elementor_edit ) {
         wp_dequeue_style( 'elementor-icons-ekiticons' );
         wp_dequeue_style( 'wc-blocks-style' );
         wp_dequeue_style( 'wc-blocks-packages-style' );
@@ -351,16 +357,21 @@ add_action( 'wp_print_styles', function() {
 
 // Stop CF7 from enqueuing JS/CSS on the homepage
 add_filter( 'wpcf7_load_js', function( $load ) {
-    return ( ( is_front_page() || is_home() ) && ! is_admin() ) ? false : $load;
+    $is_cmr_home = ( is_front_page() || is_home() || ( function_exists( 'get_queried_object_id' ) && (int) get_queried_object_id() === 14 ) || ( ! empty( $_SERVER['REQUEST_URI'] ) && ( $_SERVER['REQUEST_URI'] === '/' || strpos( $_SERVER['REQUEST_URI'], '/?' ) === 0 ) ) );
+    return ( $is_cmr_home && ! is_admin() ) ? false : $load;
 } );
 add_filter( 'wpcf7_load_css', function( $load ) {
-    return ( ( is_front_page() || is_home() ) && ! is_admin() ) ? false : $load;
+    $is_cmr_home = ( is_front_page() || is_home() || ( function_exists( 'get_queried_object_id' ) && (int) get_queried_object_id() === 14 ) || ( ! empty( $_SERVER['REQUEST_URI'] ) && ( $_SERVER['REQUEST_URI'] === '/' || strpos( $_SERVER['REQUEST_URI'], '/?' ) === 0 ) ) );
+    return ( $is_cmr_home && ! is_admin() ) ? false : $load;
 } );
 
 // Strip unneeded CSS & scripts directly from HTML output on homepage
 add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
-    if ( ( is_front_page() || is_home() ) && ! is_admin() && ( ! function_exists( '\Elementor\Plugin' ) || ! isset( \Elementor\Plugin::$instance->editor ) || ! \Elementor\Plugin::$instance->editor->is_edit_mode() ) ) {
-        if ( in_array( $handle, array( 'wc-blocks-style', 'wc-blocks-packages-style', 'elementor-icons-ekiticons', 'quanto-animate', 'aae-starter-animations' ), true ) || strpos( $html, 'wc-blocks.css' ) !== false || strpos( $html, 'ekiticons.css' ) !== false || strpos( $html, 'animate.css' ) !== false ) {
+    $is_cmr_home = ( is_front_page() || is_home() || ( function_exists( 'get_queried_object_id' ) && (int) get_queried_object_id() === 14 ) || ( ! empty( $_SERVER['REQUEST_URI'] ) && ( $_SERVER['REQUEST_URI'] === '/' || strpos( $_SERVER['REQUEST_URI'], '/?' ) === 0 ) ) );
+    $is_elementor_edit = function_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->editor ) && \Elementor\Plugin::$instance->editor->is_edit_mode();
+
+    if ( $is_cmr_home && ! is_admin() && ! $is_elementor_edit ) {
+        if ( in_array( $handle, array( 'wc-blocks-style', 'wc-blocks-packages-style', 'elementor-icons-ekiticons', 'quanto-animate', 'aae-starter-animations' ), true ) || ( is_string( $html ) && ( strpos( $html, 'wc-blocks.css' ) !== false || strpos( $html, 'ekiticons.css' ) !== false || strpos( $html, 'animate.css' ) !== false ) ) ) {
             return '';
         }
     }
@@ -368,8 +379,11 @@ add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
 }, 99999, 4 );
 
 add_filter( 'script_loader_tag', function( $tag, $handle, $src ) {
-    if ( ( is_front_page() || is_home() ) && ! is_admin() && ( ! function_exists( '\Elementor\Plugin' ) || ! isset( \Elementor\Plugin::$instance->editor ) || ! \Elementor\Plugin::$instance->editor->is_edit_mode() ) ) {
-        if ( strpos( $tag, 'slick-animation.js' ) !== false || strpos( $tag, 'hello-animai.js' ) !== false || strpos( $tag, 'starter-animations.js' ) !== false ) {
+    $is_cmr_home = ( is_front_page() || is_home() || ( function_exists( 'get_queried_object_id' ) && (int) get_queried_object_id() === 14 ) || ( ! empty( $_SERVER['REQUEST_URI'] ) && ( $_SERVER['REQUEST_URI'] === '/' || strpos( $_SERVER['REQUEST_URI'], '/?' ) === 0 ) ) );
+    $is_elementor_edit = function_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->editor ) && \Elementor\Plugin::$instance->editor->is_edit_mode();
+
+    if ( $is_cmr_home && ! is_admin() && ! $is_elementor_edit ) {
+        if ( is_string( $tag ) && ( strpos( $tag, 'slick-animation.js' ) !== false || strpos( $tag, 'hello-animai.js' ) !== false || strpos( $tag, 'starter-animations.js' ) !== false ) ) {
             return '';
         }
     }
