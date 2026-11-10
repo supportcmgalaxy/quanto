@@ -371,7 +371,7 @@ add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
     $is_elementor_edit = function_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->editor ) && \Elementor\Plugin::$instance->editor->is_edit_mode();
 
     if ( $is_cmr_home && ! is_admin() && ! $is_elementor_edit ) {
-        if ( in_array( $handle, array( 'wc-blocks-style', 'wc-blocks-packages-style', 'elementor-icons-ekiticons', 'quanto-animate', 'aae-starter-animations' ), true ) || ( is_string( $html ) && ( strpos( $html, 'wc-blocks.css' ) !== false || strpos( $html, 'ekiticons.css' ) !== false || strpos( $html, 'animate.css' ) !== false ) ) ) {
+        if ( in_array( $handle, array( 'wc-blocks-style', 'wc-blocks-packages-style', 'elementor-icons-ekiticons', 'quanto-animate', 'aae-starter-animations', 'remixicon', 'swiper-bundle', 'quanto-blog-style' ), true ) || ( is_string( $html ) && ( strpos( $html, 'wc-blocks.css' ) !== false || strpos( $html, 'ekiticons.css' ) !== false || strpos( $html, 'animate.css' ) !== false || strpos( $html, 'quanto/assets/css/remixicon.css' ) !== false ) ) ) {
             return '';
         }
     }
@@ -389,6 +389,14 @@ add_filter( 'script_loader_tag', function( $tag, $handle, $src ) {
     }
     return $tag;
 }, 99999, 3 );
+
+// Block hidden dead HTML widget 3eb1d96 from outputting broken video slider script causing TypeError
+add_filter( 'elementor/widget/render_content', function( $content, $widget ) {
+    if ( is_object( $widget ) && method_exists( $widget, 'get_id' ) && $widget->get_id() === '3eb1d96' ) {
+        return '';
+    }
+    return $content;
+}, 10, 2 );
 
 /**
  * Preload primary web font and hero image for instant LCP rendering
@@ -526,6 +534,15 @@ add_action( 'wp_head', function() {
         // 3. Stubs for uninitialized WooCommerce tracking scripts (Reddit, Snapchat)
         window.rdt = window.rdt || function() {};
         window.snaptr = window.snaptr || function() {};
+
+        // 4. Safe fallback for legacy/orphan video slider scripts so classList never throws
+        var dummyItem = { classList: { add: function(){}, remove: function(){}, toggle: function(){}, contains: function(){ return false; } }, pause: function(){}, play: function(){}, currentTime: 0, addEventListener: function(){} };
+        window.videos = window.videos || new Proxy([], {
+            get: function(t, p) { return dummyItem; }
+        });
+        window.dots = window.dots || new Proxy([], {
+            get: function(t, p) { return dummyItem; }
+        });
     })();
     </script>
     <?php

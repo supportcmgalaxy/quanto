@@ -333,7 +333,7 @@
 
     // Style "The CMR network" button badge & center divider line across all screens & pages
     function initCmrNetworkBadge() {
-        var elements = document.querySelectorAll('.elementor-button, .elementor-button-text, .elementor-heading-title, a, button, p');
+        var elements = document.querySelectorAll('.elementor-widget-button .elementor-button, .cmr-network-pill-btn, .talk-btn, .download-btn');
         elements.forEach(function(el) {
             var rawTxt = (el.textContent || el.innerText || '').trim();
             if (/^(the\s+)?cmr\s+network$/i.test(rawTxt)) {
@@ -433,13 +433,6 @@
         initCmrNetworkBadge();
         initCustomCounters();
     });
-    // Recurring check for dynamic elementor rendering
-    var counterIntervalCount = 0;
-    var counterInterval = setInterval(function() {
-        initCustomCounters();
-        counterIntervalCount++;
-        if (counterIntervalCount > 20) clearInterval(counterInterval);
-    }, 250);
 })(jQuery);
 
 
