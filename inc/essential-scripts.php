@@ -289,6 +289,18 @@ function quanto_optimize_homepage_performance() {
         wp_dequeue_script( 'animejs-data-attr-helper' );
         wp_dequeue_script( 'animejs-helper' );
 
+        // Dequeue redundant slick / carousel animations (homepage uses native Swiper)
+        wp_dequeue_script( 'quanto-slick-animation' );
+        wp_dequeue_script( 'quanto-hello-animai' );
+        wp_dequeue_style( 'quanto-animate' );
+
+        // Dequeue unused starter animations
+        wp_dequeue_script( 'aae-starter-animations' );
+        wp_dequeue_style( 'aae-starter-animations' );
+
+        // Dequeue unused wcf slider script (homepage uses Swiper)
+        wp_dequeue_script( 'wcf--slider' );
+
         // Dequeue Google reCAPTCHA v3 on staging/homepage to eliminate 189 KB payload and invalid domain error badge
         wp_dequeue_script( 'google-recaptcha' );
         wp_dequeue_script( 'wpcf7-recaptcha' );
@@ -317,11 +329,25 @@ function quanto_optimize_homepage_performance() {
         // Dequeue classic themes and block library
         wp_dequeue_style( 'classic-theme-styles' );
         wp_dequeue_style( 'wc-blocks-style' );
+        wp_dequeue_style( 'wc-blocks-packages-style' );
 
         // Dequeue duplicate icon pack
         wp_dequeue_style( 'elementor-icons-shared-0' );
     }
 }
+
+// Print styles hook to ensure late-registered block styles & ekiticons are dequeued on homepage
+add_action( 'wp_print_styles', function() {
+    if ( ( is_front_page() || is_home() ) && ! is_admin() && ( ! function_exists( '\Elementor\Plugin' ) || ! isset( \Elementor\Plugin::$instance->editor ) || ! \Elementor\Plugin::$instance->editor->is_edit_mode() ) ) {
+        wp_dequeue_style( 'elementor-icons-ekiticons' );
+        wp_dequeue_style( 'wc-blocks-style' );
+        wp_dequeue_style( 'wc-blocks-packages-style' );
+        wp_dequeue_style( 'quanto-animate' );
+        wp_dequeue_style( 'aae-starter-animations' );
+        wp_dequeue_style( 'tablepress-default' );
+        wp_dequeue_style( 'classic-theme-styles' );
+    }
+}, 99999 );
 
 // Stop CF7 from enqueuing JS/CSS on the homepage
 add_filter( 'wpcf7_load_js', function( $load ) {
@@ -364,15 +390,29 @@ function quanto_defer_non_critical_scripts( $tag, $handle ) {
         'bootstrap-bundle',
         'quanto-main-script',
         'jquery-meanmenu',
+        'wcf--addons',
         'wcf--addons-js',
+        'aae-starter-animations',
         'aae-starter-animations-js',
         'odometer-min-script',
         'viewport-jquery-script',
         'cmr-news-script',
         'quanto-core',
         'quanto-addon',
+        'quanto-addon-script',
+        'quanto-ajax',
         'quanto-ajax-js',
         'magnific-popup',
+        'gsap',
+        'scrollSmoother',
+        'scrollTo',
+        'scrollTrigger',
+        'split-text',
+        'mixitup',
+        'mas-animation',
+        'mas-sticky-header',
+        'pro-elements-handlers',
+        'elementor-pro-frontend',
     );
 
     if ( in_array( $handle, $defer_handles, true ) && false === strpos( $tag, 'defer' ) ) {
