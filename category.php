@@ -456,9 +456,22 @@ get_header();
                     continue;
                 }
                 $seen_titles[] = $norm_title;
-                $thumbnail_url = get_the_post_thumbnail_url( $post_id, 'large' );
-                $placeholder   = 'https://via.placeholder.com/800x450?text=' . rawurlencode( get_the_title() );
-                $img           = $thumbnail_url ?: $placeholder;
+                $thumb_id      = get_post_thumbnail_id( $post_id );
+                $img_html      = '';
+                if ( $thumb_id ) {
+                    $img_html = wp_get_attachment_image( $thumb_id, 'medium_large', false, array(
+                        'loading'  => 'lazy',
+                        'decoding' => 'async',
+                        'sizes'    => '(max-width: 768px) 100vw, 400px',
+                        'alt'      => esc_attr( get_the_title() ),
+                    ) );
+                }
+                if ( empty( $img_html ) ) {
+                    $thumbnail_url = get_the_post_thumbnail_url( $post_id, 'medium_large' );
+                    $placeholder   = 'https://via.placeholder.com/800x450?text=' . rawurlencode( get_the_title() );
+                    $img           = $thumbnail_url ?: $placeholder;
+                    $img_html      = '<img src="' . esc_url( $img ) . '" alt="' . esc_attr( get_the_title() ) . '" loading="lazy" decoding="async" />';
+                }
                 $excerpt       = function_exists( 'quanto_get_clean_post_excerpt' ) ? quanto_get_clean_post_excerpt( $post_id, 18 ) : wp_trim_words( get_the_excerpt( $post_id ) ?: get_the_content(), 18, '...' );
                 $word_count    = str_word_count( strip_tags( get_the_content() ) );
                 $read_time     = max( 1, ceil( $word_count / 200 ) );
@@ -468,7 +481,7 @@ get_header();
             <article class="cmr-cat-card">
                 <div class="cmr-cat-card-img">
                     <a href="<?php the_permalink(); ?>">
-                        <img src="<?php echo esc_url( $img ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>" loading="lazy" />
+                        <?php echo $img_html; ?>
                     </a>
                 </div>
                 <div class="cmr-cat-card-body">

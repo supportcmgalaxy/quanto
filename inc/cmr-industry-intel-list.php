@@ -430,9 +430,22 @@ if ( ! function_exists( 'cmr_industry_intel_list_shortcode' ) ) {
                     $count++;
                     $post_title = get_the_title( $insight_post );
                     $post_link = get_permalink( $insight_post );
-                    $thumbnail_url = get_the_post_thumbnail_url( $insight_post->ID, 'full' );
-                    if ( ! $thumbnail_url ) {
-                        $thumbnail_url = 'https://via.placeholder.com/600x400?text=No+Image';
+                    $thumb_id  = get_post_thumbnail_id( $insight_post->ID );
+                    $img_html  = '';
+                    if ( $thumb_id ) {
+                        $img_html = wp_get_attachment_image( $thumb_id, 'medium_large', false, array(
+                            'loading'  => ( $count <= 1 ) ? 'eager' : 'lazy',
+                            'decoding' => 'async',
+                            'sizes'    => '(max-width: 768px) 100vw, 650px',
+                            'alt'      => esc_attr( $post_title ),
+                        ) );
+                    }
+                    if ( empty( $img_html ) ) {
+                        $thumbnail_url = get_the_post_thumbnail_url( $insight_post->ID, 'medium_large' );
+                        if ( ! $thumbnail_url ) {
+                            $thumbnail_url = 'https://via.placeholder.com/600x400?text=No+Image';
+                        }
+                        $img_html = '<img src="' . esc_url( $thumbnail_url ) . '" alt="' . esc_attr( $post_title ) . '" loading="' . ( $count <= 1 ? 'eager' : 'lazy' ) . '" decoding="async" />';
                     }
                     
                     $default_cat_name = ! empty( $atts['nav_title'] ) ? $atts['nav_title'] : 'Industry Intelligence';
@@ -457,7 +470,7 @@ if ( ! function_exists( 'cmr_industry_intel_list_shortcode' ) ) {
                     <div class="cmr-intel-list-item">
                         <div class="cmr-intel-list-img">
                             <a href="<?php echo esc_url( $post_link ); ?>">
-                                <img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php echo esc_attr( $post_title ); ?>" />
+                                <?php echo $img_html; ?>
                             </a>
                         </div>
                         <div class="cmr-intel-list-content">
@@ -698,12 +711,27 @@ function cmr_industry_intel_list_load_more_ajax() {
     }
 
     if ( ! empty( $unique_posts ) ) {
+        $ajax_count = 0;
         foreach ( $unique_posts as $insight_post ) {
+            $ajax_count++;
             $post_title = get_the_title( $insight_post );
             $post_link = get_permalink( $insight_post );
-            $thumbnail_url = get_the_post_thumbnail_url( $insight_post->ID, 'full' );
-            if ( ! $thumbnail_url ) {
-                $thumbnail_url = 'https://via.placeholder.com/600x400?text=No+Image';
+            $thumb_id  = get_post_thumbnail_id( $insight_post->ID );
+            $img_html  = '';
+            if ( $thumb_id ) {
+                $img_html = wp_get_attachment_image( $thumb_id, 'medium_large', false, array(
+                    'loading'  => 'lazy',
+                    'decoding' => 'async',
+                    'sizes'    => '(max-width: 768px) 100vw, 650px',
+                    'alt'      => esc_attr( $post_title ),
+                ) );
+            }
+            if ( empty( $img_html ) ) {
+                $thumbnail_url = get_the_post_thumbnail_url( $insight_post->ID, 'medium_large' );
+                if ( ! $thumbnail_url ) {
+                    $thumbnail_url = 'https://via.placeholder.com/600x400?text=No+Image';
+                }
+                $img_html = '<img src="' . esc_url( $thumbnail_url ) . '" alt="' . esc_attr( $post_title ) . '" loading="lazy" decoding="async" />';
             }
             
             $default_cat_name = 'Industry Intelligence';
@@ -730,7 +758,7 @@ function cmr_industry_intel_list_load_more_ajax() {
             <div class="cmr-intel-list-item">
                 <div class="cmr-intel-list-img">
                     <a href="<?php echo esc_url( $post_link ); ?>">
-                        <img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php echo esc_attr( $post_title ); ?>" />
+                        <?php echo $img_html; ?>
                     </a>
                 </div>
                 <div class="cmr-intel-list-content">
