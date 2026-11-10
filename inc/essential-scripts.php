@@ -357,6 +357,25 @@ add_filter( 'wpcf7_load_css', function( $load ) {
     return ( ( is_front_page() || is_home() ) && ! is_admin() ) ? false : $load;
 } );
 
+// Strip unneeded CSS & scripts directly from HTML output on homepage
+add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
+    if ( ( is_front_page() || is_home() ) && ! is_admin() && ( ! function_exists( '\Elementor\Plugin' ) || ! isset( \Elementor\Plugin::$instance->editor ) || ! \Elementor\Plugin::$instance->editor->is_edit_mode() ) ) {
+        if ( in_array( $handle, array( 'wc-blocks-style', 'wc-blocks-packages-style', 'elementor-icons-ekiticons', 'quanto-animate', 'aae-starter-animations' ), true ) || strpos( $html, 'wc-blocks.css' ) !== false || strpos( $html, 'ekiticons.css' ) !== false || strpos( $html, 'animate.css' ) !== false ) {
+            return '';
+        }
+    }
+    return $html;
+}, 99999, 4 );
+
+add_filter( 'script_loader_tag', function( $tag, $handle, $src ) {
+    if ( ( is_front_page() || is_home() ) && ! is_admin() && ( ! function_exists( '\Elementor\Plugin' ) || ! isset( \Elementor\Plugin::$instance->editor ) || ! \Elementor\Plugin::$instance->editor->is_edit_mode() ) ) {
+        if ( strpos( $tag, 'slick-animation.js' ) !== false || strpos( $tag, 'hello-animai.js' ) !== false || strpos( $tag, 'starter-animations.js' ) !== false ) {
+            return '';
+        }
+    }
+    return $tag;
+}, 99999, 3 );
+
 /**
  * Preload primary web font and hero image for instant LCP rendering
  */
