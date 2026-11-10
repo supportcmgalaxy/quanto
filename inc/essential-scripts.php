@@ -383,8 +383,34 @@ add_filter( 'script_loader_tag', function( $tag, $handle, $src ) {
     $is_elementor_edit = function_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->editor ) && \Elementor\Plugin::$instance->editor->is_edit_mode();
 
     if ( $is_cmr_home && ! is_admin() && ! $is_elementor_edit ) {
-        if ( is_string( $tag ) && ( strpos( $tag, 'slick-animation.js' ) !== false || strpos( $tag, 'hello-animai.js' ) !== false || strpos( $tag, 'starter-animations.js' ) !== false ) ) {
-            return '';
+        // Temporarily comment out / disable heavy animation scripts for performance testing
+        $anim_scripts = array(
+            'gsap',
+            'gsap-script',
+            'scrollSmoother',
+            'gsap-scroll-smoother-script',
+            'scrollTo',
+            'gsap-scroll-to-plugin-script',
+            'scrollTrigger',
+            'gsap-scroll-trigger-script',
+            'split-text',
+            'gsap-split-text-script',
+            'mas-animation',
+            'wcf--addons',
+            'mixitup',
+        );
+        if ( in_array( $handle, $anim_scripts, true ) ||
+             strpos( $tag, 'gsap' ) !== false ||
+             strpos( $tag, 'ScrollSmoother' ) !== false ||
+             strpos( $tag, 'ScrollTrigger' ) !== false ||
+             strpos( $tag, 'ScrollToPlugin' ) !== false ||
+             strpos( $tag, 'SplitText' ) !== false ||
+             strpos( $tag, 'mas-animation.js' ) !== false ||
+             strpos( $tag, 'wcf-addons.min.js' ) !== false ||
+             strpos( $tag, 'slick-animation.js' ) !== false ||
+             strpos( $tag, 'hello-animai.js' ) !== false ||
+             strpos( $tag, 'starter-animations.js' ) !== false ) {
+            return "<!-- [ANIMATION JS DISABLED FOR PERF TEST] " . esc_html( $handle ) . " -->\n";
         }
     }
     return $tag;
@@ -543,8 +569,49 @@ add_action( 'wp_head', function() {
         window.dots = window.dots || new Proxy([], {
             get: function(t, p) { return dummyItem; }
         });
+
+        // 5. Safe GSAP & ScrollTrigger stub when animation JS is commented out
+        if (typeof window.gsap === 'undefined') {
+            var dummyTween = { kill: function(){}, pause: function(){}, play: function(){}, revert: function(){} };
+            window.gsap = {
+                registerPlugin: function() {},
+                config: function() {},
+                defaults: function() {},
+                to: function() { return dummyTween; },
+                from: function() { return dummyTween; },
+                fromTo: function() { return dummyTween; },
+                set: function() {},
+                matchMedia: function() {
+                    return {
+                        add: function(q, fn) {
+                            if (typeof fn === 'function') {
+                                try { fn(); } catch(e) {}
+                            }
+                        }
+                    };
+                }
+            };
+            window.ScrollTrigger = {
+                create: function() { return dummyTween; },
+                refresh: function() {},
+                getAll: function() { return []; },
+                matchMedia: function() {}
+            };
+            window.ScrollSmoother = {
+                create: function() { return { smooth: function(){}, getVelocity: function(){ return 0; } }; },
+                get: function() { return null; }
+            };
+        }
     })();
     </script>
+    <style id="cmr-smooth-reset-perf">
+    #smooth-wrapper, #smooth-content {
+        overflow: visible !important;
+        height: auto !important;
+        position: static !important;
+        transform: none !important;
+    }
+    </style>
     <?php
 }, 1 );
 
