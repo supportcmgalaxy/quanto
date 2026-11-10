@@ -270,6 +270,25 @@ function quanto_optimize_homepage_performance() {
         wp_dequeue_script( 'contact-form-7' );
         wp_dequeue_script( 'swv' );
 
+        // Dequeue WooCommerce frontend cart assets on homepage (No cart operations on homepage)
+        wp_dequeue_script( 'woocommerce' );
+        wp_dequeue_script( 'wc-jquery-blockui' );
+        wp_dequeue_script( 'wc-js-cookie' );
+        wp_dequeue_script( 'wc-add-to-cart' );
+
+        // Dequeue Easy Login WooCommerce assets on homepage (Only needed when login popup is opened)
+        wp_dequeue_script( 'xoo-aff-js' );
+        wp_dequeue_script( 'xoo-el-js' );
+        wp_dequeue_style( 'xoo-aff-style' );
+        wp_dequeue_style( 'xoo-aff-font-awesome5' );
+        wp_dequeue_style( 'xoo-el-style' );
+
+        // Dequeue unused AnimeJS & ScrollMagic scripts (All homepage widgets have animejs-disable)
+        wp_dequeue_script( 'animejs-main' );
+        wp_dequeue_script( 'animejs-scrollmagic' );
+        wp_dequeue_script( 'animejs-data-attr-helper' );
+        wp_dequeue_script( 'animejs-helper' );
+
         // Dequeue Google reCAPTCHA v3 on staging/homepage to eliminate 189 KB payload and invalid domain error badge
         wp_dequeue_script( 'google-recaptcha' );
         wp_dequeue_script( 'wpcf7-recaptcha' );
@@ -304,17 +323,28 @@ function quanto_optimize_homepage_performance() {
     }
 }
 
+// Stop CF7 from enqueuing JS/CSS on the homepage
+add_filter( 'wpcf7_load_js', function( $load ) {
+    return ( ( is_front_page() || is_home() ) && ! is_admin() ) ? false : $load;
+} );
+add_filter( 'wpcf7_load_css', function( $load ) {
+    return ( ( is_front_page() || is_home() ) && ! is_admin() ) ? false : $load;
+} );
+
 /**
  * Preload primary web font and hero image for instant LCP rendering
  */
 add_action( 'wp_head', 'quanto_preload_critical_assets', 1 );
 function quanto_preload_critical_assets() {
     $font_url = get_theme_file_uri( '/assets/fonts/instrument-sans/instrument-sans-latin-normal.woff2' );
-    echo '<link rel="preload" href="' . esc_url( $font_url ) . '" as="font" type="font/woff2" crossorigin>' . "
-";
+    echo '<link rel="preload" href="' . esc_url( $font_url ) . '" as="font" type="font/woff2" crossorigin>' . "\n";
     if ( is_front_page() || is_home() ) {
-        echo '<link rel="preload" as="image" href="https://cmrindia.com/wp-content/uploads/2026/10/CMR-Lead-Slider-1.jpg-2.jpeg" fetchpriority="high">' . "
-";
+        $upload_dir  = wp_upload_dir();
+        $base_upload = ! empty( $upload_dir['baseurl'] ) ? $upload_dir['baseurl'] : 'https://qai8358l95-staging.onrocket.site/wp-content/uploads';
+        $mobile_img  = $base_upload . '/2026/10/CMR-Lead-Slider-1.jpg-2-768x432.jpeg';
+        $desktop_img = $base_upload . '/2026/10/CMR-Lead-Slider-1.jpg-2.jpeg';
+        echo '<link rel="preload" as="image" href="' . esc_url( $mobile_img ) . '" media="(max-width: 768px)" fetchpriority="high">' . "\n";
+        echo '<link rel="preload" as="image" href="' . esc_url( $desktop_img ) . '" media="(min-width: 769px)" fetchpriority="high">' . "\n";
     }
 }
 

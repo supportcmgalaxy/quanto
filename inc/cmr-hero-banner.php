@@ -4,9 +4,16 @@
 add_shortcode('cmr_hero_banner', 'cmr_hero_banner_shortcode');
 
 function cmr_hero_banner_shortcode($atts) {
+    $upload_dir   = wp_upload_dir();
+    $base_upload  = ! empty( $upload_dir['baseurl'] ) ? $upload_dir['baseurl'] : 'https://qai8358l95-staging.onrocket.site/wp-content/uploads';
+    $default_s1   = $base_upload . '/2026/10/CMR-Lead-Slider-1.jpg-2.jpeg';
+    $default_s2   = $base_upload . '/2026/10/CMR-Lead-Slider-2.jpg-1.jpeg';
+    $default_s1_m = $base_upload . '/2026/10/CMR-Lead-Slider-1.jpg-2-768x432.jpeg';
+    $default_s2_m = $base_upload . '/2026/10/CMR-Lead-Slider-2.jpg-1-768x432.jpeg';
+
     $atts = shortcode_atts( array(
-        'slider_1' => 'https://cmrindia.com/wp-content/uploads/2026/10/CMR-Lead-Slider-1.jpg-2.jpeg',
-        'slider_2' => 'https://cmrindia.com/wp-content/uploads/2026/10/CMR-Lead-Slider-2.jpg-1.jpeg',
+        'slider_1' => $default_s1,
+        'slider_2' => $default_s2,
     ), $atts );
     ob_start();
     ?>
@@ -441,6 +448,13 @@ function cmr_hero_banner_shortcode($atts) {
         width: 14px !important;
         height: 14px !important;
         margin-left: 6px !important;
+      }
+
+      .hero-bg-slide:nth-child(1) {
+        background-image: url('<?php echo esc_url( $default_s1_m ); ?>') !important;
+      }
+      .hero-bg-slide:nth-child(2) {
+        background-image: url('<?php echo esc_url( $default_s2_m ); ?>') !important;
       }
     }
     </style>
