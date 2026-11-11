@@ -761,7 +761,7 @@ function cmr_news_tabs_shortcode( $atts ) {
                                         ?>
                                             <a href="<?php echo esc_url( $link ); ?>" target="<?php echo esc_attr( $target ); ?>" class="insights-stacked-card">
                                                 <div class="insights-stacked-image">
-                                                    <img src="<?php echo esc_url( $img_src ); ?>" alt="<?php the_title_attribute(); ?>" loading="lazy" decoding="async" />
+                                                    <img src="<?php echo esc_url( $img_src ); ?>" alt="<?php the_title_attribute(); ?>" />
                                                 </div>
                                                 <div class="insights-stacked-content">
                                                     <span class="insights-tag">&mdash; Media Releases</span>
@@ -778,15 +778,15 @@ function cmr_news_tabs_shortcode( $atts ) {
                                         <a href="<?php echo esc_url( $link ); ?>" target="<?php echo esc_attr( $target ); ?>" class="cmr-card-link-wrapper">
                                             <div class="cmr-card-image-wrap">
                                                 <?php if ( $bg_image ) : ?>
-                                                    <img src="<?php echo esc_url( $bg_image ); ?>" class="cmr-card-bg" alt="<?php the_title_attribute(); ?>" loading="lazy" decoding="async">
+                                                    <img src="<?php echo esc_url( $bg_image ); ?>" class="cmr-card-bg" alt="<?php the_title_attribute(); ?>">
                                                 <?php endif; ?>
                                                 <?php if ( $count > 0 && $logo_url ) : ?>
-                                                    <img src="<?php echo esc_url( $logo_url ); ?>" class="cmr-card-logo cmr-card-logo-desktop" alt="Source Logo" loading="lazy" decoding="async">
+                                                    <img src="<?php echo esc_url( $logo_url ); ?>" class="cmr-card-logo cmr-card-logo-desktop" alt="Source Logo">
                                                 <?php endif; ?>
                                             </div>
                                             <div class="cmr-card-content">
                                                 <?php if ( $logo_url ) : ?>
-                                                    <img src="<?php echo esc_url( $logo_url ); ?>" class="cmr-card-logo cmr-card-logo-mobile" alt="Source Logo" loading="lazy" decoding="async">
+                                                    <img src="<?php echo esc_url( $logo_url ); ?>" class="cmr-card-logo cmr-card-logo-mobile" alt="Source Logo">
                                                 <?php endif; ?>
                                                 <div class="cmr-card-meta">
                                                     <div class="cmr-meta-left">
@@ -805,7 +805,7 @@ function cmr_news_tabs_shortcode( $atts ) {
                                                 $arrow_url = $is_who_we_serve ? 'https://cmrindia.com/wp-content/uploads/2026/04/Symbol.svg' : 'https://cmrindia.com/wp-content/uploads/2026/04/Symbol-1.svg';
                                                 $btn_text = 'Read Coverage';
                                                 ?>
-                                                <span class="cmr-read-coverage"><?php echo esc_html($btn_text); ?> <img src="<?php echo esc_url($arrow_url); ?>" class="cmr-arrow-icon" alt="Arrow" loading="lazy" decoding="async"></span>
+                                                <span class="cmr-read-coverage"><?php echo esc_html($btn_text); ?> <img src="<?php echo esc_url($arrow_url); ?>" class="cmr-arrow-icon" alt="Arrow"></span>
                                             </div>
                                         </a>
                                     </div>
@@ -822,7 +822,7 @@ function cmr_news_tabs_shortcode( $atts ) {
                     </div>
                     
                     <div class="cmr-news-footer">
-                        <a href="<?php echo esc_url( home_url( '/cmr-news/' ) ); ?>" class="cmr-explore-all">Explore All <img src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol.svg" class="cmr-arrow-icon" alt="Arrow" loading="lazy" decoding="async"></a>
+                        <a href="<?php echo esc_url( home_url( '/cmr-news/' ) ); ?>" class="cmr-explore-all">Explore All <img src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol.svg" class="cmr-arrow-icon" alt="Arrow"></a>
                     </div>
                 </div>
             <?php 

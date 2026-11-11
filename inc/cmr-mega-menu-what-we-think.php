@@ -304,7 +304,7 @@ function cmr_mega_menu_what_we_think_shortcode($atts) {
             ?>
             <a href="<?php echo esc_url(get_permalink($product->ID)); ?>" class="cmr-mmt-report-card">
                 <div class="cmr-mmt-report-img">
-                    <img src="<?php echo esc_url($thumbnail_url); ?>" alt="<?php echo esc_attr(get_the_title($product->ID)); ?>" loading="lazy" decoding="async">
+                    <img src="<?php echo esc_url($thumbnail_url); ?>" alt="<?php echo esc_attr(get_the_title($product->ID)); ?>">
                 </div>
                 <div class="cmr-mmt-report-content">
                     <div class="cmr-mmt-report-cat">IT & Telecom</div>
@@ -323,7 +323,7 @@ function cmr_mega_menu_what_we_think_shortcode($atts) {
             <?php else : ?>
             <a href="#" class="cmr-mmt-report-card">
                 <div class="cmr-mmt-report-img">
-                    <img src="https://cmrindia.com/wp-content/uploads/2026/06/Why-Chipsets-are-the-New-Frontier-in-Smartphones1.jpg" alt="Report" loading="lazy" decoding="async">
+                    <img src="https://cmrindia.com/wp-content/uploads/2026/06/Why-Chipsets-are-the-New-Frontier-in-Smartphones1.jpg" alt="Report">
                 </div>
                 <div class="cmr-mmt-report-content">
                     <div class="cmr-mmt-report-cat">IT & Telecom</div>

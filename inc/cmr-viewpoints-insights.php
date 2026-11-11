@@ -504,7 +504,7 @@ if ( ! function_exists( 'cmr_viewpoints_insights_shortcode' ) ) {
                         }
                     ?>
                     <a href="<?php echo esc_url(get_permalink($post_obj->ID)); ?>" class="cmr-vpi-card<?php echo $hidden_class; ?>" data-category="<?php echo $cat_data_attr; ?>">
-                        <img src="<?php echo esc_url($thumbnail_url); ?>" alt="<?php echo esc_attr(get_the_title($post_obj)); ?>" class="cmr-vpi-card-img" loading="lazy" decoding="async">
+                        <img src="<?php echo esc_url($thumbnail_url); ?>" alt="<?php echo esc_attr(get_the_title($post_obj)); ?>" class="cmr-vpi-card-img">
                         <div class="cmr-vpi-card-meta">
                             <div class="cmr-vpi-card-cat-date">
                                 <span><?php echo esc_html($category_name); ?></span> | 

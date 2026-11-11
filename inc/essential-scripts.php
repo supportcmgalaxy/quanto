@@ -471,9 +471,6 @@ add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
         'mas-animation-ex',
         'tablepress-default',
         'contact-form-7',
-        'elementor-post-13499',
-        'local-13499-frontend-desktop',
-        'local-13499-frontend-mobile',
     );
     if ( in_array( $handle, $async_handles, true ) ) {
         $async_tag = str_replace( "media='all'", "media='print' onload=\"this.media='all'\"", $html );
@@ -512,9 +509,9 @@ add_filter( 'elementor/widget/render_content', function( $content, $widget ) {
  */
 add_action( 'wp_head', 'quanto_preload_critical_assets', 1 );
 function quanto_preload_critical_assets() {
-    // Critical zero-FOUC popup/modal hide rules + safe off-screen footer content-visibility
+    // Critical zero-FOUC popup/modal hide rules so Elementor & login popups never flash/overlap during page load
     if ( ! is_admin() && ! ( function_exists( 'quanto_is_elementor_edit' ) && quanto_is_elementor_edit() ) ) {
-        echo '<style id="cmr-critical-modal-hide">.elementor-location-popup:not(.dialog-widget-content *):not(.dialog-message *),.elementor-popup-modal[style*="display: none"],.elementor-popup-modal[style*="display:none"],.dialog-widget[style*="display: none"],.dialog-widget[style*="display:none"],.xoo-el-container.xoo-el-style-popup:not(.xoo-el-popup-active),.xoo-el-popup-notice:not(.xoo-el-notice-active),#cmr-review-modal-overlay:not(.cmr-open),#cmr-review-modal:not(.cmr-open),.cmr-vmodal-overlay:not(.active):not(.cmr-open){display:none !important;visibility:hidden !important;opacity:0 !important;pointer-events:none !important;}footer .elementor-13499{content-visibility:auto;contain-intrinsic-size:auto 520px;}</style>' . "\n";
+        echo '<style id="cmr-critical-modal-hide">.elementor-location-popup:not(.dialog-widget-content *):not(.dialog-message *),.elementor-popup-modal[style*="display: none"],.elementor-popup-modal[style*="display:none"],.dialog-widget[style*="display: none"],.dialog-widget[style*="display:none"],.xoo-el-container.xoo-el-style-popup:not(.xoo-el-popup-active),.xoo-el-popup-notice:not(.xoo-el-notice-active),#cmr-review-modal-overlay:not(.cmr-open),#cmr-review-modal:not(.cmr-open),.cmr-vmodal-overlay:not(.active):not(.cmr-open){display:none !important;visibility:hidden !important;opacity:0 !important;pointer-events:none !important;}</style>' . "\n";
     }
     $font_url = get_theme_file_uri( '/assets/fonts/instrument-sans/instrument-sans-latin-normal.woff2' );
     echo '<link rel="preload" href="' . esc_url( $font_url ) . '" as="font" type="font/woff2" crossorigin>' . "\n";

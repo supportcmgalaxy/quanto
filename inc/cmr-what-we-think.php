@@ -603,7 +603,7 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
                                         <div class="cmr-wwt-card <?php echo $is_research_reports ? 'cmr-wwt-card-research-reports' : ''; ?>">
                                             <div class="cmr-wwt-card-img">
                                                 <a href="<?php echo esc_url($post['link']); ?>">
-                                                    <img src="<?php echo esc_url($post['image']); ?>" alt="<?php echo esc_attr($post['title']); ?>" loading="lazy" decoding="async">
+                                                    <img src="<?php echo esc_url($post['image']); ?>" alt="<?php echo esc_attr($post['title']); ?>">
                                                 </a>
                                             </div>
                                             <div class="cmr-wwt-card-cat" data-i="<?php echo esc_attr($index); ?>">
@@ -645,7 +645,7 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
                                             <div class="cmr-wwt-card <?php echo $is_research_reports ? 'cmr-wwt-card-research-reports' : ''; ?>">
                                                 <div class="cmr-wwt-card-img">
                                                     <a href="<?php echo esc_url($post['link']); ?>">
-                                                        <img src="<?php echo esc_url($post['image']); ?>" alt="<?php echo esc_attr($post['title']); ?>" loading="lazy" decoding="async">
+                                                        <img src="<?php echo esc_url($post['image']); ?>" alt="<?php echo esc_attr($post['title']); ?>">
                                                     </a>
                                                 </div>
                                                 <div class="cmr-wwt-card-cat">

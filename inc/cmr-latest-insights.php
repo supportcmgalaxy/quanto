@@ -88,7 +88,7 @@ if ( ! function_exists( 'cmr_latest_insights_render_grid' ) ) {
                         ?>
                             <a href="<?php echo esc_url( $post_link ); ?>" class="insights-stacked-card">
                                 <div class="insights-stacked-image">
-                                    <img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php echo esc_attr( $post_title ); ?>" loading="lazy" decoding="async" />
+                                    <img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php echo esc_attr( $post_title ); ?>" />
                                 </div>
                                 <div class="insights-stacked-content">
                                     <span class="insights-tag">&mdash; <?php echo esc_html( $category_name ); ?></span>
