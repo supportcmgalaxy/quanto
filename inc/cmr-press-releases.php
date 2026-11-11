@@ -253,6 +253,7 @@ function cmr_render_press_releases_shortcode( $atts ) {
     </style>
 
     <?php
+    $pr_terms = array('media-release', 'media-releases', 'press-release', 'press-releases', 'pressreleases', 'press-release-2', 'press-releases-2');
     $args = array(
         'post_type'      => 'cmr_news',
         'posts_per_page' => 5,
@@ -263,17 +264,11 @@ function cmr_render_press_releases_shortcode( $atts ) {
             array(
                 'taxonomy' => 'cmr_news_category',
                 'field'    => 'slug',
-                'terms'    => array('media-release', 'media-releases', 'press-release', 'press-releases', 'pressreleases', 'press-release-2', 'press-releases-2', 'cmr-in-news'),
+                'terms'    => $pr_terms,
             ),
         ),
     );
     $query = new WP_Query( $args );
-    
-    // Fallback if 'cmr-in-news' term is incorrect, just fetch all cmr_news for demonstration
-    if ( !$query->have_posts() ) {
-        $args['tax_query'] = array();
-        $query = new WP_Query( $args );
-    }
     ?>
 
     <div id="press-release"></div>
