@@ -493,6 +493,37 @@ add_filter( 'script_loader_tag', function( $tag, $handle, $src ) {
     if ( is_string( $tag ) && ( strpos( $tag, 'slick-animation.js' ) !== false || strpos( $tag, 'hello-animai.js' ) !== false || strpos( $tag, 'starter-animations.js' ) !== false || strpos( $tag, 'animejs' ) !== false ) ) {
         return '';
     }
+    // Performance test: strip unused/heavy animation & slider JS on homepage
+    $is_cmr_home = function_exists( 'quanto_is_cmr_home' ) ? quanto_is_cmr_home() : ( is_front_page() || is_home() );
+    if ( $is_cmr_home ) {
+        $blocked_anim_handles = array(
+            'gsap', 'gsap-script',
+            'scrollSmoother', 'gsap-scroll-smoother-script', 'scroll-smoother',
+            'scrollTo', 'gsap-scroll-to-plugin-script',
+            'scrollTrigger', 'gsap-scroll-trigger-script',
+            'split-text', 'gsap-split-text-script',
+            'mixitup', 'jquery-mixitup',
+            'mas-animation',
+            'wcf--addons', 'wcf--slider',
+            'odometer-min-script', 'viewport-jquery-script',
+            'swiper-bundle', 'swiper',
+            'quanto-addon-script',
+        );
+        if ( in_array( $handle, $blocked_anim_handles, true ) ) {
+            return '';
+        }
+        if ( is_string( $src ) && (
+            strpos( $src, '/mas-animation/' ) !== false ||
+            strpos( $src, '/animation-addons-for-elementor/' ) !== false ||
+            strpos( $src, 'odometer.min.js' ) !== false ||
+            strpos( $src, 'viewport.jquery.js' ) !== false ||
+            strpos( $src, 'swiper-bundle.min.js' ) !== false ||
+            strpos( $src, 'swiper.min.js' ) !== false ||
+            strpos( $src, 'quanto-addon.js' ) !== false
+        ) ) {
+            return '';
+        }
+    }
     return $tag;
 }, 99999, 3 );
 
@@ -666,6 +697,31 @@ add_action( 'wp_head', function() {
         window.dots = window.dots || new Proxy([], {
             get: function(t, p) { return dummyItem; }
         });
+
+        <?php if ( function_exists( 'quanto_is_cmr_home' ) ? quanto_is_cmr_home() : ( is_front_page() || is_home() ) ) : ?>
+        // 5. Safe no-op stubs on homepage only while animation/slider scripts are stripped for performance test
+        if ( ! window.gsap ) {
+            var _tl = { to: function(){ return _tl; }, from: function(){ return _tl; }, fromTo: function(){ return _tl; }, set: function(){ return _tl; }, add: function(){ return _tl; }, kill: function(){} };
+            window.gsap = {
+                registerPlugin: function(){}, config: function(){}, defaults: function(){},
+                to: function(){ return _tl; }, from: function(){ return _tl; }, fromTo: function(){ return _tl; }, set: function(){},
+                timeline: function(){ return _tl; },
+                matchMedia: function(){ return { add: function(){}, revert: function(){} }; },
+                context: function(){ return { revert: function(){} }; }
+            };
+        }
+        window.ScrollTrigger = window.ScrollTrigger || { create: function(){ return { kill: function(){} }; }, refresh: function(){}, getAll: function(){ return []; }, getById: function(){ return null; } };
+        window.ScrollSmoother = window.ScrollSmoother || { create: function(){ return null; }, get: function(){ return null; } };
+        window.Swiper = window.Swiper || function() { return { on: function(){}, destroy: function(){}, update: function(){}, slideTo: function(){}, params: {} }; };
+        window.addEventListener('load', function() {
+            if (typeof window.Odometer === 'undefined') {
+                document.querySelectorAll('.odometer[data-odometer-final]').forEach(function(el) {
+                    var val = el.getAttribute('data-odometer-final');
+                    if (val !== null && val !== '') { el.textContent = val; }
+                });
+            }
+        });
+        <?php endif; ?>
     })();
     </script>
     <?php
