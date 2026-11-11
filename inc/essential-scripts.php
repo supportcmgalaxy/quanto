@@ -12,6 +12,22 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+if ( ! function_exists( 'quanto_is_cmr_home' ) ) {
+    function quanto_is_cmr_home() {
+        return ( is_front_page() || is_home() || ( function_exists( 'get_queried_object_id' ) && (int) get_queried_object_id() === 14 ) || ( ! empty( $_SERVER['REQUEST_URI'] ) && ( $_SERVER['REQUEST_URI'] === '/' || strpos( $_SERVER['REQUEST_URI'], '/?' ) === 0 ) ) );
+    }
+}
+if ( ! function_exists( 'quanto_is_woocommerce_context' ) ) {
+    function quanto_is_woocommerce_context() {
+        return ( ( function_exists( 'is_woocommerce' ) && is_woocommerce() ) || ( function_exists( 'is_cart' ) && is_cart() ) || ( function_exists( 'is_checkout' ) && is_checkout() ) || ( function_exists( 'is_account_page' ) && is_account_page() ) || ( function_exists( 'is_product' ) && is_product() ) );
+    }
+}
+if ( ! function_exists( 'quanto_is_elementor_edit' ) ) {
+    function quanto_is_elementor_edit() {
+        return function_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->editor ) && \Elementor\Plugin::$instance->editor->is_edit_mode();
+    }
+}
+
 /**
  * Enqueue scripts and styles.
  */
@@ -266,61 +282,51 @@ function quanto_optimize_homepage_performance() {
         wp_dequeue_script( 'scroll-smoother' );
     }
 
-    // 4. Homepage performance optimization: dequeue unused trackers and non-layout third-party assets
-    $is_cmr_home = ( is_front_page() || is_home() || ( function_exists( 'get_queried_object_id' ) && (int) get_queried_object_id() === 14 ) || ( ! empty( $_SERVER['REQUEST_URI'] ) && ( $_SERVER['REQUEST_URI'] === '/' || strpos( $_SERVER['REQUEST_URI'], '/?' ) === 0 ) ) );
-    $is_elementor_edit = function_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->editor ) && \Elementor\Plugin::$instance->editor->is_edit_mode();
+    // 4. Global & Homepage frontend asset optimization
+    if ( ! is_admin() && ! quanto_is_elementor_edit() ) {
+        $is_cmr_home = quanto_is_cmr_home();
+        $is_woo_page = quanto_is_woocommerce_context();
 
-    if ( $is_cmr_home && ! is_admin() && ! $is_elementor_edit ) {
-        // Dequeue unneeded third-party trackers & attribution
+        // Dequeue unneeded third-party trackers & attribution across frontend pages
         wp_dequeue_script( 'reddit_tracking' );
         wp_dequeue_script( 'snapchat_tracking' );
         wp_dequeue_script( 'reddit-for-woocommerce-tracking' );
         wp_dequeue_script( 'snapchat-for-woocommerce-tracking' );
-        wp_dequeue_script( 'wc-order-attribution' );
-        wp_dequeue_script( 'sourcebuster-js' );
-        wp_dequeue_script( 'woocommerce-analytics' );
-        wp_dequeue_script( 'woocommerce-analytics-client' );
         wp_dequeue_script( 'jp-tracks' );
         wp_dequeue_script( 'jp-tracks-functions' );
 
-        // Dequeue Contact Form 7 scripts (Homepage has no CF7 form)
-        wp_dequeue_script( 'contact-form-7' );
-        wp_dequeue_script( 'swv' );
+        // Dequeue WooCommerce scripts & block styles on non-WooCommerce pages (e.g. home, /cmr-news/, /automotive/)
+        if ( ! $is_woo_page ) {
+            wp_dequeue_script( 'woocommerce' );
+            wp_dequeue_script( 'wc-jquery-blockui' );
+            wp_dequeue_script( 'wc-js-cookie' );
+            wp_dequeue_script( 'wc-add-to-cart' );
+            wp_dequeue_script( 'wc-order-attribution' );
+            wp_dequeue_script( 'sourcebuster-js' );
+            wp_dequeue_script( 'woocommerce-analytics' );
+            wp_dequeue_script( 'woocommerce-analytics-client' );
+            wp_dequeue_style( 'wc-blocks-style' );
+            wp_dequeue_style( 'wc-blocks-packages-style' );
 
-        // Dequeue WooCommerce frontend cart assets on homepage (No cart operations on homepage)
-        wp_dequeue_script( 'woocommerce' );
-        wp_dequeue_script( 'wc-jquery-blockui' );
-        wp_dequeue_script( 'wc-js-cookie' );
-        wp_dequeue_script( 'wc-add-to-cart' );
+            // Easy Login WooCommerce assets only needed on account/cart/checkout
+            wp_dequeue_script( 'xoo-aff-js' );
+            wp_dequeue_script( 'xoo-el-js' );
+            wp_dequeue_style( 'xoo-aff-style' );
+            wp_dequeue_style( 'xoo-aff-font-awesome5' );
+            wp_dequeue_style( 'xoo-el-style' );
+        }
 
-        // Dequeue Easy Login WooCommerce assets on homepage (Only needed when login popup is opened)
-        wp_dequeue_script( 'xoo-aff-js' );
-        wp_dequeue_script( 'xoo-el-js' );
-        wp_dequeue_style( 'xoo-aff-style' );
-        wp_dequeue_style( 'xoo-aff-font-awesome5' );
-        wp_dequeue_style( 'xoo-el-style' );
-
-        // Dequeue unused AnimeJS & ScrollMagic scripts (All homepage widgets have animejs-disable)
+        // Dequeue unused AnimeJS & redundant starter animation bloat
         wp_dequeue_script( 'animejs-main' );
         wp_dequeue_script( 'animejs-scrollmagic' );
         wp_dequeue_script( 'animejs-data-attr-helper' );
         wp_dequeue_script( 'animejs-helper' );
-
-        // Dequeue redundant slick / carousel animations (homepage uses native Swiper)
         wp_dequeue_script( 'quanto-slick-animation' );
         wp_dequeue_script( 'quanto-hello-animai' );
         wp_dequeue_style( 'quanto-animate' );
-
-        // Dequeue unused starter animations
         wp_dequeue_script( 'aae-starter-animations' );
         wp_dequeue_style( 'aae-starter-animations' );
-
-        // Dequeue unused wcf slider script (homepage uses Swiper)
         wp_dequeue_script( 'wcf--slider' );
-
-        // Dequeue Google reCAPTCHA v3 on staging/homepage to eliminate 189 KB payload and invalid domain error badge
-        wp_dequeue_script( 'google-recaptcha' );
-        wp_dequeue_script( 'wpcf7-recaptcha' );
 
         // Dequeue unneeded ElementsKit Lite assets (~300 KB CSS + ~60 KB JS)
         wp_dequeue_style( 'ekit-widget-common' );
@@ -337,106 +343,159 @@ function quanto_optimize_homepage_performance() {
         wp_dequeue_script( 'ekit-header-offcanvas' );
         wp_dequeue_script( 'magnific-popup' );
 
-        // Dequeue TablePress styles & scripts
-        wp_dequeue_style( 'tablepress-default' );
+        // Dequeue TablePress CSS unless current post uses a TablePress shortcode
+        global $post;
+        if ( ! isset( $post->post_content ) || strpos( $post->post_content, '[table' ) === false ) {
+            wp_dequeue_style( 'tablepress-default' );
+        }
 
-        // Dequeue Jetpack form layout CSS
+        // Dequeue classic theme fallback & Jetpack form CSS & duplicate icon pack
         wp_dequeue_style( 'jetpack-forms-layout' );
-
-        // Dequeue classic themes and block library
         wp_dequeue_style( 'classic-theme-styles' );
-        wp_dequeue_style( 'wc-blocks-style' );
-        wp_dequeue_style( 'wc-blocks-packages-style' );
-
-        // Dequeue duplicate icon pack
         wp_dequeue_style( 'elementor-icons-shared-0' );
+
+        if ( $is_cmr_home ) {
+            // Dequeue Contact Form 7 & reCAPTCHA on homepage (Homepage has no CF7 form)
+            wp_dequeue_script( 'contact-form-7' );
+            wp_dequeue_script( 'swv' );
+            wp_dequeue_script( 'google-recaptcha' );
+            wp_dequeue_script( 'wpcf7-recaptcha' );
+        }
     }
 }
 
-// Print styles hook to ensure late-registered block styles & ekiticons are dequeued on homepage
+// Print styles hook to ensure late-registered block styles & ekiticons are dequeued
 add_action( 'wp_print_styles', function() {
-    $is_cmr_home = ( is_front_page() || is_home() || ( function_exists( 'get_queried_object_id' ) && (int) get_queried_object_id() === 14 ) || ( ! empty( $_SERVER['REQUEST_URI'] ) && ( $_SERVER['REQUEST_URI'] === '/' || strpos( $_SERVER['REQUEST_URI'], '/?' ) === 0 ) ) );
-    $is_elementor_edit = function_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->editor ) && \Elementor\Plugin::$instance->editor->is_edit_mode();
-
-    if ( $is_cmr_home && ! is_admin() && ! $is_elementor_edit ) {
-        wp_dequeue_style( 'elementor-icons-ekiticons' );
+    if ( is_admin() || ( function_exists( 'quanto_is_elementor_edit' ) && quanto_is_elementor_edit() ) ) {
+        return;
+    }
+    $is_woo_page = function_exists( 'quanto_is_woocommerce_context' ) && quanto_is_woocommerce_context();
+    wp_dequeue_style( 'elementor-icons-ekiticons' );
+    wp_dequeue_style( 'quanto-animate' );
+    wp_dequeue_style( 'aae-starter-animations' );
+    wp_dequeue_style( 'classic-theme-styles' );
+    wp_dequeue_style( 'ekit-widget-common' );
+    wp_dequeue_style( 'ekit-nav-menu' );
+    wp_dequeue_style( 'ekit-header-search' );
+    wp_dequeue_style( 'ekit-header-offcanvas' );
+    wp_dequeue_style( 'ekit-header-info' );
+    if ( ! $is_woo_page ) {
         wp_dequeue_style( 'wc-blocks-style' );
         wp_dequeue_style( 'wc-blocks-packages-style' );
-        wp_dequeue_style( 'quanto-animate' );
-        wp_dequeue_style( 'aae-starter-animations' );
+    }
+    global $post;
+    if ( ! isset( $post->post_content ) || strpos( $post->post_content, '[table' ) === false ) {
         wp_dequeue_style( 'tablepress-default' );
-        wp_dequeue_style( 'classic-theme-styles' );
     }
 }, 99999 );
 
 // Stop CF7 from enqueuing JS/CSS on the homepage
 add_filter( 'wpcf7_load_js', function( $load ) {
-    $is_cmr_home = ( is_front_page() || is_home() || ( function_exists( 'get_queried_object_id' ) && (int) get_queried_object_id() === 14 ) || ( ! empty( $_SERVER['REQUEST_URI'] ) && ( $_SERVER['REQUEST_URI'] === '/' || strpos( $_SERVER['REQUEST_URI'], '/?' ) === 0 ) ) );
-    return ( $is_cmr_home && ! is_admin() ) ? false : $load;
+    $is_home = function_exists( 'quanto_is_cmr_home' ) ? quanto_is_cmr_home() : ( is_front_page() || is_home() );
+    return ( $is_home && ! is_admin() ) ? false : $load;
 } );
 add_filter( 'wpcf7_load_css', function( $load ) {
-    $is_cmr_home = ( is_front_page() || is_home() || ( function_exists( 'get_queried_object_id' ) && (int) get_queried_object_id() === 14 ) || ( ! empty( $_SERVER['REQUEST_URI'] ) && ( $_SERVER['REQUEST_URI'] === '/' || strpos( $_SERVER['REQUEST_URI'], '/?' ) === 0 ) ) );
-    return ( $is_cmr_home && ! is_admin() ) ? false : $load;
+    $is_home = function_exists( 'quanto_is_cmr_home' ) ? quanto_is_cmr_home() : ( is_front_page() || is_home() );
+    return ( $is_home && ! is_admin() ) ? false : $load;
 } );
 
-// Strip unneeded CSS & scripts directly from HTML output on homepage, and load non-critical CSS asynchronously
+// Strip unneeded CSS directly from HTML output and load non-critical/icon/below-the-fold CSS asynchronously
 add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
-    $is_cmr_home = ( is_front_page() || is_home() || ( function_exists( 'get_queried_object_id' ) && (int) get_queried_object_id() === 14 ) || ( ! empty( $_SERVER['REQUEST_URI'] ) && ( $_SERVER['REQUEST_URI'] === '/' || strpos( $_SERVER['REQUEST_URI'], '/?' ) === 0 ) ) );
-    $is_elementor_edit = function_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->editor ) && \Elementor\Plugin::$instance->editor->is_edit_mode();
+    if ( is_admin() || ( function_exists( 'quanto_is_elementor_edit' ) && quanto_is_elementor_edit() ) ) {
+        return $html;
+    }
 
-    if ( $is_cmr_home && ! is_admin() && ! $is_elementor_edit ) {
-        // 1. Completely unneeded on homepage: strip from output so they only load on pages where needed
-        $blocked_styles = array(
+    $is_cmr_home = function_exists( 'quanto_is_cmr_home' ) ? quanto_is_cmr_home() : ( is_front_page() || is_home() );
+    $is_woo_page = function_exists( 'quanto_is_woocommerce_context' ) && quanto_is_woocommerce_context();
+
+    // 1. Strip globally unneeded styles from output
+    $global_blocked = array(
+        'elementor-icons-ekiticons',
+        'ekit-widget-common',
+        'ekit-nav-menu',
+        'ekit-header-search',
+        'ekit-header-offcanvas',
+        'ekit-header-info',
+        'quanto-animate',
+        'aae-starter-animations',
+        'classic-theme-styles',
+    );
+    if ( ! $is_woo_page ) {
+        $global_blocked = array_merge( $global_blocked, array(
             'wc-blocks-style',
             'wc-blocks-packages-style',
-            'elementor-icons-ekiticons',
-            'quanto-animate',
-            'aae-starter-animations',
+            'xoo-aff-style',
+            'xoo-aff-font-awesome5',
+            'xoo-el-style',
+        ) );
+    }
+    if ( $is_cmr_home ) {
+        $global_blocked = array_merge( $global_blocked, array(
             'remixicon',
             'swiper-bundle',
             'quanto-blog-style',
             'tablepress-default',
-            'classic-theme-styles',
             'cmr-sticky-nav-css',
             'cmr-modal-style',
             'wcf--addons',
             'mas-animation-ex',
             'e-popup',
-        );
-        if ( in_array( $handle, $blocked_styles, true ) || ( is_string( $html ) && ( strpos( $html, 'wc-blocks.css' ) !== false || strpos( $html, 'ekiticons.css' ) !== false || strpos( $html, 'animate.css' ) !== false || strpos( $html, 'quanto/assets/css/remixicon.css' ) !== false || strpos( $html, 'cmr-sticky-nav.css' ) !== false || strpos( $html, 'cmr-modal.css' ) !== false || strpos( $html, 'wcf-addons.min.css' ) !== false || strpos( $html, 'mas-animation.css' ) !== false ) ) ) {
-            return '';
-        }
-
-        // 2. Below-the-fold stylesheets: load asynchronously to eliminate remaining render-blocking
-        $async_handles = array(
-            'cmr-live-css',
-            'cmr-testimonials-css',
-            'cmr-news-style',
-            'fontawesome-style',
-            'cmr-latest-insights',
-        );
-        if ( in_array( $handle, $async_handles, true ) ) {
-            $async_tag = str_replace( "media='all'", "media='print' onload=\"this.media='all'\"", $html );
-            if ( $async_tag === $html ) {
-                $async_tag = str_replace( 'media="all"', 'media="print" onload="this.media=\'all\'"', $html );
-            }
-            if ( $async_tag === $html ) {
-                $async_tag = str_replace( '/>', ' media="print" onload="this.media=\'all\'" />', $html );
-            }
-            return $async_tag . '<noscript><link rel="stylesheet" href="' . esc_url( $href ) . '"></noscript>' . "\n";
-        }
+        ) );
     }
+
+    $is_blocked_src = is_string( $html ) && (
+        strpos( $html, 'ekiticons.css' ) !== false ||
+        strpos( $html, 'elementskit-lite/' ) !== false ||
+        strpos( $html, 'animate.css' ) !== false ||
+        ( ! $is_woo_page && ( strpos( $html, 'wc-blocks.css' ) !== false || strpos( $html, 'xoo-aff' ) !== false || strpos( $html, 'xoo-el' ) !== false ) ) ||
+        ( $is_cmr_home && ( strpos( $html, 'quanto/assets/css/remixicon.css' ) !== false || strpos( $html, 'cmr-sticky-nav.css' ) !== false || strpos( $html, 'cmr-modal.css' ) !== false || strpos( $html, 'wcf-addons.min.css' ) !== false || strpos( $html, 'mas-animation.css' ) !== false ) )
+    );
+
+    if ( in_array( $handle, $global_blocked, true ) || $is_blocked_src ) {
+        return '';
+    }
+
+    // 2. Icon fonts, popups, animations, & below-the-fold stylesheets: load asynchronously to eliminate render-blocking across all pages
+    $async_handles = array(
+        'cmr-live-css',
+        'cmr-testimonials-css',
+        'cmr-news-style',
+        'cmr-media-coverage-style',
+        'fontawesome-style',
+        'remixicon-style',
+        'elementor-icons',
+        'cmr-latest-insights',
+        'odometer-style',
+        'meanmenu-min-style',
+        'cmr-modal-style',
+        'cmr-sticky-nav-css',
+        'e-animation-fadeIn',
+        'e-popup',
+        'wcf--addons',
+        'mas-animation-ex',
+        'tablepress-default',
+        'contact-form-7',
+    );
+    if ( in_array( $handle, $async_handles, true ) ) {
+        $async_tag = str_replace( "media='all'", "media='print' onload=\"this.media='all'\"", $html );
+        if ( $async_tag === $html ) {
+            $async_tag = str_replace( 'media="all"', 'media="print" onload="this.media=\'all\'"', $html );
+        }
+        if ( $async_tag === $html ) {
+            $async_tag = str_replace( '/>', ' media="print" onload="this.media=\'all\'" />', $html );
+        }
+        return $async_tag . '<noscript><link rel="stylesheet" href="' . esc_url( $href ) . '"></noscript>' . "\n";
+    }
+
     return $html;
 }, 99999, 4 );
 
 add_filter( 'script_loader_tag', function( $tag, $handle, $src ) {
-    $is_cmr_home = ( is_front_page() || is_home() || ( function_exists( 'get_queried_object_id' ) && (int) get_queried_object_id() === 14 ) || ( ! empty( $_SERVER['REQUEST_URI'] ) && ( $_SERVER['REQUEST_URI'] === '/' || strpos( $_SERVER['REQUEST_URI'], '/?' ) === 0 ) ) );
-    $is_elementor_edit = function_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->editor ) && \Elementor\Plugin::$instance->editor->is_edit_mode();
-
-    if ( $is_cmr_home && ! is_admin() && ! $is_elementor_edit ) {
-        if ( is_string( $tag ) && ( strpos( $tag, 'slick-animation.js' ) !== false || strpos( $tag, 'hello-animai.js' ) !== false || strpos( $tag, 'starter-animations.js' ) !== false ) ) {
-            return '';
-        }
+    if ( is_admin() || ( function_exists( 'quanto_is_elementor_edit' ) && quanto_is_elementor_edit() ) ) {
+        return $tag;
+    }
+    if ( is_string( $tag ) && ( strpos( $tag, 'slick-animation.js' ) !== false || strpos( $tag, 'hello-animai.js' ) !== false || strpos( $tag, 'starter-animations.js' ) !== false || strpos( $tag, 'animejs' ) !== false ) ) {
+        return '';
     }
     return $tag;
 }, 99999, 3 );
@@ -505,6 +564,19 @@ function quanto_defer_non_critical_scripts( $tag, $handle ) {
         'mas-sticky-header',
         'pro-elements-handlers',
         'elementor-pro-frontend',
+        'cmr-media-coverage-script',
+        'google-recaptcha',
+        'wpcf7-recaptcha',
+        'contact-form-7',
+        'swv',
+        'wp-polyfill',
+        'ekit-core',
+        'ekit-nav-menu',
+        'ekit-menu',
+        'ekit-header-search',
+        'ekit-header-offcanvas',
+        'xoo-el-js',
+        'xoo-aff-js',
     );
 
     if ( in_array( $handle, $defer_handles, true ) && false === strpos( $tag, 'defer' ) ) {

@@ -10,9 +10,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_shortcode( 'cmr_news_carousel', 'cmr_render_news_carousel_shortcode' );
 
 function cmr_render_news_carousel_shortcode( $atts ) {
-    wp_enqueue_style( 'swiper-bundle-style', get_template_directory_uri() . '/assets/css/swiper-bundle.min.css', array(), '7.0.8' );
-    wp_enqueue_script( 'swiper-bundle-script', get_template_directory_uri() . '/assets/js/swiper-bundle.min.js', array('jquery'), '7.0.8', true );
-    wp_enqueue_style( 'cmr-media-coverage-style', get_template_directory_uri() . '/assets/css/cmr-media-coverage.css', array(), time() );
+    if ( ! wp_style_is( 'swiper-bundle-min-style', 'enqueued' ) ) {
+        wp_enqueue_style( 'swiper-bundle-min-style', get_template_directory_uri() . '/assets/css/swiper-bundle.min.css', array(), '7.0.8' );
+    }
+    if ( ! wp_script_is( 'swiper-bundle', 'enqueued' ) ) {
+        wp_enqueue_script( 'swiper-bundle', get_template_directory_uri() . '/assets/js/swiper-bundle.min.js', array('jquery'), '7.0.8', true );
+    }
+    $mc_css_path = get_template_directory() . '/assets/css/cmr-media-coverage.css';
+    $mc_css_ver  = file_exists( $mc_css_path ) ? filemtime( $mc_css_path ) : '1.0.0';
+    wp_enqueue_style( 'cmr-media-coverage-style', get_template_directory_uri() . '/assets/css/cmr-media-coverage.css', array(), $mc_css_ver );
 
     $args = array(
         'post_type'      => 'cmr_news',
@@ -76,6 +82,24 @@ function cmr_render_news_carousel_shortcode( $atts ) {
         align-items: stretch;
     }
 
+    /* Prevent CLS before Swiper JS initializes */
+    .cmr-nc-carousel:not(.swiper-initialized) .swiper-wrapper {
+        display: flex;
+        justify-content: center;
+    }
+
+    .cmr-nc-carousel:not(.swiper-initialized) .swiper-slide {
+        flex: 0 0 84.7%;
+        width: 84.7%;
+        max-width: 84.7%;
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .cmr-nc-carousel:not(.swiper-initialized) .swiper-slide:not(:first-child) {
+        display: none;
+    }
+
     .cmr-nc-carousel .swiper-slide {
         transition: opacity 0.4s ease, transform 0.4s ease;
         opacity: 0.55;
@@ -95,6 +119,7 @@ function cmr_render_news_carousel_shortcode( $atts ) {
         height: 740px !important;
         border-radius: 0 !important;
         overflow: hidden;
+        background-color: #0b1020;
         background-size: cover;
         background-position: center;
         display: flex;
@@ -102,6 +127,18 @@ function cmr_render_news_carousel_shortcode( $atts ) {
         justify-content: space-between;
         box-sizing: border-box;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .cmr-nc-card .cmr-nc-bg-img {
+        position: absolute;
+        inset: 0;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover;
+        object-position: center;
+        z-index: 0;
+        pointer-events: none;
+        border-radius: 0 !important;
     }
 
     .cmr-nc-overlay {
@@ -468,12 +505,31 @@ function cmr_render_news_carousel_shortcode( $atts ) {
         <?php if ( $query->have_posts() ) : ?>
         <div class="swiper cmr-nc-carousel">
             <div class="swiper-wrapper">
-                <?php while ( $query->have_posts() ) : $query->the_post(); 
+                <?php
+                $slide_index = 0;
+                while ( $query->have_posts() ) : $query->the_post(); 
                     $post_id = get_the_ID();
-                    $bg_image = get_the_post_thumbnail_url( $post_id, 'large' );
-                    if ( ! $bg_image ) {
-                        $bg_image = 'https://via.placeholder.com/800x500';
+                    $thumb_id = get_post_thumbnail_id( $post_id );
+                    $is_first_slide = ( $slide_index === 0 );
+                    $bg_img_html = '';
+                    if ( $thumb_id ) {
+                        $img_attrs = array(
+                            'class'    => 'cmr-nc-bg-img',
+                            'sizes'    => '(max-width: 768px) 88vw, 85vw',
+                            'alt'      => esc_attr( get_the_title() ),
+                            'decoding' => $is_first_slide ? 'sync' : 'async',
+                            'loading'  => $is_first_slide ? 'eager' : 'lazy',
+                        );
+                        if ( $is_first_slide ) {
+                            $img_attrs['fetchpriority'] = 'high';
+                        }
+                        $bg_img_html = wp_get_attachment_image( $thumb_id, 'large', false, $img_attrs );
                     }
+                    if ( empty( $bg_img_html ) ) {
+                        $bg_image = get_the_post_thumbnail_url( $post_id, 'large' ) ?: 'https://via.placeholder.com/800x500';
+                        $bg_img_html = '<img src="' . esc_url( $bg_image ) . '" class="cmr-nc-bg-img" alt="' . esc_attr( get_the_title() ) . '" loading="' . ( $is_first_slide ? 'eager' : 'lazy' ) . '" decoding="' . ( $is_first_slide ? 'sync' : 'async' ) . '"' . ( $is_first_slide ? ' fetchpriority="high"' : '' ) . '>';
+                    }
+                    $slide_index++;
                     $publisher_name = get_post_meta( $post_id, '_cmr_news_publisher_name', true );
                     if ( ! $publisher_name ) {
                         $publisher_name = 'BBC News';
@@ -515,7 +571,8 @@ function cmr_render_news_carousel_shortcode( $atts ) {
                     $show_featured = ( $query->current_post === 0 || $is_featured == '1' );
                 ?>
                 <div class="swiper-slide">
-                    <div class="cmr-nc-card" style="background-image: url('<?php echo esc_url( $bg_image ); ?>');">
+                    <div class="cmr-nc-card">
+                        <?php echo $bg_img_html; ?>
                         <div class="cmr-nc-overlay"></div>
                         
                         <!-- Top Bar: Featured Badge on top-left -->
@@ -594,7 +651,7 @@ function cmr_render_news_carousel_shortcode( $atts ) {
                         loop: slideCount > 1,
                         speed: 400,
                         autoplay: slideCount > 1 ? {
-                            delay: 4000,
+                            delay: 6000,
                             disableOnInteraction: false,
                             pauseOnMouseEnter: true,
                         } : false,
@@ -664,12 +721,13 @@ function cmr_render_news_carousel_shortcode( $atts ) {
                             fill.style.transition = 'none';
                             fill.style.webkitTransition = 'none';
                             fill.style.width = '0%';
-                            void fill.offsetWidth; // Force layout reflow
 
                             requestAnimationFrame(function() {
-                                fill.style.transition = 'width 4000ms linear';
-                                fill.style.webkitTransition = 'width 4000ms linear';
-                                fill.style.width = '100%';
+                                requestAnimationFrame(function() {
+                                    fill.style.transition = 'width 6000ms linear';
+                                    fill.style.webkitTransition = 'width 6000ms linear';
+                                    fill.style.width = '100%';
+                                });
                             });
                         }
                     }

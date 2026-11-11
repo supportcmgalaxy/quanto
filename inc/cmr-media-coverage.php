@@ -11,76 +11,86 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_shortcode( 'cmr_media_coverage', 'cmr_render_media_coverage_shortcode' );
 
 function cmr_render_media_coverage_shortcode( $atts ) {
-    // Enqueue scripts and styles
-    wp_enqueue_style( 'cmr-media-coverage-style', get_template_directory_uri() . '/assets/css/cmr-media-coverage.css', array(), time() );
-    wp_enqueue_script( 'cmr-media-coverage-script', get_template_directory_uri() . '/assets/js/cmr-media-coverage.js', array('jquery'), time(), true );
+    // Enqueue scripts and styles with filemtime versions for proper browser/CDN caching
+    $mc_css_path = get_template_directory() . '/assets/css/cmr-media-coverage.css';
+    $mc_js_path  = get_template_directory() . '/assets/js/cmr-media-coverage.js';
+    $mc_css_ver  = file_exists( $mc_css_path ) ? filemtime( $mc_css_path ) : '1.0.0';
+    $mc_js_ver   = file_exists( $mc_js_path ) ? filemtime( $mc_js_path ) : '1.0.0';
+    wp_enqueue_style( 'cmr-media-coverage-style', get_template_directory_uri() . '/assets/css/cmr-media-coverage.css', array(), $mc_css_ver );
+    wp_enqueue_script( 'cmr-media-coverage-script', get_template_directory_uri() . '/assets/js/cmr-media-coverage.js', array('jquery'), $mc_js_ver, true );
     
     // Pass ajax_url to JS
     wp_localize_script( 'cmr-media-coverage-script', 'cmr_mc_ajax', array(
         'ajax_url' => admin_url( 'admin-ajax.php' )
     ) );
 
-    // Fetch distinct publishers that have valid published posts in this category
-    global $wpdb;
-    $raw_publishers = $wpdb->get_col("
-        SELECT pm.meta_value 
-        FROM {$wpdb->postmeta} pm
-        INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
-        WHERE pm.meta_key = '_cmr_news_publisher_name' 
-        AND TRIM(pm.meta_value) != ''
-        AND p.post_type = 'cmr_news'
-        AND p.post_status = 'publish'
-        AND p.ID NOT IN (
-            SELECT tr.object_id FROM {$wpdb->term_relationships} tr
-            INNER JOIN {$wpdb->term_taxonomy} tt ON tt.term_taxonomy_id = tr.term_taxonomy_id
-            INNER JOIN {$wpdb->terms} t ON t.term_id = tt.term_id
-            WHERE tt.taxonomy IN ('cmr_news_category', 'category')
-            AND (
-                t.slug IN ('media-releases', 'media-release', 'media_releases', 'media_release', 'press-releases', 'press-release', 'pressreleases', 'press-releases-2', 'press-release-2', 'quarterly-results')
-                OR t.name LIKE '%Media Release%'
-                OR t.name LIKE '%Press Release%'
-                OR t.name LIKE '%Quarterly%'
-            )
-        )
-        GROUP BY pm.meta_value
-        ORDER BY COUNT(p.ID) DESC, pm.meta_value ASC
-    ");
-
-    $publishers = array();
-    if ( ! empty( $raw_publishers ) ) {
-        foreach ( $raw_publishers as $r_pub ) {
-            $r_pub = trim( $r_pub );
-            if ( empty( $r_pub ) || in_array( $r_pub, $publishers ) ) continue;
-
-            // Verify with exact WP_Query criteria
-            $chk = new WP_Query( array(
-                'post_type'      => 'cmr_news',
-                'post_status'    => 'publish',
-                'posts_per_page' => 1,
-                'fields'         => 'ids',
-                'tax_query'      => array(
-                    'relation' => 'AND',
-                    array(
-                        'taxonomy' => 'cmr_news_category',
-                        'field'    => 'slug',
-                        'terms'    => array('media-releases', 'media-release', 'media_releases', 'media_release', 'press-releases', 'press-release', 'pressreleases', 'press-releases-2', 'press-release-2', 'quarterly-results'),
-                        'operator' => 'NOT IN'
-                    ),
-                ),
-                'meta_query'     => array(
-                    array(
-                        'key'     => '_cmr_news_publisher_name',
-                        'value'   => $r_pub,
-                        'compare' => '='
-                    )
+    // Fetch distinct publishers (cached via transient to avoid N+1 WP_Query calls on every page load)
+    $publishers = get_transient( 'cmr_mc_valid_publishers_v1' );
+    if ( false === $publishers || ! is_array( $publishers ) ) {
+        global $wpdb;
+        $raw_publishers = $wpdb->get_col("
+            SELECT pm.meta_value 
+            FROM {$wpdb->postmeta} pm
+            INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+            WHERE pm.meta_key = '_cmr_news_publisher_name' 
+            AND TRIM(pm.meta_value) != ''
+            AND p.post_type = 'cmr_news'
+            AND p.post_status = 'publish'
+            AND p.ID NOT IN (
+                SELECT tr.object_id FROM {$wpdb->term_relationships} tr
+                INNER JOIN {$wpdb->term_taxonomy} tt ON tt.term_taxonomy_id = tr.term_taxonomy_id
+                INNER JOIN {$wpdb->terms} t ON t.term_id = tt.term_id
+                WHERE tt.taxonomy IN ('cmr_news_category', 'category')
+                AND (
+                    t.slug IN ('media-releases', 'media-release', 'media_releases', 'media_release', 'press-releases', 'press-release', 'pressreleases', 'press-releases-2', 'press-release-2', 'quarterly-results')
+                    OR t.name LIKE '%Media Release%'
+                    OR t.name LIKE '%Press Release%'
+                    OR t.name LIKE '%Quarterly%'
                 )
-            ) );
+            )
+            GROUP BY pm.meta_value
+            ORDER BY COUNT(p.ID) DESC, pm.meta_value ASC
+        ");
 
-            if ( $chk->have_posts() ) {
-                $publishers[] = $r_pub;
+        $publishers = array();
+        if ( ! empty( $raw_publishers ) ) {
+            foreach ( $raw_publishers as $r_pub ) {
+                $r_pub = trim( $r_pub );
+                if ( empty( $r_pub ) || in_array( $r_pub, $publishers, true ) ) continue;
+
+                $chk = new WP_Query( array(
+                    'post_type'      => 'cmr_news',
+                    'post_status'    => 'publish',
+                    'posts_per_page' => 1,
+                    'fields'         => 'ids',
+                    'no_found_rows'  => true,
+                    'tax_query'      => array(
+                        'relation' => 'AND',
+                        array(
+                            'taxonomy' => 'cmr_news_category',
+                            'field'    => 'slug',
+                            'terms'    => array('media-releases', 'media-release', 'media_releases', 'media_release', 'press-releases', 'press-release', 'pressreleases', 'press-releases-2', 'press-release-2', 'quarterly-results'),
+                            'operator' => 'NOT IN'
+                        ),
+                    ),
+                    'meta_query'     => array(
+                        array(
+                            'key'     => '_cmr_news_publisher_name',
+                            'value'   => $r_pub,
+                            'compare' => '='
+                        )
+                    )
+                ) );
+
+                if ( $chk->have_posts() ) {
+                    $publishers[] = $r_pub;
+                }
             }
         }
+        set_transient( 'cmr_mc_valid_publishers_v1', $publishers, HOUR_IN_SECONDS );
     }
+
+    $initial_data = cmr_get_media_coverage_grid_data( 1, '', '' );
 
     ob_start();
     ?>
@@ -667,27 +677,25 @@ function cmr_render_media_coverage_shortcode( $atts ) {
         </div>
 
         <div class="cmr-mc-grid" id="cmr-mc-grid-container">
-            <!-- Initial posts will be loaded here via AJAX -->
-            <div class="cmr-mc-loading">Loading...</div>
+            <?php echo $initial_data['html']; ?>
         </div>
 
         <div class="cmr-mc-footer">
-            <button id="cmr-mc-load-more" class="cmr-mc-load-more" style="display:none;">Load More</button>
+            <button id="cmr-mc-load-more" class="cmr-mc-load-more"<?php echo empty( $initial_data['has_more'] ) ? ' style="display:none;"' : ''; ?>>Load More</button>
         </div>
     </div>
     <?php
     return ob_get_clean();
 }
 
-// 2. AJAX Handler for Fetching Posts
-add_action( 'wp_ajax_cmr_filter_media_coverage', 'cmr_ajax_filter_media_coverage' );
-add_action( 'wp_ajax_nopriv_cmr_filter_media_coverage', 'cmr_ajax_filter_media_coverage' );
+add_action( 'save_post_cmr_news', function() {
+    delete_transient( 'cmr_mc_valid_publishers_v1' );
+} );
 
-function cmr_ajax_filter_media_coverage() {
-    $paged = isset( $_POST['page'] ) ? intval( $_POST['page'] ) : 1;
-    $publisher = isset( $_POST['publisher'] ) ? sanitize_text_field( $_POST['publisher'] ) : '';
-    $search = isset( $_POST['search'] ) ? sanitize_text_field( $_POST['search'] ) : '';
-
+/**
+ * Shared renderer for Media Coverage grid items (used by SSR initial render and AJAX)
+ */
+function cmr_get_media_coverage_grid_data( $paged = 1, $publisher = '', $search = '' ) {
     $args = array(
         'post_type'      => 'cmr_news',
         'posts_per_page' => 7, // 1 featured + 6 standard (2 rows) per page
@@ -706,7 +714,6 @@ function cmr_ajax_filter_media_coverage() {
         ),
     );
 
-    // Apply publisher filter
     if ( ! empty( $publisher ) ) {
         $args['meta_query'] = array(
             array(
@@ -717,13 +724,12 @@ function cmr_ajax_filter_media_coverage() {
         );
     }
 
-    // Apply search
     if ( ! empty( $search ) ) {
         $args['s'] = $search;
     }
 
     $query = new WP_Query( $args );
-    
+
     ob_start();
 
     if ( $query->have_posts() ) {
@@ -731,7 +737,24 @@ function cmr_ajax_filter_media_coverage() {
         while ( $query->have_posts() ) {
             $query->the_post();
             $post_id = get_the_ID();
-            $bg_image = get_the_post_thumbnail_url( $post_id, 'large' );
+            $thumb_id = get_post_thumbnail_id( $post_id );
+            $is_featured_card = ( $paged === 1 && $count === 0 );
+            $bg_img_html = '';
+            if ( $thumb_id ) {
+                $bg_img_html = wp_get_attachment_image( $thumb_id, 'medium_large', false, array(
+                    'class'    => 'cmr-mc-bg',
+                    'loading'  => 'lazy',
+                    'decoding' => 'async',
+                    'sizes'    => $is_featured_card ? '(max-width: 768px) 100vw, 680px' : '(max-width: 768px) 100vw, 420px',
+                    'alt'      => esc_attr( get_the_title() ),
+                ) );
+            }
+            if ( empty( $bg_img_html ) ) {
+                $bg_image = get_the_post_thumbnail_url( $post_id, 'medium_large' );
+                if ( $bg_image ) {
+                    $bg_img_html = '<img src="' . esc_url( $bg_image ) . '" class="cmr-mc-bg" alt="' . esc_attr( get_the_title() ) . '" loading="lazy" decoding="async">';
+                }
+            }
             $logo_id = get_post_meta( $post_id, '_cmr_news_source_logo_id', true );
             $logo_url = $logo_id ? wp_get_attachment_url( $logo_id ) : '';
             $document_id = get_post_meta( $post_id, '_cmr_news_document_id', true );
@@ -750,18 +773,15 @@ function cmr_ajax_filter_media_coverage() {
             $publisher_name = get_post_meta( $post_id, '_cmr_news_publisher_name', true );
             $date = get_the_date( 'M j, Y' );
 
-            // If it's page 1 and the very first item, render the featured layout
-            if ( $paged === 1 && $count === 0 ) {
+            if ( $is_featured_card ) {
                 ?>
                 <div class="cmr-mc-card cmr-mc-featured">
                     <a href="<?php echo esc_url( $link ); ?>" target="<?php echo esc_attr( $target ); ?>" class="cmr-mc-link-wrapper">
                         <div class="cmr-mc-image-wrap">
-                            <?php if ( $bg_image ) : ?>
-                                <img src="<?php echo esc_url( $bg_image ); ?>" class="cmr-mc-bg" alt="<?php the_title_attribute(); ?>">
-                            <?php endif; ?>
+                            <?php echo $bg_img_html; ?>
                             <span class="cmr-mc-trending-tag">✦ TRENDING</span>
                             <?php if ( $logo_url ) : ?>
-                                <img src="<?php echo esc_url( $logo_url ); ?>" class="cmr-mc-logo" alt="Source Logo">
+                                <img src="<?php echo esc_url( $logo_url ); ?>" class="cmr-mc-logo" alt="Source Logo" loading="lazy" decoding="async">
                             <?php endif; ?>
                         </div>
                         <div class="cmr-mc-content">
@@ -781,22 +801,19 @@ function cmr_ajax_filter_media_coverage() {
                             <?php if ( has_excerpt() ) : ?>
                                 <p class="cmr-mc-excerpt"><?php echo wp_trim_words( get_the_excerpt(), 25 ); ?></p>
                             <?php endif; ?>
-                            <span class="cmr-mc-read-coverage">View Coverage <img src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol-1.svg" class="cmr-mc-arrow" alt=""></span>
+                            <span class="cmr-mc-read-coverage">View Coverage <img src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol-1.svg" class="cmr-mc-arrow" alt="" loading="lazy" decoding="async"></span>
                         </div>
                     </a>
                 </div>
                 <?php
             } else {
-                // Render standard card
                 ?>
                 <div class="cmr-mc-card cmr-mc-standard">
                     <a href="<?php echo esc_url( $link ); ?>" target="<?php echo esc_attr( $target ); ?>" class="cmr-mc-link-wrapper">
                         <div class="cmr-mc-image-wrap">
-                            <?php if ( $bg_image ) : ?>
-                                <img src="<?php echo esc_url( $bg_image ); ?>" class="cmr-mc-bg" alt="<?php the_title_attribute(); ?>">
-                            <?php endif; ?>
+                            <?php echo $bg_img_html; ?>
                             <?php if ( $logo_url ) : ?>
-                                <img src="<?php echo esc_url( $logo_url ); ?>" class="cmr-mc-logo" alt="Source Logo">
+                                <img src="<?php echo esc_url( $logo_url ); ?>" class="cmr-mc-logo" alt="Source Logo" loading="lazy" decoding="async">
                             <?php endif; ?>
                         </div>
                         <div class="cmr-mc-content">
@@ -813,7 +830,7 @@ function cmr_ajax_filter_media_coverage() {
                                 </div>
                             </div>
                             <h3 class="cmr-mc-title" style="text-align: left !important;"><?php the_title(); ?></h3>
-                            <span class="cmr-mc-read-coverage">View Coverage <img src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol-1.svg" class="cmr-mc-arrow" alt=""></span>
+                            <span class="cmr-mc-read-coverage">View Coverage <img src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol-1.svg" class="cmr-mc-arrow" alt="" loading="lazy" decoding="async"></span>
                         </div>
                     </a>
                 </div>
@@ -826,15 +843,27 @@ function cmr_ajax_filter_media_coverage() {
             echo '<p class="cmr-mc-no-results">No articles found matching your criteria.</p>';
         }
     }
-    
+
     $html = ob_get_clean();
-
     $has_more = ( $query->max_num_pages > $paged );
-
     wp_reset_postdata();
 
-    wp_send_json_success( array(
-        'html' => $html,
-        'has_more' => $has_more
-    ) );
+    return array(
+        'html'     => $html,
+        'has_more' => $has_more,
+    );
+}
+
+// 2. AJAX Handler for Fetching Posts
+add_action( 'wp_ajax_cmr_filter_media_coverage', 'cmr_ajax_filter_media_coverage' );
+add_action( 'wp_ajax_nopriv_cmr_filter_media_coverage', 'cmr_ajax_filter_media_coverage' );
+
+function cmr_ajax_filter_media_coverage() {
+    $paged     = isset( $_POST['page'] ) ? intval( $_POST['page'] ) : 1;
+    $publisher = isset( $_POST['publisher'] ) ? sanitize_text_field( $_POST['publisher'] ) : '';
+    $search    = isset( $_POST['search'] ) ? sanitize_text_field( $_POST['search'] ) : '';
+
+    $data = cmr_get_media_coverage_grid_data( $paged, $publisher, $search );
+
+    wp_send_json_success( $data );
 }

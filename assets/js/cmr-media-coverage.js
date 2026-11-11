@@ -54,8 +54,10 @@ jQuery(document).ready(function($) {
         });
     }
 
-    // Initial load
-    loadMediaCoverage();
+    // Initial load (skip AJAX if already server-side rendered)
+    if ($('#cmr-mc-grid-container .cmr-mc-loading').length > 0) {
+        loadMediaCoverage();
+    }
 
     // Dropdown toggle
     $(document).on('click', '.cmr-mc-dropdown-toggle', function(e) {
