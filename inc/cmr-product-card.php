@@ -6,7 +6,7 @@ function cmr_render_custom_product_card($product = null) {
     if (!$product) return;
     
     $image_url = wp_get_attachment_image_src( $product->get_image_id(), 'medium' );
-    $image_url = $image_url ? $image_url[0] : 'https://via.placeholder.com/400x400';
+    $image_url = $image_url ? $image_url[0] : quanto_get_placeholder_image_uri();
     
     $cats = $product->get_category_ids();
     $cat_name = 'Report';

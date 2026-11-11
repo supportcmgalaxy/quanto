@@ -263,7 +263,7 @@ function cmr_news_automotive_shortcode( $atts ) {
                                                 </div>
                                             </div>
                                             <h3 class="cmr-card-title"><?php the_title(); ?></h3>
-                                            <span class="cmr-read-coverage">Read Coverage <img src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol.svg" class="cmr-arrow-icon" alt="Arrow"></span>
+                                            <span class="cmr-read-coverage">Read Coverage <img src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/04/Symbol.svg' ) ); ?>" class="cmr-arrow-icon" alt="Arrow"></span>
                                         </div>
                                     </a>
                                 </div>
@@ -298,7 +298,7 @@ function cmr_news_automotive_shortcode( $atts ) {
                                                 </div>
                                             </div>
                                             <h3 class="cmr-card-title"><?php the_title(); ?></h3>
-                                            <span class="cmr-read-coverage">Read Coverage <img src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol.svg" class="cmr-arrow-icon" alt="Arrow"></span>
+                                            <span class="cmr-read-coverage">Read Coverage <img src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/04/Symbol.svg' ) ); ?>" class="cmr-arrow-icon" alt="Arrow"></span>
                                         </div>
                                     </a>
                                 </div>

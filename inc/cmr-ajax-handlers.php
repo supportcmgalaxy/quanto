@@ -52,7 +52,7 @@ function cmr_load_more_intel_ajax() {
             $post_link = get_permalink();
             $thumbnail_url = get_the_post_thumbnail_url( get_the_ID(), 'full' );
             if ( ! $thumbnail_url ) {
-                $thumbnail_url = 'https://via.placeholder.com/600x400?text=No+Image';
+                $thumbnail_url = quanto_get_placeholder_image_uri();
             }
             
             $content = get_post_field( 'post_content', get_the_ID() );
@@ -228,7 +228,7 @@ function cmr_load_more_media_releases_ajax() {
             $excerpt = function_exists( 'quanto_get_clean_post_excerpt' ) ? quanto_get_clean_post_excerpt( $post_id, 18 ) : wp_trim_words( get_the_excerpt( $post_id ), 18, '...' );
             $bg_image = get_the_post_thumbnail_url( $post_id, 'medium_large' );
             if ( ! $bg_image ) {
-                $bg_image = 'https://via.placeholder.com/600x400';
+                $bg_image = quanto_get_placeholder_image_uri();
             }
             
             $content = get_post_field( 'post_content', $post_id );
@@ -353,7 +353,7 @@ function cmr_load_more_smb_connect_ajax() {
             }
             $bg_image = get_the_post_thumbnail_url( $post_id, 'medium_large' );
             if ( ! $bg_image ) {
-                $bg_image = 'https://via.placeholder.com/600x400';
+                $bg_image = quanto_get_placeholder_image_uri();
             }
             
             $content = get_post_field( 'post_content', $post_id );
@@ -514,7 +514,7 @@ function cmr_load_more_enterprise_connect_ajax() {
             }
             $bg_image = get_the_post_thumbnail_url( $post_id, 'medium_large' );
             if ( ! $bg_image ) {
-                $bg_image = 'https://via.placeholder.com/600x400';
+                $bg_image = quanto_get_placeholder_image_uri();
             }
             
             $content = get_post_field( 'post_content', $post_id );
@@ -674,7 +674,7 @@ function cmr_load_more_channel_connect_ajax() {
             }
             $bg_image = get_the_post_thumbnail_url( $post_id, 'medium_large' );
             if ( ! $bg_image ) {
-                $bg_image = 'https://via.placeholder.com/600x400';
+                $bg_image = quanto_get_placeholder_image_uri();
             }
             
             $content = get_post_field( 'post_content', $post_id );
@@ -786,7 +786,7 @@ function cmr_load_more_consulting_ajax() {
             $post_link = get_permalink();
             $thumbnail_url = get_the_post_thumbnail_url( get_the_ID(), 'full' );
             if ( ! $thumbnail_url ) {
-                $thumbnail_url = 'https://via.placeholder.com/600x400?text=No+Image';
+                $thumbnail_url = quanto_get_placeholder_image_uri();
             }
             
             $content = get_post_field( 'post_content', get_the_ID() );
@@ -885,7 +885,7 @@ function cmr_load_more_marketing_ajax() {
             $post_link = get_permalink();
             $thumbnail_url = get_the_post_thumbnail_url( get_the_ID(), 'full' );
             if ( ! $thumbnail_url ) {
-                $thumbnail_url = 'https://via.placeholder.com/600x400?text=No+Image';
+                $thumbnail_url = quanto_get_placeholder_image_uri();
             }
             
             $content = get_post_field( 'post_content', get_the_ID() );

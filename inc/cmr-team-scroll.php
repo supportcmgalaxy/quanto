@@ -390,7 +390,7 @@ function cmr_team_scroll_shortcode($atts) {
 
                     $image_url = get_the_post_thumbnail_url($post_id, 'large');
                     if (!$image_url) {
-                        $image_url = 'https://via.placeholder.com/600x800.png?text=No+Image'; 
+                        $image_url = quanto_get_placeholder_image_uri(); 
                     }
                 ?>
                     <div class="cmr-team-card">

@@ -110,7 +110,7 @@ if ( ! function_exists( 'cmr_featured_intelligence_carousel_shortcode' ) ) {
             
             $thumbnail_url = get_the_post_thumbnail_url( get_the_ID(), 'full' );
             if ( ! $thumbnail_url ) {
-                $thumbnail_url = 'https://via.placeholder.com/1200x800?text=Featured+Image';
+                $thumbnail_url = quanto_get_placeholder_image_uri();
             }
             
             // Categories & Badges

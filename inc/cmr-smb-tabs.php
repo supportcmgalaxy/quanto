@@ -223,7 +223,7 @@ function cmr_smb_tabs_shortcode( $atts ) {
                                                         <span class="cmr-category-tag">&mdash; Media Releases</span>
                                                     </div>
                                                     <h3 class="cmr-card-title"><?php the_title(); ?></h3>
-                                                    <?php $arrow_url = $is_who_we_serve ? 'https://cmrindia.com/wp-content/uploads/2026/04/Symbol.svg' : 'https://cmrindia.com/wp-content/uploads/2026/04/Symbol-1.svg'; ?>
+                                                    <?php $arrow_url = $is_who_we_serve ? home_url( '/wp-content/uploads/2026/04/Symbol.svg' ) : home_url( '/wp-content/uploads/2026/04/Symbol-1.svg' ); ?>
                                                     <span class="cmr-read-coverage">More Details <img src="<?php echo esc_url($arrow_url); ?>" class="cmr-arrow-icon" alt="Arrow"></span>
                                                 </div>
                                             </a>
@@ -245,7 +245,7 @@ function cmr_smb_tabs_shortcode( $atts ) {
                                                         <span class="cmr-category-tag">&mdash; Media Releases</span>
                                                     </div>
                                                     <h3 class="cmr-card-title"><?php the_title(); ?></h3>
-                                                    <?php $arrow_url = $is_who_we_serve ? 'https://cmrindia.com/wp-content/uploads/2026/04/Symbol.svg' : 'https://cmrindia.com/wp-content/uploads/2026/04/Symbol-1.svg'; ?>
+                                                    <?php $arrow_url = $is_who_we_serve ? home_url( '/wp-content/uploads/2026/04/Symbol.svg' ) : home_url( '/wp-content/uploads/2026/04/Symbol-1.svg' ); ?>
                                                     <span class="cmr-read-coverage">More Details <img src="<?php echo esc_url($arrow_url); ?>" class="cmr-arrow-icon" alt="Arrow"></span>
                                                 </div>
                                             </a>
@@ -292,7 +292,7 @@ function cmr_smb_tabs_shortcode( $atts ) {
                                                 </div>
                                                 <h3 class="cmr-card-title"><?php the_title(); ?></h3>
                                                 <?php
-                                                $arrow_url = $is_who_we_serve ? 'https://cmrindia.com/wp-content/uploads/2026/04/Symbol.svg' : 'https://cmrindia.com/wp-content/uploads/2026/04/Symbol-1.svg';
+                                                $arrow_url = $is_who_we_serve ? home_url( '/wp-content/uploads/2026/04/Symbol.svg' ) : home_url( '/wp-content/uploads/2026/04/Symbol-1.svg' );
                                                 ?>
                                                 <span class="cmr-read-coverage">Read Coverage <img src="<?php echo esc_url($arrow_url); ?>" class="cmr-arrow-icon" alt="Arrow"></span>
                                             </div>

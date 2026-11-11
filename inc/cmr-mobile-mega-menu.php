@@ -234,7 +234,7 @@ function cmr_inject_mobile_mega_menu() {
     <div class="cmr-mobile-nav-overlay" id="cmrMobileNav">
         <div class="cmr-mobile-nav-header">
             <a href="/" class="cmr-mobile-nav-logo">
-                <img src="https://cmrindia.com/wp-content/uploads/2026/04/cmrheaderlogo.svg" alt="CMR" style="height: 32px;">
+                <img src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/04/cmrheaderlogo.svg' ) ); ?>" alt="CMR" style="height: 32px;">
             </a>
             <button class="cmr-mobile-nav-close" aria-label="Close mobile menu">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>

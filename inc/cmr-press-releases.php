@@ -295,7 +295,7 @@ function cmr_render_press_releases_shortcode( $atts ) {
                         $post_id = get_the_ID();
                         $bg_image = get_the_post_thumbnail_url( $post_id, 'large' );
                         if ( ! $bg_image ) {
-                            $bg_image = 'https://via.placeholder.com/800x500';
+                            $bg_image = quanto_get_placeholder_image_uri();
                         }
                         $document_id = get_post_meta( $post_id, '_cmr_news_document_id', true );
                         $ext_url = get_post_meta( $post_id, '_cmr_news_external_link', true );

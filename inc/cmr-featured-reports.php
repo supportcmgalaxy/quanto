@@ -411,7 +411,7 @@ if ( ! function_exists( 'cmr_featured_reports_shortcode' ) ) {
                 <?php if ( ! empty( $products ) && isset( $products[0] ) ) : 
                     $product = $products[0];
                     $image_url = wp_get_attachment_image_src( $product->get_image_id(), 'large' );
-                    $image_url = $image_url ? $image_url[0] : 'https://via.placeholder.com/600x800';
+                    $image_url = $image_url ? $image_url[0] : quanto_get_placeholder_image_uri();
                 ?>
                 <!-- Large Card -->
                 <div class="cmr-fr-card cmr-fr-large" onclick="if(!event.target.closest('a.button, .add_to_cart_button, button, input')) { window.location.href='<?php echo esc_url( $product->get_permalink() ); ?>'; }">
@@ -462,7 +462,7 @@ if ( ! function_exists( 'cmr_featured_reports_shortcode' ) ) {
                         if ( isset( $products[$i] ) ) {
                             $product = $products[$i];
                             $image_url = wp_get_attachment_image_src( $product->get_image_id(), 'medium' );
-                            $image_url = $image_url ? $image_url[0] : 'https://via.placeholder.com/400x400';
+                            $image_url = $image_url ? $image_url[0] : quanto_get_placeholder_image_uri();
                             
                             $cats = $product->get_category_ids();
                             $cat_name = 'Report';

@@ -2330,7 +2330,7 @@
                                     <article class="cmr-rel-card">
                                         <div class="cmr-rel-card-img">
                                             <a href="<?php echo esc_url( $rel_link ); ?>" <?php echo ( $rel_target === '_blank' ) ? 'target="_blank" rel="noopener noreferrer"' : ''; ?>>
-                                                <img src="<?php echo esc_url( $rel_thumb ?: 'https://via.placeholder.com/800x450?text=No+Image' ); ?>" alt="<?php echo esc_attr( $rel_title ); ?>" loading="lazy" />
+                                                <img src="<?php echo esc_url( $rel_thumb ?: quanto_get_placeholder_image_uri() ); ?>" alt="<?php echo esc_attr( $rel_title ); ?>" loading="lazy" />
                                             </a>
                                         </div>
                                         <div class="cmr-rel-card-body">

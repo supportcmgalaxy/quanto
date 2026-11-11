@@ -546,7 +546,7 @@ function cmr_market_updates_shortcode($atts) {
                     <span class="elementor-button-content-wrapper" style="width: 100%; display: flex; align-items: center; justify-content: center;">
                         <span class="elementor-button-text" style="margin-right: 6px; font-size: 14px; font-weight: 600 !important; color: #111 !important; line-height: 1; white-space: nowrap;">View all</span>
                         <span class="elementor-button-icon" style="display: flex; align-items: center;">
-                            <img src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol-1.svg" alt="Icon" width="16" height="14" style="object-fit: contain;">
+                            <img src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/04/Symbol-1.svg' ) ); ?>" alt="Icon" width="16" height="14" style="object-fit: contain;">
                         </span>
                     </span>
                 </a>
@@ -2198,7 +2198,7 @@ if ( ! function_exists( 'cmr_get_thumbnail_with_fallback' ) ) {
             return $thumbnail_url;
         }
 
-        $fallback_img = 'https://cmrindia.com/wp-content/uploads/2026/06/Why-Chipsets-are-the-New-Frontier-in-Smartphones1.jpg';
+        $fallback_img = function_exists( 'quanto_get_placeholder_image_uri' ) ? quanto_get_placeholder_image_uri() : get_theme_file_uri( '/assets/img/placeholder.svg' );
 
         // 2. Check if there's a custom media URL and try to fetch og:image
         $media_url = get_post_meta($post_id, '_cmr_media_url', true);

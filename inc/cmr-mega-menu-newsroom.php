@@ -254,7 +254,7 @@ function cmr_mega_menu_newsroom_shortcode($atts) {
             <?php if ($latest_news) : 
                 $thumbnail_url = get_the_post_thumbnail_url( $latest_news->ID, 'medium_large' );
                 if ( ! $thumbnail_url ) {
-                    $thumbnail_url = 'https://cmrindia.com/wp-content/uploads/2026/06/Why-Chipsets-are-the-New-Frontier-in-Smartphones1.jpg';
+                    $thumbnail_url = quanto_get_placeholder_image_uri();
                 }
             ?>
             <a href="<?php echo esc_url(get_permalink($latest_news->ID)); ?>" class="cmr-mmn-announcement">
@@ -274,7 +274,7 @@ function cmr_mega_menu_newsroom_shortcode($atts) {
             <?php else : ?>
             <a href="#" class="cmr-mmn-announcement">
                 <div class="cmr-mmn-announcement-img">
-                    <img src="https://cmrindia.com/wp-content/uploads/2026/06/Why-Chipsets-are-the-New-Frontier-in-Smartphones1.jpg" alt="Latest Announcement">
+                    <img src="<?php echo esc_url( quanto_get_placeholder_image_uri() ); ?>" alt="Latest Announcement">
                 </div>
                 <div class="cmr-mmn-announcement-title">
                     Explore our newest corporate updates.

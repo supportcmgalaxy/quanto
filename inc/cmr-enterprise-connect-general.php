@@ -67,7 +67,7 @@ function cmr_enterprise_connect_general_shortcode( $atts ) {
             [
                 'title' => 'CMR India expands AI-driven intelligence capabilities',
                 'excerpt' => 'Strengthening enterprise research solutions across key sectors to provide real-time strategic guidance for global stakeholders.',
-                'image' => 'https://via.placeholder.com/800x500',
+                'image' => quanto_get_placeholder_image_uri(),
                 'read_time' => '4 min read',
                 'link' => '#',
                 'pdf_link' => '#'
@@ -75,7 +75,7 @@ function cmr_enterprise_connect_general_shortcode( $atts ) {
             [
                 'title' => 'India\'s EV Market Accelerates 57% in Q1 2026...',
                 'excerpt' => 'Electric vehicles continue to dominate the new car sales market...',
-                'image' => 'https://via.placeholder.com/800x500',
+                'image' => quanto_get_placeholder_image_uri(),
                 'read_time' => '3 min read',
                 'link' => '#',
                 'pdf_link' => ''
@@ -83,7 +83,7 @@ function cmr_enterprise_connect_general_shortcode( $atts ) {
             [
                 'title' => 'ADAS Market Grows 49%; CMR Survey 2026...',
                 'excerpt' => 'Advanced Driver Assistance Systems are becoming standard...',
-                'image' => 'https://via.placeholder.com/800x500',
+                'image' => quanto_get_placeholder_image_uri(),
                 'read_time' => '5 min read',
                 'link' => '#',
                 'pdf_link' => '#'
@@ -91,7 +91,7 @@ function cmr_enterprise_connect_general_shortcode( $atts ) {
             [
                 'title' => 'Tech Infrastructure Spending Surges Post-Pandemic',
                 'excerpt' => 'A closer look at how enterprises are scaling their tech stacks.',
-                'image' => 'https://via.placeholder.com/800x500',
+                'image' => quanto_get_placeholder_image_uri(),
                 'read_time' => '2 min read',
                 'link' => '#',
                 'pdf_link' => ''

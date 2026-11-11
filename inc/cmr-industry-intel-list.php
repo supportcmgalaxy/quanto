@@ -443,7 +443,7 @@ if ( ! function_exists( 'cmr_industry_intel_list_shortcode' ) ) {
                     if ( empty( $img_html ) ) {
                         $thumbnail_url = get_the_post_thumbnail_url( $insight_post->ID, 'medium_large' );
                         if ( ! $thumbnail_url ) {
-                            $thumbnail_url = 'https://via.placeholder.com/600x400?text=No+Image';
+                            $thumbnail_url = quanto_get_placeholder_image_uri();
                         }
                         $img_html = '<img src="' . esc_url( $thumbnail_url ) . '" alt="' . esc_attr( $post_title ) . '" loading="' . ( $count <= 1 ? 'eager' : 'lazy' ) . '" decoding="async" />';
                     }
@@ -729,7 +729,7 @@ function cmr_industry_intel_list_load_more_ajax() {
             if ( empty( $img_html ) ) {
                 $thumbnail_url = get_the_post_thumbnail_url( $insight_post->ID, 'medium_large' );
                 if ( ! $thumbnail_url ) {
-                    $thumbnail_url = 'https://via.placeholder.com/600x400?text=No+Image';
+                    $thumbnail_url = quanto_get_placeholder_image_uri();
                 }
                 $img_html = '<img src="' . esc_url( $thumbnail_url ) . '" alt="' . esc_attr( $post_title ) . '" loading="lazy" decoding="async" />';
             }

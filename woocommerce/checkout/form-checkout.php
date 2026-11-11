@@ -474,24 +474,12 @@ if ( WC()->cart && ! WC()->cart->is_empty() ) {
             <div class="cmr-trust-badges">
                 <p class="cmr-trust-label">Guaranteed safe checkout</p>
                 <div class="cmr-trust-icons">
-                    <div class="cmr-icon-pill">
-                        <img decoding="async" src="https://cmrindia.com/wp-content/uploads/2026/05/ApplePay.svg" alt="Apple Pay">
-                    </div>
-                    <div class="cmr-icon-pill">
-                        <img decoding="async" src="https://cmrindia.com/wp-content/uploads/2026/05/GooglePay.svg" alt="Google Pay">
-                    </div>
-                    <div class="cmr-icon-pill">
-                        <img decoding="async" src="https://cmrindia.com/wp-content/uploads/2026/05/Mastercard.svg" alt="Mastercard">
-                    </div>
-                    <div class="cmr-icon-pill">
-                        <img decoding="async" src="https://cmrindia.com/wp-content/uploads/2026/05/Amex.svg" alt="Amex">
-                    </div>
-                    <div class="cmr-icon-pill">
-                        <img decoding="async" src="https://cmrindia.com/wp-content/uploads/2026/05/PayPal.svg" alt="PayPal">
-                    </div>
-                    <div class="cmr-icon-pill">
-                        <img decoding="async" src="https://cmrindia.com/wp-content/uploads/2026/05/Visa.svg" alt="Visa">
-                    </div>
+                    <?php
+                    foreach ( array( 'ApplePay' => 'Apple Pay', 'GooglePay' => 'Google Pay', 'Mastercard' => 'Mastercard', 'Amex' => 'Amex', 'PayPal' => 'PayPal', 'Visa' => 'Visa' ) as $icon_slug => $icon_label ) : ?>
+                        <div class="cmr-icon-pill">
+                            <img decoding="async" src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/05/' . $icon_slug . '.svg' ) ); ?>" alt="<?php echo esc_attr( $icon_label ); ?>">
+                        </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>

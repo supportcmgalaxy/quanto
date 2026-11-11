@@ -189,7 +189,7 @@ if ( ! function_exists( 'cmr_quarterly_results_shortcode' ) ) {
                 border-radius: 12px;
                 overflow: hidden;
                 aspect-ratio: 16/9;
-                background: #000;
+                background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
                 box-shadow: 0 10px 30px rgba(0,0,0,0.2);
                 cursor: pointer;
             }
@@ -492,7 +492,7 @@ if ( ! function_exists( 'cmr_quarterly_results_shortcode' ) ) {
                             <div class="cmr-qr-ceo-img-wrap">
                                 <div class="cmr-qr-ceo-img-bg"></div>
                                 <div class="cmr-qr-ceo-img">
-                                    <img src="https://cmrindia.com/wp-content/uploads/2026/06/Group-1000005376.png" alt="Thomas George">
+                                    <img src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/06/Group-1000005376.png' ) ); ?>" alt="Thomas George">
                                 </div>
                             </div>
                         </div>
@@ -504,7 +504,6 @@ if ( ! function_exists( 'cmr_quarterly_results_shortcode' ) ) {
                         
                         <!-- Video Card -->
                         <div class="cmr-qr-video-card">
-                            <img src="https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&q=80&w=1200" alt="FY26 Video">
                             <div class="cmr-qr-video-badge">45:15 MINS</div>
                             <div class="cmr-qr-video-play">
                                 <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>

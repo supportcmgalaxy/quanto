@@ -131,7 +131,7 @@ if ( ! function_exists( 'cmr_industry_intelligence_shortcode' ) ) {
                         $post_link = get_permalink( $insight_post );
                         $thumbnail_url = get_the_post_thumbnail_url( $insight_post->ID, 'full' );
                         if ( ! $thumbnail_url ) {
-                            $thumbnail_url = 'https://via.placeholder.com/600x400?text=No+Image';
+                            $thumbnail_url = quanto_get_placeholder_image_uri();
                         }
                         
                         // Categories / Tags

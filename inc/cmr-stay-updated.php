@@ -231,7 +231,7 @@ if ( ! function_exists( 'cmr_stay_updated_shortcode' ) ) {
                             $post_link = get_permalink();
                             $thumbnail_url = get_the_post_thumbnail_url( get_the_ID(), 'large' );
                             if ( ! $thumbnail_url ) {
-                                $thumbnail_url = 'https://via.placeholder.com/600x400?text=No+Image';
+                                $thumbnail_url = quanto_get_placeholder_image_uri();
                             }
                             
                             $category_name = 'CMR in News';

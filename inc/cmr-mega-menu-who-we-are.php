@@ -98,20 +98,6 @@ function cmr_mega_menu_who_we_are_shortcode($atts) {
             align-items: center;
         }
 
-        .cmr-mm-image {
-            flex: 0 0 280px;
-            height: 200px;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .cmr-mm-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
         .cmr-mm-locations {
             flex: 1;
         }
@@ -251,10 +237,6 @@ function cmr_mega_menu_who_we_are_shortcode($atts) {
         <div class="cmr-mm-bottom">
             <div class="cmr-mm-label">GLOBAL PRESENCE</div>
             <div class="cmr-mm-bottom-content">
-                <div class="cmr-mm-image">
-                    <!-- Replace src with actual glass building image from media library -->
-                    <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop" alt="Global Presence">
-                </div>
                 <div class="cmr-mm-locations">
                     <h3>Serving businesses across<br>key markets.</h3>
                     <ul>

@@ -13,7 +13,7 @@ if ( ! function_exists( 'cmr_research_reports_hero_shortcode' ) ) {
         $atts = shortcode_atts( array(
             'title'       => 'Research Reports',
             'description' => 'Browse premium research reports across industries, designed to deliver actionable insights and strategic clarity.',
-            'bg_image'    => 'https://cmrindia.com/wp-content/uploads/2026/06/Gradients_2-1-scaled.png',
+            'bg_image'    => home_url( '/wp-content/uploads/2026/06/Gradients_2-1-scaled.png' ),
         ), $atts );
 
         ob_start();

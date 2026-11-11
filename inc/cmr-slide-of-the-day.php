@@ -333,7 +333,7 @@ function cmr_slide_of_the_day_shortcode( $atts ) {
                         
                         <!-- Main Image Card -->
                         <div class="hero-image-card">
-                            <img src="https://cmrindia.com/wp-content/uploads/2026/04/Rectangle-25.png" alt="India AI Market">
+                            <img src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/04/Rectangle-25.png' ) ); ?>" alt="India AI Market">
                             
                             <!-- Stat Overlay -->
                             <div class="stat-overlay">
@@ -349,7 +349,7 @@ function cmr_slide_of_the_day_shortcode( $atts ) {
                     <div class="content-col">
                         <!-- Slide Tag -->
                         <div class="badge-tag">
-                            <img src="https://cmrindia.com/wp-content/uploads/2026/05/slide-of-day.svg"
+                            <img src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/05/slide-of-day.svg' ) ); ?>"
                             class="slide-day-icon" alt="Slide of the Day">
                             <span>SLIDE OF THE DAY</span>
                         </div>
@@ -367,7 +367,7 @@ function cmr_slide_of_the_day_shortcode( $atts ) {
                         <!-- CTA Button -->
                         <div class="w-100 d-flex justify-content-center justify-content-lg-start">
                             <a href="#download" class="btn-download">
-                                Download free report <img src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol-1.svg"
+                                Download free report <img src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/04/Symbol-1.svg' ) ); ?>"
                             class="button-icon" alt="arrow">
                             </a>
                         </div>

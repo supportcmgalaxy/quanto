@@ -10,9 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! function_exists( 'cmr_industry_stack_shortcode' ) ) {
     function cmr_industry_stack_shortcode( $atts ) {
         $atts = shortcode_atts( array(
-            'icon_1' => 'https://cmrindia.com/wp-content/uploads/2026/06/service-icon1.svg',
-            'icon_2' => 'https://cmrindia.com/wp-content/uploads/2026/06/Group-266.svg',
-            'icon_3' => 'https://cmrindia.com/wp-content/uploads/2026/06/Vector2.svg.svg',
+            'icon_1' => home_url( '/wp-content/uploads/2026/06/service-icon1.svg' ),
+            'icon_2' => home_url( '/wp-content/uploads/2026/06/Group-266.svg' ),
+            'icon_3' => home_url( '/wp-content/uploads/2026/06/Vector2.svg.svg' ),
         ), $atts );
 
         ob_start();
@@ -150,7 +150,7 @@ if ( ! function_exists( 'cmr_industry_stack_shortcode' ) ) {
                 <div class="cmr-stack-card">
                     <div class="cmr-stack-card-top">
                         <div class="cmr-stack-icon">
-                            <img src="https://cmrindia.com/wp-content/uploads/2026/06/service-icon1.svg" alt="Industry Intelligence Icon" style="width: 34px; height: 34px; object-fit: contain;">
+                            <img src="<?php echo esc_url( $atts['icon_1'] ); ?>" alt="Industry Intelligence Icon" style="width: 34px; height: 34px; object-fit: contain;">
                         </div>
                         <div class="cmr-stack-number">01</div>
                     </div>
@@ -167,7 +167,7 @@ if ( ! function_exists( 'cmr_industry_stack_shortcode' ) ) {
                 <div class="cmr-stack-card">
                     <div class="cmr-stack-card-top">
                         <div class="cmr-stack-icon">
-                            <img src="https://cmrindia.com/wp-content/uploads/2026/06/Group-266.svg" alt="Consulting & Advisory Icon" style="width: 34px; height: 34px; object-fit: contain;">
+                            <img src="<?php echo esc_url( $atts['icon_2'] ); ?>" alt="Consulting & Advisory Icon" style="width: 34px; height: 34px; object-fit: contain;">
                         </div>
                         <div class="cmr-stack-number">02</div>
                     </div>
@@ -184,7 +184,7 @@ if ( ! function_exists( 'cmr_industry_stack_shortcode' ) ) {
                 <div class="cmr-stack-card">
                     <div class="cmr-stack-card-top">
                         <div class="cmr-stack-icon">
-                            <img src="https://cmrindia.com/wp-content/uploads/2026/06/Vector2.svg.svg" alt="Marketing Services Icon" style="width: 34px; height: 34px; object-fit: contain;">
+                            <img src="<?php echo esc_url( $atts['icon_3'] ); ?>" alt="Marketing Services Icon" style="width: 34px; height: 34px; object-fit: contain;">
                         </div>
                         <div class="cmr-stack-number">03</div>
                     </div>

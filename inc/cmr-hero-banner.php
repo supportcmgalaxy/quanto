@@ -5,7 +5,7 @@ add_shortcode('cmr_hero_banner', 'cmr_hero_banner_shortcode');
 
 function cmr_hero_banner_shortcode($atts) {
     $upload_dir   = wp_upload_dir();
-    $base_upload  = ! empty( $upload_dir['baseurl'] ) ? $upload_dir['baseurl'] : 'https://qai8358l95-staging.onrocket.site/wp-content/uploads';
+    $base_upload  = ! empty( $upload_dir['baseurl'] ) ? $upload_dir['baseurl'] : content_url( '/uploads' );
     $default_s1   = $base_upload . '/2026/10/CMR-Lead-Slider-1.jpg-2.jpeg';
     $default_s2   = $base_upload . '/2026/10/CMR-Lead-Slider-2.jpg-1.jpeg';
     $default_s1_m = $base_upload . '/2026/10/CMR-Lead-Slider-1.jpg-2-768x432.jpeg';
@@ -489,7 +489,7 @@ function cmr_hero_banner_shortcode($atts) {
         <a href="<?php echo esc_url( home_url( '/research-reports/' ) ); ?>" class="btn-primary">
           Get Report
           <img class="hero-arrow-button-white"
-               src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol-1.svg"
+               src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/04/Symbol-1.svg' ) ); ?>"
                alt="Arrow"
                aria-hidden="true">
         </a>
@@ -497,7 +497,7 @@ function cmr_hero_banner_shortcode($atts) {
         <a href="#elementor-action%3Aaction%3Dpopup%3Aopen%26settings%3DeyJpZCI6Ijc2MzciLCJ0b2dnbGUiOmZhbHNlfQ%3D%3D" class="btn-outline open-popup" data-popup-id="7637">
           Connect with us
           <img class="hero-arrow-button"
-               src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol.svg"
+               src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/04/Symbol.svg' ) ); ?>"
                alt="Arrow"
                aria-hidden="true">
         </a>

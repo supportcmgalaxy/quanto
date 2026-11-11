@@ -27,6 +27,14 @@ if ( ! function_exists( 'quanto_is_elementor_edit' ) ) {
         return function_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->editor ) && \Elementor\Plugin::$instance->editor->is_edit_mode();
     }
 }
+if ( ! function_exists( 'quanto_get_placeholder_image_uri' ) ) {
+    /**
+     * Return local SVG placeholder URI so fallback thumbnails make zero third-party requests.
+     */
+    function quanto_get_placeholder_image_uri() {
+        return get_theme_file_uri( '/assets/img/placeholder.svg' );
+    }
+}
 
 /**
  * Enqueue scripts and styles.
@@ -548,7 +556,7 @@ function quanto_preload_critical_assets() {
     echo '<link rel="preload" href="' . esc_url( $font_url ) . '" as="font" type="font/woff2" crossorigin>' . "\n";
     if ( is_front_page() || is_home() ) {
         $upload_dir  = wp_upload_dir();
-        $base_upload = ! empty( $upload_dir['baseurl'] ) ? $upload_dir['baseurl'] : 'https://qai8358l95-staging.onrocket.site/wp-content/uploads';
+        $base_upload = ! empty( $upload_dir['baseurl'] ) ? $upload_dir['baseurl'] : content_url( '/uploads' );
         $mobile_img  = $base_upload . '/2026/10/CMR-Lead-Slider-1.jpg-2-768x432.jpeg';
         $desktop_img = $base_upload . '/2026/10/CMR-Lead-Slider-1.jpg-2.jpeg';
         echo '<link rel="preload" as="image" href="' . esc_url( $mobile_img ) . '" media="(max-width: 768px)" fetchpriority="high">' . "\n";

@@ -740,7 +740,7 @@ function cmr_news_tabs_shortcode( $atts ) {
                                 $date = get_the_date( 'M j, Y' );
                                 
                                 if ( $is_media_releases ) {
-                                    $placeholder = 'https://via.placeholder.com/800x600?text=No+Image';
+                                    $placeholder = quanto_get_placeholder_image_uri();
                                     $img_src = $bg_image ? $bg_image : $placeholder;
                                     
                                     if ( $count === 0 ) {
@@ -802,7 +802,7 @@ function cmr_news_tabs_shortcode( $atts ) {
                                                 </div>
                                                 <h3 class="cmr-card-title"><?php the_title(); ?></h3>
                                                 <?php
-                                                $arrow_url = $is_who_we_serve ? 'https://cmrindia.com/wp-content/uploads/2026/04/Symbol.svg' : 'https://cmrindia.com/wp-content/uploads/2026/04/Symbol-1.svg';
+                                                $arrow_url = $is_who_we_serve ? home_url( '/wp-content/uploads/2026/04/Symbol.svg' ) : home_url( '/wp-content/uploads/2026/04/Symbol-1.svg' );
                                                 $btn_text = 'Read Coverage';
                                                 ?>
                                                 <span class="cmr-read-coverage"><?php echo esc_html($btn_text); ?> <img src="<?php echo esc_url($arrow_url); ?>" class="cmr-arrow-icon" alt="Arrow"></span>
@@ -822,7 +822,7 @@ function cmr_news_tabs_shortcode( $atts ) {
                     </div>
                     
                     <div class="cmr-news-footer">
-                        <a href="<?php echo esc_url( home_url( '/cmr-news/' ) ); ?>" class="cmr-explore-all">Explore All <img src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol.svg" class="cmr-arrow-icon" alt="Arrow"></a>
+                        <a href="<?php echo esc_url( home_url( '/cmr-news/' ) ); ?>" class="cmr-explore-all">Explore All <img src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/04/Symbol.svg' ) ); ?>" class="cmr-arrow-icon" alt="Arrow"></a>
                     </div>
                 </div>
             <?php 

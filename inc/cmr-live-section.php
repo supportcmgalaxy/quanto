@@ -229,7 +229,7 @@ if ( ! function_exists( 'cmr_live_section_shortcode' ) ) {
                             $link = get_permalink( $post->ID );
                             $img_url = get_the_post_thumbnail_url( $post->ID, 'large' );
                             if ( ! $img_url ) {
-                                $img_url = 'https://via.placeholder.com/910x479/222/fff?text=No+Image';
+                                $img_url = quanto_get_placeholder_image_uri();
                             }
                             
                             $type_class = 'type-topview';

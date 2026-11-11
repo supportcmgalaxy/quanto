@@ -14,13 +14,13 @@ jQuery(document).ready(function($) {
         container.find('#' + targetId).addClass('active');
         
         // Update "Explore All" text
-        var arrowHtml = '<img src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol.svg" class="cmr-arrow-icon" alt="Arrow">';
+        var arrowHtml = '<img src="/wp-content/uploads/2026/04/Symbol.svg" class="cmr-arrow-icon" alt="Arrow">';
         container.find('.cmr-explore-all').html('Explore All ' + arrowHtml);
     });
     
     // Initialize the first tab's button text
     if ($('.cmr-explore-all').length) {
-        var arrowHtml = '<img src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol.svg" class="cmr-arrow-icon" alt="Arrow">';
+        var arrowHtml = '<img src="/wp-content/uploads/2026/04/Symbol.svg" class="cmr-arrow-icon" alt="Arrow">';
         $('.cmr-explore-all').html('Explore All ' + arrowHtml);
     }
 });

@@ -735,7 +735,7 @@
 
 
 
-                                <img src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol-1.svg" alt="Icon" width="16" height="14" style="object-fit: contain;">
+                                <img src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/04/Symbol-1.svg' ) ); ?>" alt="Icon" width="16" height="14" style="object-fit: contain;">
 
 
 

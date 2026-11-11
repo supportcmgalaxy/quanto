@@ -170,7 +170,7 @@ function cmr_team_grid_shortcode($atts) {
 
                 $image_url = get_the_post_thumbnail_url($post_id, 'large');
                 if (!$image_url) {
-                    $image_url = 'https://via.placeholder.com/600x800.png?text=No+Image'; // Fallback
+                    $image_url = quanto_get_placeholder_image_uri(); // Fallback
                 }
             ?>
                 <div class="cmr-team-member">

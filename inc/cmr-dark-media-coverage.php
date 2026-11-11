@@ -156,7 +156,7 @@ if ( ! function_exists( 'cmr_dark_media_render_posts' ) ) {
                             </div>
                             <h3 class="cmr-card-title"><?php the_title(); ?></h3>
                             <?php
-                            $arrow_url = 'https://cmrindia.com/wp-content/uploads/2026/04/Symbol.svg';
+                            $arrow_url = home_url( '/wp-content/uploads/2026/04/Symbol.svg' );
                             ?>
                             <span class="cmr-read-coverage">Read Coverage <img src="<?php echo esc_url($arrow_url); ?>" class="cmr-arrow-icon" alt="Arrow"></span>
                         </div>

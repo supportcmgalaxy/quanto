@@ -41,7 +41,7 @@ if ( ! function_exists( 'cmr_market_updates_hero_shortcode' ) ) {
                 
                 $thumbnail_url = get_the_post_thumbnail_url( $post_obj->ID, 'full' );
                 if ( ! $thumbnail_url ) {
-                    $thumbnail_url = 'https://via.placeholder.com/1200x800?text=Featured+Image';
+                    $thumbnail_url = quanto_get_placeholder_image_uri();
                 }
                 
                 $category_name = 'Market Updates';
@@ -420,7 +420,7 @@ if ( ! function_exists( 'cmr_market_updates_hero_shortcode' ) ) {
 
             <form id="cmr-mu-hero-search-form" class="cmr-mu-hero-search" action="<?php echo esc_url(home_url('/')); ?>" method="get">
                 <div class="cmr-mu-hero-search-icon-left">
-                    <img src="https://cmrindia.com/wp-content/uploads/2026/06/cmrlogo-with-oly-c.svg" alt="CMR Logo" style="width: 24px; height: auto;">
+                    <img src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/06/cmrlogo-with-oly-c.svg' ) ); ?>" alt="CMR Logo" style="width: 24px; height: auto;">
                 </div>
                 <input type="text" name="s" placeholder="Search..." required>
                 <button type="submit" class="cmr-mu-hero-search-btn" aria-label="<?php esc_attr_e( 'Search Market Updates', 'quanto' ); ?>">

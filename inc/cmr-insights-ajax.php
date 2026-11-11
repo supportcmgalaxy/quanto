@@ -75,7 +75,7 @@ function cmr_insights_ajax_search_callback() {
     foreach ( $posts as $post_obj ) : 
         $thumbnail_url = get_the_post_thumbnail_url( $post_obj->ID, 'large' );
         if ( ! $thumbnail_url ) {
-            $thumbnail_url = 'https://via.placeholder.com/600x400?text=Insight+Image';
+            $thumbnail_url = quanto_get_placeholder_image_uri();
         }
         
         $all_term_names = array();

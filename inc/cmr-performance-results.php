@@ -320,7 +320,7 @@ if ( ! function_exists( 'cmr_performance_results_shortcode' ) ) {
                                         <div class="cmr-pr-card-img">
                                             <div class="cmr-pr-card-badge">Q3 Result</div>
                                             <!-- SVG Logo placeholder based on image -->
-                                            <img class="cmr-pr-card-logo" src="https://cmrindia.com/wp-content/uploads/2026/06/cmrlogo-with-oly-c.svg" alt="CMR Logo">
+                                            <img class="cmr-pr-card-logo" src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/06/cmrlogo-with-oly-c.svg' ) ); ?>" alt="CMR Logo">
                                         </div>
                                         <div class="cmr-pr-card-content">
                                             <div class="cmr-pr-card-meta">
@@ -337,7 +337,7 @@ if ( ! function_exists( 'cmr_performance_results_shortcode' ) ) {
                                     <div class="cmr-pr-card">
                                         <div class="cmr-pr-card-img">
                                             <div class="cmr-pr-card-badge">Q2 Result</div>
-                                            <img class="cmr-pr-card-logo" src="https://cmrindia.com/wp-content/uploads/2026/06/cmrlogo-with-oly-c.svg" alt="CMR Logo">
+                                            <img class="cmr-pr-card-logo" src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/06/cmrlogo-with-oly-c.svg' ) ); ?>" alt="CMR Logo">
                                         </div>
                                         <div class="cmr-pr-card-content">
                                             <div class="cmr-pr-card-meta">
@@ -354,7 +354,7 @@ if ( ! function_exists( 'cmr_performance_results_shortcode' ) ) {
                                     <div class="cmr-pr-card">
                                         <div class="cmr-pr-card-img">
                                             <div class="cmr-pr-card-badge">Q1 Result</div>
-                                            <img class="cmr-pr-card-logo" src="https://cmrindia.com/wp-content/uploads/2026/06/cmrlogo-with-oly-c.svg" alt="CMR Logo">
+                                            <img class="cmr-pr-card-logo" src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/06/cmrlogo-with-oly-c.svg' ) ); ?>" alt="CMR Logo">
                                         </div>
                                         <div class="cmr-pr-card-content">
                                             <div class="cmr-pr-card-meta">

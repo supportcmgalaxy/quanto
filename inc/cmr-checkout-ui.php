@@ -345,7 +345,7 @@ function cmr_checkout_ui_shortcode( $atts ) {
 
                 <div class="cmr-right-box">
                     <div class="cmr-order-item">
-                        <img src="https://cmrindia.com/wp-content/uploads/2026/04/image-10.jpg" alt="Report" class="cmr-order-image">
+                        <img src="<?php echo esc_url( quanto_get_placeholder_image_uri() ); ?>" alt="Report" class="cmr-order-image">
                         <div class="cmr-order-details">
                             <div class="cmr-order-title">Navigating Digital Supply Chain Transformation: Key Insights</div>
                             <div class="cmr-order-publisher">Cyber Media Research (CMR)</div>

@@ -26,16 +26,16 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
 
         $default_fallback_cards = array(
             'market-updates' => array(
-                array( 'title' => 'What the UAE Is Doing With Agentic AI — And What India Can Learn?', 'link' => '#', 'image' => 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&q=80', 'cat' => 'Market Updates' ),
-                array( 'title' => 'The Philippines: Charting a Course as Southeast Asia\'s Digital Economy Leader', 'link' => '#', 'image' => 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80', 'cat' => 'Market Updates' ),
+                array( 'title' => 'What the UAE Is Doing With Agentic AI — And What India Can Learn?', 'link' => '#', 'image' => quanto_get_placeholder_image_uri(), 'cat' => 'Market Updates' ),
+                array( 'title' => 'The Philippines: Charting a Course as Southeast Asia\'s Digital Economy Leader', 'link' => '#', 'image' => quanto_get_placeholder_image_uri(), 'cat' => 'Market Updates' ),
             ),
             'industry-insights' => array(
-                array( 'title' => 'How AI Is Reshaping Supply Chain Management Across Asia-Pacific', 'link' => '#', 'image' => 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80', 'cat' => 'Industry Insights' ),
-                array( 'title' => 'Digital Transformation in Healthcare: Lessons from Leading Markets', 'link' => '#', 'image' => 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&q=80', 'cat' => 'Industry Insights' ),
+                array( 'title' => 'How AI Is Reshaping Supply Chain Management Across Asia-Pacific', 'link' => '#', 'image' => quanto_get_placeholder_image_uri(), 'cat' => 'Industry Insights' ),
+                array( 'title' => 'Digital Transformation in Healthcare: Lessons from Leading Markets', 'link' => '#', 'image' => quanto_get_placeholder_image_uri(), 'cat' => 'Industry Insights' ),
             ),
             'research-reports' => array(
-                array( 'title' => 'Global Cloud Infrastructure Spending Report Q1 2026', 'link' => '#', 'image' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80', 'cat' => 'Research Reports' ),
-                array( 'title' => 'The Future of Work: Hybrid Models and Their Impact on Productivity', 'link' => '#', 'image' => 'https://images.unsplash.com/photo-1497215842964-222b430dc094?w=600&q=80', 'cat' => 'Research Reports' ),
+                array( 'title' => 'Global Cloud Infrastructure Spending Report Q1 2026', 'link' => '#', 'image' => quanto_get_placeholder_image_uri(), 'cat' => 'Research Reports' ),
+                array( 'title' => 'The Future of Work: Hybrid Models and Their Impact on Productivity', 'link' => '#', 'image' => quanto_get_placeholder_image_uri(), 'cat' => 'Research Reports' ),
             ),
         );
 
@@ -217,7 +217,7 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
                     $thumbnail_url = get_the_post_thumbnail_url( $post_obj->ID, 'large' );
                 }
                 if ( ! $thumbnail_url ) {
-                    $thumbnail_url = 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&q=80';
+                    $thumbnail_url = quanto_get_placeholder_image_uri();
                 }
 
                 $slide_data[] = array(
@@ -257,16 +257,16 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
         if (empty($slides)) {
             $slides = [
                 [
-                    ['title' => 'What the UAE Is Doing With Agentic AI — And What India Can Learn?', 'cat' => 'Market Updates', 'image' => 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&q=80', 'link' => '#'],
-                    ['title' => 'The Philippines: Charting a Course as Southeast Asia\'s Digital Economy Leader', 'cat' => 'Market Updates', 'image' => 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80', 'link' => '#'],
+                    ['title' => 'What the UAE Is Doing With Agentic AI — And What India Can Learn?', 'cat' => 'Market Updates', 'image' => quanto_get_placeholder_image_uri(), 'link' => '#'],
+                    ['title' => 'The Philippines: Charting a Course as Southeast Asia\'s Digital Economy Leader', 'cat' => 'Market Updates', 'image' => quanto_get_placeholder_image_uri(), 'link' => '#'],
                 ],
                 [
-                    ['title' => 'How AI Is Reshaping Supply Chain Management Across Asia-Pacific', 'cat' => 'Industry Insights', 'image' => 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80', 'link' => '#'],
-                    ['title' => 'Digital Transformation in Healthcare: Lessons from Leading Markets', 'cat' => 'Industry Insights', 'image' => 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&q=80', 'link' => '#'],
+                    ['title' => 'How AI Is Reshaping Supply Chain Management Across Asia-Pacific', 'cat' => 'Industry Insights', 'image' => quanto_get_placeholder_image_uri(), 'link' => '#'],
+                    ['title' => 'Digital Transformation in Healthcare: Lessons from Leading Markets', 'cat' => 'Industry Insights', 'image' => quanto_get_placeholder_image_uri(), 'link' => '#'],
                 ],
                 [
-                    ['title' => 'Global Cloud Infrastructure Spending Report Q1 2026', 'cat' => 'Research Reports', 'image' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80', 'link' => '#'],
-                    ['title' => 'The Future of Work: Hybrid Models and Their Impact on Productivity', 'cat' => 'Research Reports', 'image' => 'https://images.unsplash.com/photo-1497215842964-222b430dc094?w=600&q=80', 'link' => '#'],
+                    ['title' => 'Global Cloud Infrastructure Spending Report Q1 2026', 'cat' => 'Research Reports', 'image' => quanto_get_placeholder_image_uri(), 'link' => '#'],
+                    ['title' => 'The Future of Work: Hybrid Models and Their Impact on Productivity', 'cat' => 'Research Reports', 'image' => quanto_get_placeholder_image_uri(), 'link' => '#'],
                 ]
             ];
         }

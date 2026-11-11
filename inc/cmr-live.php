@@ -624,7 +624,7 @@ if ( ! function_exists( 'cmr_trending_podcast_shortcode' ) ) {
                         } else {
                             $thumbnail_url = get_the_post_thumbnail_url( $post_obj->ID, 'large' );
                             if ( ! $thumbnail_url ) {
-                                $thumbnail_url = 'https://cmrindia.com/wp-content/uploads/2026/06/Why-Chipsets-are-the-New-Frontier-in-Smartphones1.jpg';
+                                $thumbnail_url = quanto_get_placeholder_image_uri();
                             }
                         }
                         
@@ -966,7 +966,7 @@ if ( ! function_exists( 'cmr_trending_topview_shortcode' ) ) {
                         // Featured Post (first item)
                         $feat_post = $posts[0];
                         $feat_thumb = get_the_post_thumbnail_url( $feat_post->ID, 'large' );
-                        if ( ! $feat_thumb ) $feat_thumb = 'https://cmrindia.com/wp-content/uploads/2026/06/Why-Chipsets-are-the-New-Frontier-in-Smartphones1.jpg';
+                        if ( ! $feat_thumb ) $feat_thumb = quanto_get_placeholder_image_uri();
                         
                         $feat_cat = 'AUTOMOTIVE';
                         $terms = get_the_terms( $feat_post->ID, 'category' );
@@ -1002,14 +1002,14 @@ if ( ! function_exists( 'cmr_trending_topview_shortcode' ) ) {
                         <?php 
                         foreach ( $posts as $index => $post_obj ) : 
                             $thumb = get_the_post_thumbnail_url( $post_obj->ID, 'medium' );
-                            if ( ! $thumb ) $thumb = 'https://cmrindia.com/wp-content/uploads/2026/06/Why-Chipsets-are-the-New-Frontier-in-Smartphones1.jpg';
+                            if ( ! $thumb ) $thumb = quanto_get_placeholder_image_uri();
                             
                             $date = get_the_date('d M Y', $post_obj);
                             $link = esc_url(get_permalink($post_obj->ID));
                             
                             // Get metadata for JS
                             $full_thumb = get_the_post_thumbnail_url( $post_obj->ID, 'large' );
-                            if ( ! $full_thumb ) $full_thumb = 'https://cmrindia.com/wp-content/uploads/2026/06/Why-Chipsets-are-the-New-Frontier-in-Smartphones1.jpg';
+                            if ( ! $full_thumb ) $full_thumb = quanto_get_placeholder_image_uri();
                             $dur = get_post_meta( $post_obj->ID, '_cmr_media_duration', true ) ?: '08:20 MINS';
                             $type = get_post_meta( $post_obj->ID, '_cmr_media_type', true ) ?: 'TOP VIEW';
                             $cat = 'AUTOMOTIVE';
@@ -1256,7 +1256,7 @@ if ( ! function_exists( 'cmr_filter_recently_updated_ajax' ) ) {
                 
                 $thumbnail_url = get_the_post_thumbnail_url( $post_obj->ID, 'large' );
                 if ( ! $thumbnail_url ) {
-                    $thumbnail_url = 'https://cmrindia.com/wp-content/uploads/2026/06/Why-Chipsets-are-the-New-Frontier-in-Smartphones1.jpg';
+                    $thumbnail_url = quanto_get_placeholder_image_uri();
                 }
                 
                 $category_name = 'AUTOMOTIVE';

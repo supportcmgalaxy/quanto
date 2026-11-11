@@ -801,7 +801,7 @@ function cmr_get_media_coverage_grid_data( $paged = 1, $publisher = '', $search 
                             <?php if ( has_excerpt() ) : ?>
                                 <p class="cmr-mc-excerpt"><?php echo wp_trim_words( get_the_excerpt(), 25 ); ?></p>
                             <?php endif; ?>
-                            <span class="cmr-mc-read-coverage">View Coverage <img src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol-1.svg" class="cmr-mc-arrow" alt="" loading="lazy" decoding="async"></span>
+                            <span class="cmr-mc-read-coverage">View Coverage <img src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/04/Symbol-1.svg' ) ); ?>" class="cmr-mc-arrow" alt="" loading="lazy" decoding="async"></span>
                         </div>
                     </a>
                 </div>
@@ -830,7 +830,7 @@ function cmr_get_media_coverage_grid_data( $paged = 1, $publisher = '', $search 
                                 </div>
                             </div>
                             <h3 class="cmr-mc-title" style="text-align: left !important;"><?php the_title(); ?></h3>
-                            <span class="cmr-mc-read-coverage">View Coverage <img src="https://cmrindia.com/wp-content/uploads/2026/04/Symbol-1.svg" class="cmr-mc-arrow" alt="" loading="lazy" decoding="async"></span>
+                            <span class="cmr-mc-read-coverage">View Coverage <img src="<?php echo esc_url( home_url( '/wp-content/uploads/2026/04/Symbol-1.svg' ) ); ?>" class="cmr-mc-arrow" alt="" loading="lazy" decoding="async"></span>
                         </div>
                     </a>
                 </div>

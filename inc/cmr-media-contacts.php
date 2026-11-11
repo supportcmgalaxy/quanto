@@ -28,7 +28,7 @@ function cmr_render_media_contacts_shortcode( $atts ) {
 
         <div class="cmr-media-contacts-grid">
             <div class="cmr-media-contact-card">
-                <div class="cmr-media-contact-img" style="background-image: url('https://cmrindia.com/wp-content/uploads/2026/05/Avatar-Image.svg');"></div>
+                <div class="cmr-media-contact-img" style="background-image: url('<?php echo esc_url( home_url( '/wp-content/uploads/2026/05/Avatar-Image.svg' ) ); ?>');"></div>
                 <div class="cmr-media-contact-info">
                     <h4>Rose Hines</h4>
                     <p>CMR Services</p>
@@ -42,7 +42,7 @@ function cmr_render_media_contacts_shortcode( $atts ) {
             </div>
 
             <div class="cmr-media-contact-card">
-                <div class="cmr-media-contact-img" style="background-image: url('https://cmrindia.com/wp-content/uploads/2026/05/Avatar-Image-1.svg');"></div>
+                <div class="cmr-media-contact-img" style="background-image: url('<?php echo esc_url( home_url( '/wp-content/uploads/2026/05/Avatar-Image-1.svg' ) ); ?>');"></div>
                 <div class="cmr-media-contact-info">
                     <h4>Eric Yates</h4>
                     <p>CMR Services</p>

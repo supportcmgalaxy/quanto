@@ -386,7 +386,7 @@ function cmr_mega_menu_connect_shortcode($atts) {
                     <?php foreach ( $tab_posts as $post ) : 
                         $thumbnail_url = get_the_post_thumbnail_url( $post->ID, 'medium' );
                         if ( ! $thumbnail_url ) {
-                            $thumbnail_url = 'https://cmrindia.com/wp-content/uploads/2026/06/Why-Chipsets-are-the-New-Frontier-in-Smartphones1.jpg';
+                            $thumbnail_url = quanto_get_placeholder_image_uri();
                         }
                     ?>
                         <a href="<?php echo esc_url( get_permalink( $post->ID ) ); ?>" class="cmr-mmc-post-card">

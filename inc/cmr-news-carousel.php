@@ -526,7 +526,7 @@ function cmr_render_news_carousel_shortcode( $atts ) {
                         $bg_img_html = wp_get_attachment_image( $thumb_id, 'large', false, $img_attrs );
                     }
                     if ( empty( $bg_img_html ) ) {
-                        $bg_image = get_the_post_thumbnail_url( $post_id, 'large' ) ?: 'https://via.placeholder.com/800x500';
+                        $bg_image = get_the_post_thumbnail_url( $post_id, 'large' ) ?: quanto_get_placeholder_image_uri();
                         $bg_img_html = '<img src="' . esc_url( $bg_image ) . '" class="cmr-nc-bg-img" alt="' . esc_attr( get_the_title() ) . '" loading="' . ( $is_first_slide ? 'eager' : 'lazy' ) . '" decoding="' . ( $is_first_slide ? 'sync' : 'async' ) . '"' . ( $is_first_slide ? ' fetchpriority="high"' : '' ) . '>';
                     }
                     $slide_index++;
