@@ -253,7 +253,7 @@ function cmr_mega_menu_who_we_are_shortcode($atts) {
             <div class="cmr-mm-bottom-content">
                 <div class="cmr-mm-image">
                     <!-- Replace src with actual glass building image from media library -->
-                    <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop" alt="Global Presence">
+                    <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop" alt="Global Presence" loading="lazy" decoding="async">
                 </div>
                 <div class="cmr-mm-locations">
                     <h3>Serving businesses across<br>key markets.</h3>

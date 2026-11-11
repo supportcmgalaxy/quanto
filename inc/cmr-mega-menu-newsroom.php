@@ -259,7 +259,7 @@ function cmr_mega_menu_newsroom_shortcode($atts) {
             ?>
             <a href="<?php echo esc_url(get_permalink($latest_news->ID)); ?>" class="cmr-mmn-announcement">
                 <div class="cmr-mmn-announcement-img">
-                    <img src="<?php echo esc_url($thumbnail_url); ?>" alt="<?php echo esc_attr(get_the_title($latest_news->ID)); ?>">
+                    <img src="<?php echo esc_url($thumbnail_url); ?>" alt="<?php echo esc_attr(get_the_title($latest_news->ID)); ?>" loading="lazy" decoding="async">
                 </div>
                 <div class="cmr-mmn-announcement-title">
                     <?php echo esc_html(get_the_title($latest_news->ID)); ?>
@@ -274,7 +274,7 @@ function cmr_mega_menu_newsroom_shortcode($atts) {
             <?php else : ?>
             <a href="#" class="cmr-mmn-announcement">
                 <div class="cmr-mmn-announcement-img">
-                    <img src="https://cmrindia.com/wp-content/uploads/2026/06/Why-Chipsets-are-the-New-Frontier-in-Smartphones1.jpg" alt="Latest Announcement">
+                    <img src="https://cmrindia.com/wp-content/uploads/2026/06/Why-Chipsets-are-the-New-Frontier-in-Smartphones1.jpg" alt="Latest Announcement" loading="lazy" decoding="async">
                 </div>
                 <div class="cmr-mmn-announcement-title">
                     Explore our newest corporate updates.
