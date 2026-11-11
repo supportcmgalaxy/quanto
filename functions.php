@@ -3053,7 +3053,7 @@ function cmr_account_icon_shortcode() {
         
         $icon_html = '<div class="cmr-account-initial" style="width:30px; height:30px; min-width:30px; min-height:30px; border-radius:50%; background:#00bfbc; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; line-height:1; margin:0 auto;">' . esc_html( strtoupper( $initial ) ) . '</div>';
     } else {
-        $icon_html = '<i class="ri-user-line" style="font-size:22px;"></i>';
+        $icon_html = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
     }
     
     ob_start();
