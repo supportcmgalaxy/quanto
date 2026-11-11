@@ -80,11 +80,9 @@ function quanto_essential_scripts() {
     // CMR News Style - register so news/media components enqueue it when needed
     wp_register_style( 'cmr-news-style', get_theme_file_uri('/assets/css/cmr-news.css') ,array(), $quanto_theme_ver );
     
-    // CMR Common Modal Styles - register so modal components enqueue it when needed
+    // CMR Common Modal Styles - enqueue everywhere (loaded async via style_loader_tag) so popups stay hidden & styled
     wp_register_style( 'cmr-modal-style', get_theme_file_uri('/assets/css/cmr-modal.css'), array(), $quanto_theme_ver );
-    if ( ! is_front_page() && ! is_home() ) {
-        wp_enqueue_style( 'cmr-modal-style' );
-    }
+    wp_enqueue_style( 'cmr-modal-style' );
 
     if ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() || is_account_page() ) ) {
         wp_enqueue_style( 'cmr-checkout-block', get_theme_file_uri('/assets/css/cmr-checkout-block.css') ,array(), $quanto_theme_ver );
@@ -436,10 +434,8 @@ add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
             'quanto-blog-style',
             'tablepress-default',
             'cmr-sticky-nav-css',
-            'cmr-modal-style',
             'wcf--addons',
             'mas-animation-ex',
-            'e-popup',
         ) );
     }
 
@@ -448,7 +444,7 @@ add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
         strpos( $html, 'elementskit-lite/' ) !== false ||
         strpos( $html, 'animate.css' ) !== false ||
         ( ! $is_woo_page && ( strpos( $html, 'wc-blocks.css' ) !== false || strpos( $html, 'xoo-aff' ) !== false || strpos( $html, 'xoo-el' ) !== false ) ) ||
-        ( $is_cmr_home && ( strpos( $html, 'quanto/assets/css/remixicon.css' ) !== false || strpos( $html, 'cmr-sticky-nav.css' ) !== false || strpos( $html, 'cmr-modal.css' ) !== false || strpos( $html, 'wcf-addons.min.css' ) !== false || strpos( $html, 'mas-animation.css' ) !== false ) )
+        ( $is_cmr_home && ( strpos( $html, 'quanto/assets/css/remixicon.css' ) !== false || strpos( $html, 'cmr-sticky-nav.css' ) !== false || strpos( $html, 'wcf-addons.min.css' ) !== false || strpos( $html, 'mas-animation.css' ) !== false ) )
     );
 
     if ( in_array( $handle, $global_blocked, true ) || $is_blocked_src ) {
@@ -513,6 +509,10 @@ add_filter( 'elementor/widget/render_content', function( $content, $widget ) {
  */
 add_action( 'wp_head', 'quanto_preload_critical_assets', 1 );
 function quanto_preload_critical_assets() {
+    // Critical zero-FOUC popup/modal hide rules so Elementor & login popups never flash/overlap during page load
+    if ( ! is_admin() && ! ( function_exists( 'quanto_is_elementor_edit' ) && quanto_is_elementor_edit() ) ) {
+        echo '<style id="cmr-critical-modal-hide">.elementor-location-popup:not(.dialog-widget-content *):not(.dialog-message *),.elementor-popup-modal[style*="display: none"],.elementor-popup-modal[style*="display:none"],.dialog-widget[style*="display: none"],.dialog-widget[style*="display:none"],.xoo-el-container.xoo-el-style-popup:not(.xoo-el-popup-active),.xoo-el-popup-notice:not(.xoo-el-notice-active),#cmr-review-modal-overlay:not(.cmr-open),#cmr-review-modal:not(.cmr-open),.cmr-vmodal-overlay:not(.active):not(.cmr-open){display:none !important;visibility:hidden !important;opacity:0 !important;pointer-events:none !important;}</style>' . "\n";
+    }
     $font_url = get_theme_file_uri( '/assets/fonts/instrument-sans/instrument-sans-latin-normal.woff2' );
     echo '<link rel="preload" href="' . esc_url( $font_url ) . '" as="font" type="font/woff2" crossorigin>' . "\n";
     if ( is_front_page() || is_home() ) {
