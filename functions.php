@@ -143,6 +143,7 @@ require_once QUANTO_DIR_PATH_INC . 'cmr-stay-updated.php';
 require_once QUANTO_DIR_PATH_INC . 'cmr-featured-insight.php';
 require_once get_theme_file_path( 'inc/cmr-what-we-think.php' );
 require_once get_theme_file_path( 'inc/cmr-slide-of-the-day.php' );
+require_once get_theme_file_path( 'inc/cmr-scroll-slider.php' );
 require_once get_theme_file_path( 'inc/cmr-team-scroll.php' );
 require_once get_theme_file_path( 'inc/cmr-media-cpt.php' );
 require_once get_theme_file_path( 'inc/cmr-gtm.php' );
