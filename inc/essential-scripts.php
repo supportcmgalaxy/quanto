@@ -565,13 +565,25 @@ add_filter( 'elementor/widget/render_content', function( $content, $widget ) {
 }, 10, 2 );
 
 /**
+ * Exclude footer from WP Rocket Lazy Render (content-visibility: auto) so negative-margin card overlap renders identically for logged-out users
+ */
+add_filter( 'rocket_lrc_exclusions', function( $exclusions ) {
+    if ( ! is_array( $exclusions ) ) {
+        $exclusions = array();
+    }
+    $exclusions[] = 'class="footer"';
+    $exclusions[] = 'e-ba501f5-d6b8384';
+    return $exclusions;
+} );
+
+/**
  * Preload primary web font and hero image for instant LCP rendering
  */
 add_action( 'wp_head', 'quanto_preload_critical_assets', 1 );
 function quanto_preload_critical_assets() {
     // Critical zero-FOUC popup/modal hide rules so Elementor & login popups never flash/overlap during page load
     if ( ! is_admin() && ! ( function_exists( 'quanto_is_elementor_edit' ) && quanto_is_elementor_edit() ) ) {
-        echo '<style id="cmr-critical-modal-hide">.elementor-location-popup:not(.dialog-widget-content *):not(.dialog-message *),.elementor-popup-modal[style*="display: none"],.elementor-popup-modal[style*="display:none"],.dialog-widget[style*="display: none"],.dialog-widget[style*="display:none"],.xoo-el-container.xoo-el-style-popup:not(.xoo-el-popup-active),.xoo-el-popup-notice:not(.xoo-el-notice-active),#cmr-review-modal-overlay:not(.cmr-open),#cmr-review-modal:not(.cmr-open),.cmr-vmodal-overlay:not(.active):not(.cmr-open){display:none !important;visibility:hidden !important;opacity:0 !important;pointer-events:none !important;}</style>' . "\n";
+        echo '<style id="cmr-critical-modal-hide">footer.footer[data-wpr-lazyrender]{content-visibility:visible !important;contain:none !important;}.elementor-location-popup:not(.dialog-widget-content *):not(.dialog-message *),.elementor-popup-modal[style*="display: none"],.elementor-popup-modal[style*="display:none"],.dialog-widget[style*="display: none"],.dialog-widget[style*="display:none"],.xoo-el-container.xoo-el-style-popup:not(.xoo-el-popup-active),.xoo-el-popup-notice:not(.xoo-el-notice-active),#cmr-review-modal-overlay:not(.cmr-open),#cmr-review-modal:not(.cmr-open),.cmr-vmodal-overlay:not(.active):not(.cmr-open){display:none !important;visibility:hidden !important;opacity:0 !important;pointer-events:none !important;}</style>' . "\n";
     }
     $font_url = get_theme_file_uri( '/assets/fonts/instrument-sans/instrument-sans-latin-normal.woff2' );
     echo '<link rel="preload" href="' . esc_url( $font_url ) . '" as="font" type="font/woff2" crossorigin>' . "\n";
