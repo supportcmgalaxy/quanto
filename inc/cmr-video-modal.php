@@ -10,6 +10,38 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+add_filter( 'elementor/widget/render_content', 'cmr_replace_elementor_yt_iframe_with_facade', 20, 2 );
+function cmr_replace_elementor_yt_iframe_with_facade( $content, $widget ) {
+    if ( is_admin() || ( function_exists( 'quanto_is_elementor_edit' ) && quanto_is_elementor_edit() ) ) {
+        return $content;
+    }
+    if ( ! is_object( $widget ) || ! method_exists( $widget, 'get_name' ) || $widget->get_name() !== 'video' ) {
+        return $content;
+    }
+    // Homepage widgets already use Elementor's image overlay
+    if ( strpos( $content, 'elementor-custom-embed-image-overlay' ) !== false ) {
+        return $content;
+    }
+    if ( stripos( $content, 'youtube' ) === false || stripos( $content, '<iframe' ) === false ) {
+        return $content;
+    }
+
+    return preg_replace_callback(
+        '/<iframe\b[^>]*\bsrc=["\'][^"\']*youtube(?:-nocookie)?\.com\/embed\/([a-zA-Z0-9_-]{11})[^"\']*["\'][^>]*>\s*<\/iframe>/is',
+        function( $m ) {
+            $vid = $m[1];
+            $thumb = 'https://i.ytimg.com/vi/' . $vid . '/hqdefault.jpg';
+            return '<div class="elementor-custom-embed-image-overlay cmr-yt-facade" data-cmr-yt-id="' . esc_attr( $vid ) . '" role="button" tabindex="0" aria-label="Play Video">'
+                . '<img src="' . esc_url( $thumb ) . '" alt="Video preview" loading="lazy" decoding="async" width="480" height="360">'
+                . '<div class="elementor-custom-embed-play cmr-yt-play-btn" aria-hidden="true">'
+                . '<svg viewBox="0 0 68 48" width="68" height="48"><path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="#f00"/><path d="M45 24L27 14v20" fill="#fff"/></svg>'
+                . '</div>'
+                . '</div>';
+        },
+        $content
+    );
+}
+
 add_action( 'wp_footer', 'cmr_render_video_modal_html', 99 );
 add_action( 'elementor/editor/footer', 'cmr_render_video_modal_html', 99 );
 
@@ -27,6 +59,32 @@ function cmr_render_video_modal_html() {
     .elementor-widget-video .elementor-video iframe {
         display: none !important;
         pointer-events: none !important;
+    }
+
+    .cmr-yt-facade {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        background: #000;
+        cursor: pointer;
+        overflow: hidden;
+    }
+    .cmr-yt-facade img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .cmr-yt-facade .cmr-yt-play-btn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        transition: transform 0.2s ease;
+    }
+    .cmr-yt-facade:hover .cmr-yt-play-btn {
+        transform: translate(-50%, -50%) scale(1.08);
     }
 
     .cmr-vmodal-overlay {
@@ -190,8 +248,14 @@ function cmr_render_video_modal_html() {
 
             var ytUrl = '';
 
+            // 0. Facade thumbnail data attribute
+            var facadeEl = e.target.closest('[data-cmr-yt-id]');
+            if (facadeEl && facadeEl.dataset && facadeEl.dataset.cmrYtId) {
+                ytUrl = 'https://youtu.be/' + facadeEl.dataset.cmrYtId;
+            }
+
             // 1. Direct button link
-            if (watchBtn) {
+            if (!ytUrl && watchBtn) {
                 ytUrl = watchBtn.getAttribute('href') || '';
             }
 
