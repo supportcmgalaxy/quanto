@@ -3,10 +3,13 @@
  * CMR Common Horizontal Scroll-on-Scroll Slider
  *
  * Reusable, zero-dependency (no GSAP) sticky horizontal scroll animation.
- * Usage: Add class `cmr-scroll-slider` to any slider/container (and optionally
- * `cmr-scroll-track` on the moving inner row, or it auto-detects `.process-box-wrapper`,
- * `.swiper-wrapper`, `.e-con-inner`, or the element itself).
- * Also automatically enhances `.process-box-wrapper.horizontal-scroll`.
+ * Pins the parent section (keeping headings + cards together) and scrolls
+ * the card track edge-to-edge across the full viewport without container clipping.
+ *
+ * Usage:
+ * - Automatically enhances `.process-box-wrapper.horizontal-scroll` (pins its parent section).
+ * - Reusable anywhere: add class `cmr-scroll-slider` to any Elementor section/container
+ *   or slider wrapper (optionally add `cmr-scroll-track` on the moving row).
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -26,14 +29,18 @@ function cmr_render_common_scroll_slider_assets() {
     }
     .cmr-hscroll-sticky {
         position: sticky;
-        top: 96px;
+        top: 64px;
         width: 100%;
-        overflow: hidden;
+        overflow-x: clip;
+        overflow-y: visible;
     }
     .cmr-hscroll-track-ready {
         display: flex !important;
         flex-wrap: nowrap !important;
         will-change: transform;
+    }
+    .cmr-hscroll-unclip {
+        overflow: visible !important;
     }
     @media (max-width: 991px) {
         .cmr-hscroll-spacer {
@@ -51,7 +58,7 @@ function cmr_render_common_scroll_slider_assets() {
     </style>
     <script id="cmr-scroll-slider-js">
     (function() {
-        var STICKY_TOP = 96;
+        var STICKY_TOP = 64;
         var BREAKPOINT = 992;
         var instances = [];
         var ticking = false;
@@ -60,45 +67,64 @@ function cmr_render_common_scroll_slider_assets() {
             var p = el.parentElement;
             while (p && p !== document.body && p !== document.documentElement) {
                 var cs = window.getComputedStyle(p);
-                if (cs.overflow === 'hidden' || cs.overflowY === 'hidden') {
+                if (cs.overflow === 'hidden' || cs.overflowY === 'hidden' || cs.overflowX === 'hidden') {
                     p.style.overflow = 'clip';
                 }
                 p = p.parentElement;
             }
         }
 
-        function resolveTrack(root) {
-            if (root.matches('.cmr-scroll-track, .process-box-wrapper, .swiper-wrapper')) {
-                return root;
+        function unclipBetween(track, sticky) {
+            var p = track.parentElement;
+            while (p && p !== sticky) {
+                p.classList.add('cmr-hscroll-unclip');
+                p = p.parentElement;
             }
-            return root.querySelector('.cmr-scroll-track, .process-box-wrapper, .swiper-wrapper, :scope > .e-con-inner') || root;
         }
 
-        function setupSlider(root) {
-            if (root.dataset.cmrHscrollInit === '1') return;
-            if (root.closest('.cmr-hscroll-spacer')) return;
-            root.dataset.cmrHscrollInit = '1';
+        function resolvePinTarget(target) {
+            // If target is an Elementor parent section/container, pin it directly
+            if (target.classList.contains('cmr-scroll-slider')) {
+                return target;
+            }
+            // For `.process-box-wrapper.horizontal-scroll`, pin its outer Elementor parent section
+            // so the section heading ("WHO WE SERVE") stays pinned with the cards
+            var parentSection = target.closest('.e-con.e-parent, .elementor-section');
+            return parentSection || target;
+        }
 
-            var track = resolveTrack(root);
-            var isRootTrack = (track === root);
+        function resolveTrack(pinTarget, originalTarget) {
+            if (originalTarget && originalTarget !== pinTarget && originalTarget.matches('.cmr-scroll-track, .process-box-wrapper, .swiper-wrapper')) {
+                return originalTarget;
+            }
+            return pinTarget.querySelector('.cmr-scroll-track, .process-box-wrapper, .swiper-wrapper, :scope > .e-con-inner') || pinTarget;
+        }
+
+        function setupSlider(originalTarget) {
+            var pinTarget = resolvePinTarget(originalTarget);
+            if (pinTarget.dataset.cmrHscrollInit === '1') return;
+            if (pinTarget.closest('.cmr-hscroll-spacer')) return;
+            pinTarget.dataset.cmrHscrollInit = '1';
+
+            var track = resolveTrack(pinTarget, originalTarget);
 
             var spacer = document.createElement('div');
             spacer.className = 'cmr-hscroll-spacer';
             var sticky = document.createElement('div');
             sticky.className = 'cmr-hscroll-sticky';
 
-            root.parentNode.insertBefore(spacer, root);
-            sticky.appendChild(root);
+            pinTarget.parentNode.insertBefore(spacer, pinTarget);
+            sticky.appendChild(pinTarget);
             spacer.appendChild(sticky);
 
             track.classList.add('cmr-hscroll-track-ready');
+            unclipBetween(track, sticky);
             ensureStickyAncestors(spacer);
 
             instances.push({
                 spacer: spacer,
                 sticky: sticky,
                 track: track,
-                isRootTrack: isRootTrack,
                 maxScroll: 0,
                 scrollable: 0
             });
@@ -114,7 +140,10 @@ function cmr_render_common_scroll_slider_assets() {
                     inst.scrollable = 0;
                     return;
                 }
-                var maxScroll = Math.max(0, inst.track.scrollWidth - inst.sticky.clientWidth);
+                var trackRect = inst.track.getBoundingClientRect();
+                var startLeft = Math.max(0, trackRect.left);
+                var viewportW = document.documentElement.clientWidth || window.innerWidth;
+                var maxScroll = Math.max(0, inst.track.scrollWidth - (viewportW - 2 * startLeft));
                 inst.maxScroll = maxScroll;
                 if (maxScroll > 10) {
                     var stickyH = inst.sticky.offsetHeight;
