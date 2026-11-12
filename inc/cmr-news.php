@@ -719,7 +719,8 @@ function cmr_news_tabs_shortcode( $atts ) {
                             foreach ( $all_posts as $post ) {
                                 setup_postdata( $post );
                                 $post_id = get_the_ID();
-                                $bg_image = get_the_post_thumbnail_url( $post_id, 'large' );
+                                $thumb_id = get_post_thumbnail_id( $post_id );
+                                $bg_image = get_the_post_thumbnail_url( $post_id, 'medium_large' );
                                 $logo_id = get_post_meta( $post_id, '_cmr_news_source_logo_id', true );
                                 $logo_url = $logo_id ? wp_get_attachment_url( $logo_id ) : '';
                                 $ext_link = get_post_meta( $post_id, '_cmr_news_external_link', true );
@@ -773,21 +774,54 @@ function cmr_news_tabs_shortcode( $atts ) {
                                     }
                                 } else {
                                     $card_class = ( $count === 0 ) ? 'cmr-card cmr-card-featured' : 'cmr-card cmr-card-standard';
+                                    $bg_img_html = '';
+                                    if ( $thumb_id ) {
+                                        $bg_img_html = wp_get_attachment_image( $thumb_id, 'medium_large', false, array(
+                                            'class'    => 'cmr-card-bg',
+                                            'loading'  => 'lazy',
+                                            'decoding' => 'async',
+                                            'sizes'    => ( $count === 0 ) ? '(max-width: 768px) 100vw, 680px' : '(max-width: 768px) 100vw, 580px',
+                                            'alt'      => esc_attr( get_the_title() ),
+                                        ) );
+                                    }
+                                    if ( empty( $bg_img_html ) && $bg_image ) {
+                                        $bg_img_html = '<img src="' . esc_url( $bg_image ) . '" class="cmr-card-bg" alt="' . esc_attr( get_the_title() ) . '" loading="lazy" decoding="async">';
+                                    }
+                                    $logo_desktop_html = '';
+                                    $logo_mobile_html  = '';
+                                    if ( $logo_id && is_numeric( $logo_id ) ) {
+                                        $logo_desktop_html = wp_get_attachment_image( (int) $logo_id, 'medium', false, array(
+                                            'class'    => 'cmr-card-logo cmr-card-logo-desktop',
+                                            'loading'  => 'lazy',
+                                            'decoding' => 'async',
+                                            'sizes'    => '130px',
+                                            'alt'      => 'Source Logo',
+                                        ) );
+                                        $logo_mobile_html = wp_get_attachment_image( (int) $logo_id, 'medium', false, array(
+                                            'class'    => 'cmr-card-logo cmr-card-logo-mobile',
+                                            'loading'  => 'lazy',
+                                            'decoding' => 'async',
+                                            'sizes'    => '130px',
+                                            'alt'      => 'Source Logo',
+                                        ) );
+                                    }
+                                    if ( empty( $logo_desktop_html ) && $logo_url ) {
+                                        $logo_desktop_html = '<img src="' . esc_url( $logo_url ) . '" class="cmr-card-logo cmr-card-logo-desktop" alt="Source Logo" loading="lazy" decoding="async">';
+                                    }
+                                    if ( empty( $logo_mobile_html ) && $logo_url ) {
+                                        $logo_mobile_html = '<img src="' . esc_url( $logo_url ) . '" class="cmr-card-logo cmr-card-logo-mobile" alt="Source Logo" loading="lazy" decoding="async">';
+                                    }
                                     ?>
                                     <div class="<?php echo esc_attr( $card_class ); ?>">
                                         <a href="<?php echo esc_url( $link ); ?>" target="<?php echo esc_attr( $target ); ?>" class="cmr-card-link-wrapper">
                                             <div class="cmr-card-image-wrap">
-                                                <?php if ( $bg_image ) : ?>
-                                                    <img src="<?php echo esc_url( $bg_image ); ?>" class="cmr-card-bg" alt="<?php the_title_attribute(); ?>">
-                                                <?php endif; ?>
-                                                <?php if ( $count > 0 && $logo_url ) : ?>
-                                                    <img src="<?php echo esc_url( $logo_url ); ?>" class="cmr-card-logo cmr-card-logo-desktop" alt="Source Logo">
+                                                <?php echo $bg_img_html; ?>
+                                                <?php if ( $count > 0 && $logo_desktop_html ) : ?>
+                                                    <?php echo $logo_desktop_html; ?>
                                                 <?php endif; ?>
                                             </div>
                                             <div class="cmr-card-content">
-                                                <?php if ( $logo_url ) : ?>
-                                                    <img src="<?php echo esc_url( $logo_url ); ?>" class="cmr-card-logo cmr-card-logo-mobile" alt="Source Logo">
-                                                <?php endif; ?>
+                                                <?php echo $logo_mobile_html; ?>
                                                 <div class="cmr-card-meta">
                                                     <div class="cmr-meta-left">
                                                         <?php if ( $publisher ) : ?>

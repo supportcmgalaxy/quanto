@@ -454,8 +454,9 @@ add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
         strpos( $html, 'ekiticons.css' ) !== false ||
         strpos( $html, 'elementskit-lite/' ) !== false ||
         strpos( $html, 'animate.css' ) !== false ||
+        strpos( $html, 'swiper' ) !== false ||
         ( ! $is_woo_page && ( strpos( $html, 'wc-blocks.css' ) !== false || strpos( $html, 'xoo-aff' ) !== false || strpos( $html, 'xoo-el' ) !== false ) ) ||
-        ( $is_cmr_home && ( strpos( $html, 'quanto/assets/css/remixicon.css' ) !== false || strpos( $html, 'cmr-sticky-nav.css' ) !== false || strpos( $html, 'wcf-addons.min.css' ) !== false || strpos( $html, 'mas-animation.css' ) !== false ) )
+        ( $is_cmr_home && ( strpos( $html, 'remixicon' ) !== false || strpos( $html, 'cmr-sticky-nav.css' ) !== false || strpos( $html, 'wcf-addons.min.css' ) !== false || strpos( $html, 'mas-animation.css' ) !== false ) )
     );
 
     if ( in_array( $handle, $global_blocked, true ) || $is_blocked_src ) {
@@ -729,6 +730,12 @@ add_action( 'wp_head', function() {
                     if (val !== null && val !== '') { el.textContent = val; }
                 });
             }
+            document.querySelectorAll('.wcf-arrow-prev:not([aria-label])').forEach(function(el) {
+                el.setAttribute('aria-label', 'Previous slide');
+            });
+            document.querySelectorAll('.wcf-arrow-next:not([aria-label])').forEach(function(el) {
+                el.setAttribute('aria-label', 'Next slide');
+            });
         });
         <?php endif; ?>
     })();
