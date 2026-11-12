@@ -188,34 +188,37 @@ function quanto_essential_scripts() {
     // Bootstrap
     wp_enqueue_script( 'bootstrap-bundle', get_theme_file_uri( '/assets/js/bootstrap.bundle.min.js' ), array( 'jquery' ), '5.3.3', true );
 
-    // jquery mixitup (avoid double load if already enqueued)
-    if ( ! wp_script_is( 'mixitup', 'enqueued' ) ) {
-        wp_enqueue_script( 'jquery-mixitup', get_theme_file_uri( '/assets/js/jquery.mixitup.min.js' ), array('jquery'), '2.1.11', true );
-    }
+    // Animation & slider scripts hidden on frontend; only load in Admin / Elementor Editor
+    if ( is_admin() || ( function_exists( 'quanto_is_elementor_edit' ) && quanto_is_elementor_edit() ) ) {
+        // jquery mixitup (avoid double load if already enqueued)
+        if ( ! wp_script_is( 'mixitup', 'enqueued' ) ) {
+            wp_enqueue_script( 'jquery-mixitup', get_theme_file_uri( '/assets/js/jquery.mixitup.min.js' ), array('jquery'), '2.1.11', true );
+        }
 
-    // swiper bundle
-    wp_enqueue_script( 'swiper-bundle', get_theme_file_uri( '/assets/js/swiper-bundle.min.js' ), array('jquery'), '7.0.8', true );
+        // swiper bundle
+        wp_enqueue_script( 'swiper-bundle', get_theme_file_uri( '/assets/js/swiper-bundle.min.js' ), array('jquery'), '7.0.8', true );
+
+        // Odometer JS
+        wp_enqueue_script( 'odometer-min-script', get_theme_file_uri( '/assets/js/odometer.min.js' ), array( 'jquery' ), '0.4.8', true );
+        wp_enqueue_script( 'viewport-jquery-script', get_theme_file_uri( '/assets/js/viewport.jquery.js' ), array('jquery'), $quanto_theme_ver, true );
+
+        // gsap JS: only enqueue theme copy if mas-animation plugin has not loaded it
+        if ( ! wp_script_is( 'gsap', 'enqueued' ) ) {
+            wp_enqueue_script( 'gsap-script', get_theme_file_uri( '/assets/js/gsap.js' ), array( 'jquery' ), '3.11.4', true );
+            wp_enqueue_script( 'gsap-scroll-smoother-script', get_theme_file_uri( '/assets/js/gsap-scroll-smoother.js' ), array( 'jquery' ), '3.11.4', true );
+            wp_enqueue_script( 'gsap-scroll-to-plugin-script', get_theme_file_uri( '/assets/js/gsap-scroll-to-plugin.js' ), array( 'jquery' ), '3.11.4', true );
+            wp_enqueue_script( 'gsap-scroll-trigger-script', get_theme_file_uri( '/assets/js/gsap-scroll-trigger.js' ), array( 'jquery' ), '3.11.4', true );
+            wp_enqueue_script( 'gsap-split-text-script', get_theme_file_uri( '/assets/js/gsap-split-text.js' ), array( 'jquery' ), '3.11.2', true );
+        }
+    }
 
     // magnific popup (avoid double load if already enqueued)
     if ( ! wp_script_is( 'magnific-popup', 'enqueued' ) ) {
         wp_enqueue_script( 'magnific-popup', get_theme_file_uri( '/assets/js/jquery.magnific-popup.min.js' ), array('jquery'), '1.1.0', true );
     }
 
-    // Odometer JS
-    wp_enqueue_script( 'odometer-min-script', get_theme_file_uri( '/assets/js/odometer.min.js' ), array( 'jquery' ), '0.4.8', true );
-    wp_enqueue_script( 'viewport-jquery-script', get_theme_file_uri( '/assets/js/viewport.jquery.js' ), array('jquery'), $quanto_theme_ver, true );
-
     // Meanmenu JS
     wp_enqueue_script( 'jquery-meanmenu', get_theme_file_uri( '/assets/js/jquery.meanmenu.min.js' ), array('jquery'), $quanto_theme_ver, true );
-
-    // gsap JS: only enqueue theme copy if mas-animation plugin has not loaded it
-    if ( ! wp_script_is( 'gsap', 'enqueued' ) ) {
-        wp_enqueue_script( 'gsap-script', get_theme_file_uri( '/assets/js/gsap.js' ), array( 'jquery' ), '3.11.4', true );
-        wp_enqueue_script( 'gsap-scroll-smoother-script', get_theme_file_uri( '/assets/js/gsap-scroll-smoother.js' ), array( 'jquery' ), '3.11.4', true );
-        wp_enqueue_script( 'gsap-scroll-to-plugin-script', get_theme_file_uri( '/assets/js/gsap-scroll-to-plugin.js' ), array( 'jquery' ), '3.11.4', true );
-        wp_enqueue_script( 'gsap-scroll-trigger-script', get_theme_file_uri( '/assets/js/gsap-scroll-trigger.js' ), array( 'jquery' ), '3.11.4', true );
-        wp_enqueue_script( 'gsap-split-text-script', get_theme_file_uri( '/assets/js/gsap-split-text.js' ), array( 'jquery' ), '3.11.2', true );
-    }
 
     // main script
     wp_enqueue_script( 'quanto-main-script', get_theme_file_uri( '/assets/js/main.js' ), array('jquery'), $quanto_theme_ver, true );
@@ -501,36 +504,33 @@ add_filter( 'script_loader_tag', function( $tag, $handle, $src ) {
     if ( is_string( $tag ) && ( strpos( $tag, 'slick-animation.js' ) !== false || strpos( $tag, 'hello-animai.js' ) !== false || strpos( $tag, 'starter-animations.js' ) !== false || strpos( $tag, 'animejs' ) !== false ) ) {
         return '';
     }
-    // Performance test: strip unused/heavy animation & slider JS on homepage
-    $is_cmr_home = function_exists( 'quanto_is_cmr_home' ) ? quanto_is_cmr_home() : ( is_front_page() || is_home() );
-    if ( $is_cmr_home ) {
-        $blocked_anim_handles = array(
-            'gsap', 'gsap-script',
-            'scrollSmoother', 'gsap-scroll-smoother-script', 'scroll-smoother',
-            'scrollTo', 'gsap-scroll-to-plugin-script',
-            'scrollTrigger', 'gsap-scroll-trigger-script',
-            'split-text', 'gsap-split-text-script',
-            'mixitup', 'jquery-mixitup',
-            'mas-animation',
-            'wcf--addons', 'wcf--slider',
-            'odometer-min-script', 'viewport-jquery-script',
-            'swiper-bundle', 'swiper',
-            'quanto-addon-script',
-        );
-        if ( in_array( $handle, $blocked_anim_handles, true ) ) {
-            return '';
-        }
-        if ( is_string( $src ) && (
-            strpos( $src, '/mas-animation/' ) !== false ||
-            strpos( $src, '/animation-addons-for-elementor/' ) !== false ||
-            strpos( $src, 'odometer.min.js' ) !== false ||
-            strpos( $src, 'viewport.jquery.js' ) !== false ||
-            strpos( $src, 'swiper-bundle.min.js' ) !== false ||
-            strpos( $src, 'swiper.min.js' ) !== false ||
-            strpos( $src, 'quanto-addon.js' ) !== false
-        ) ) {
-            return '';
-        }
+    // Hide/disable animation & slider JS across all frontend pages (Admin & Elementor editor bypass above)
+    $blocked_anim_handles = array(
+        'gsap', 'gsap-script',
+        'scrollSmoother', 'gsap-scroll-smoother-script', 'scroll-smoother',
+        'scrollTo', 'gsap-scroll-to-plugin-script',
+        'scrollTrigger', 'gsap-scroll-trigger-script',
+        'split-text', 'gsap-split-text-script',
+        'mixitup', 'jquery-mixitup',
+        'mas-animation',
+        'wcf--addons', 'wcf--slider',
+        'odometer-min-script', 'viewport-jquery-script',
+        'swiper-bundle', 'swiper',
+        'quanto-addon-script',
+    );
+    if ( in_array( $handle, $blocked_anim_handles, true ) ) {
+        return '';
+    }
+    if ( is_string( $src ) && (
+        strpos( $src, '/mas-animation/' ) !== false ||
+        strpos( $src, '/animation-addons-for-elementor/' ) !== false ||
+        strpos( $src, 'odometer.min.js' ) !== false ||
+        strpos( $src, 'viewport.jquery.js' ) !== false ||
+        strpos( $src, 'swiper-bundle.min.js' ) !== false ||
+        strpos( $src, 'swiper.min.js' ) !== false ||
+        strpos( $src, 'quanto-addon.js' ) !== false
+    ) ) {
+        return '';
     }
     return $tag;
 }, 99999, 3 );
@@ -706,8 +706,8 @@ add_action( 'wp_head', function() {
             get: function(t, p) { return dummyItem; }
         });
 
-        <?php if ( function_exists( 'quanto_is_cmr_home' ) ? quanto_is_cmr_home() : ( is_front_page() || is_home() ) ) : ?>
-        // 5. Safe no-op stubs on homepage only while animation/slider scripts are stripped for performance test
+        <?php if ( ! is_admin() && ! ( function_exists( 'quanto_is_elementor_edit' ) && quanto_is_elementor_edit() ) ) : ?>
+        // 5. Safe no-op stubs across frontend pages while animation/slider scripts are hidden
         if ( ! window.gsap ) {
             var _tl = { to: function(){ return _tl; }, from: function(){ return _tl; }, fromTo: function(){ return _tl; }, set: function(){ return _tl; }, add: function(){ return _tl; }, kill: function(){} };
             window.gsap = {
@@ -720,6 +720,7 @@ add_action( 'wp_head', function() {
         }
         window.ScrollTrigger = window.ScrollTrigger || { create: function(){ return { kill: function(){} }; }, refresh: function(){}, getAll: function(){ return []; }, getById: function(){ return null; } };
         window.ScrollSmoother = window.ScrollSmoother || { create: function(){ return null; }, get: function(){ return null; } };
+        window.SplitText = window.SplitText || function() { return { chars: [], words: [], lines: [], revert: function(){} }; };
         window.Swiper = window.Swiper || function() { return { on: function(){}, destroy: function(){}, update: function(){}, slideTo: function(){}, params: {} }; };
         window.addEventListener('load', function() {
             if (typeof window.Odometer === 'undefined') {
