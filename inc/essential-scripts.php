@@ -536,10 +536,22 @@ add_filter( 'script_loader_tag', function( $tag, $handle, $src ) {
     return $tag;
 }, 99999, 3 );
 
-// Block hidden dead HTML widget 3eb1d96 from outputting broken video slider script causing TypeError
+// Block hidden dead HTML widget 3eb1d96 & add accessible aria-labels to slider arrows
 add_filter( 'elementor/widget/render_content', function( $content, $widget ) {
     if ( is_object( $widget ) && method_exists( $widget, 'get_id' ) && $widget->get_id() === '3eb1d96' ) {
         return '';
+    }
+    if ( is_string( $content ) && strpos( $content, 'wcf-arrow' ) !== false ) {
+        $content = preg_replace(
+            '/(<div\b[^>]*class="[^"]*\bwcf-arrow-prev\b[^"]*"(?![^>]*\baria-label=))/i',
+            '$1 aria-label="Previous slide"',
+            $content
+        );
+        $content = preg_replace(
+            '/(<div\b[^>]*class="[^"]*\bwcf-arrow-next\b[^"]*"(?![^>]*\baria-label=))/i',
+            '$1 aria-label="Next slide"',
+            $content
+        );
     }
     return $content;
 }, 10, 2 );
@@ -723,6 +735,28 @@ add_action( 'wp_head', function() {
         window.ScrollSmoother = window.ScrollSmoother || { create: function(){ return null; }, get: function(){ return null; } };
         window.SplitText = window.SplitText || function() { return { chars: [], words: [], lines: [], revert: function(){} }; };
         window.Swiper = window.Swiper || function() { return { on: function(){}, destroy: function(){}, update: function(){}, slideTo: function(){}, params: {} }; };
+        function applyAccessibilityLabels() {
+            document.querySelectorAll('.wcf-arrow-prev:not([aria-label])').forEach(function(el) {
+                el.setAttribute('aria-label', 'Previous slide');
+            });
+            document.querySelectorAll('.wcf-arrow-next:not([aria-label])').forEach(function(el) {
+                el.setAttribute('aria-label', 'Next slide');
+            });
+            document.querySelectorAll('a.e-paragraph-link-base:not([aria-label])').forEach(function(el) {
+                var txt = (el.textContent || '').trim();
+                var hasAltImg = el.querySelector('img[alt]:not([alt=""])');
+                if (!txt && !hasAltImg && el.pathname) {
+                    var slug = el.pathname.replace(/^\/+|\/+$/g, '').split('/').pop() || 'Link';
+                    var label = slug.replace(/[-_]+/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+                    el.setAttribute('aria-label', label);
+                }
+            });
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', applyAccessibilityLabels);
+        } else {
+            applyAccessibilityLabels();
+        }
         window.addEventListener('load', function() {
             if (typeof window.Odometer === 'undefined') {
                 document.querySelectorAll('.odometer[data-odometer-final]').forEach(function(el) {
@@ -730,12 +764,7 @@ add_action( 'wp_head', function() {
                     if (val !== null && val !== '') { el.textContent = val; }
                 });
             }
-            document.querySelectorAll('.wcf-arrow-prev:not([aria-label])').forEach(function(el) {
-                el.setAttribute('aria-label', 'Previous slide');
-            });
-            document.querySelectorAll('.wcf-arrow-next:not([aria-label])').forEach(function(el) {
-                el.setAttribute('aria-label', 'Next slide');
-            });
+            applyAccessibilityLabels();
         });
         <?php endif; ?>
     })();

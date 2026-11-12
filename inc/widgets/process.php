@@ -726,7 +726,7 @@ class Quanto_Process extends Widget_Base {
         
                     <div class="process-info" style="position: relative; z-index: 2;">
                         <?php if (!empty($process['title'])) : ?>
-                            <h5 class="process-title text-color-white"><?php echo esc_html($process['title']); ?></h5>
+                            <p class="process-title text-color-white"><?php echo esc_html($process['title']); ?></p>
                         <?php endif; ?>
         
                         <?php if (!empty($process['description'])) : ?>
