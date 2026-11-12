@@ -553,6 +553,14 @@ add_filter( 'elementor/widget/render_content', function( $content, $widget ) {
             $content
         );
     }
+    // Unwrap accidental nested <a> inside Elementor atomic paragraph links (e.g. footer Enterprise/SMB/Channel Connect)
+    if ( is_string( $content ) && strpos( $content, 'e-paragraph-link-base' ) !== false ) {
+        $content = preg_replace(
+            '/(<a\b[^>]*class="[^"]*\be-paragraph-link-base\b[^"]*"[^>]*>)\s*<a\b[^>]*>(.*?)<\/a>\s*(<\/a>)/is',
+            '$1$2$3',
+            $content
+        );
+    }
     return $content;
 }, 10, 2 );
 
