@@ -1084,6 +1084,63 @@
                 return $html;
             }
 
+            // Step 1: Unwrap accidental nested <a> inside <p id="fotter"> or .e-paragraph-link-base
+            // Elementor text widgets can have a link set in widget settings while their text content also contains <a> tags.
+            // HTML5 parsers break on nested <a> by instantly closing the outer <a>, leaving an empty ghost link that fails accessibility audits.
+            $html = preg_replace_callback(
+                '/(<a\b[^>]*class=["\'][^"\']*\be-paragraph-link-base\b[^"\']*["\'][^>]*>)((?:(?!<\/a>)[\s\S])*?)<a\b[^>]*>(.*?)<\/a>((?:(?!<\/a>)[\s\S])*?)(<\/a>)/i',
+                function( $m ) {
+                    $outer_a   = $m[1];
+                    $before    = $m[2];
+                    $inner_txt = trim( strip_tags( $m[3] ) );
+                    $after     = preg_replace( '/<br\s*\/?>\s*$/i', '', $m[4] );
+                    $closing_a = $m[5];
+
+                    $label = $inner_txt;
+                    if ( empty( $label ) && preg_match( '/href=["\']([^"\']+)["\']/i', $outer_a, $hm ) ) {
+                        $path = trim( parse_url( $hm[1], PHP_URL_PATH ) ?: '', '/' );
+                        $parts = explode( '/', $path );
+                        $slug = end( $parts );
+                        $label = ucwords( str_replace( array( '-', '_' ), ' ', $slug ) );
+                    }
+
+                    if ( ! empty( $label ) && ! preg_match( '/\baria-label\s*=/i', $outer_a ) ) {
+                        $outer_a = preg_replace( '/<a\b/i', '<a aria-label="' . esc_attr( $label ) . '"', $outer_a, 1 );
+                    }
+
+                    return $outer_a . $before . ( ! empty( $inner_txt ) ? $inner_txt : $label ) . $after . $closing_a;
+                },
+                $html
+            );
+
+            // Step 1b: Also catch any remaining nested <a> inside <p id="fotter">
+            $html = preg_replace_callback(
+                '/(<p\b[^>]*id=["\']?fotter["\']?[^>]*>\s*<a\b[^>]*>)((?:(?!<\/a>)[\s\S])*?)<a\b[^>]*>(.*?)<\/a>((?:(?!<\/a>)[\s\S])*?)(<\/a>\s*<\/p>)/i',
+                function( $m ) {
+                    $outer_open = $m[1];
+                    $before     = $m[2];
+                    $inner_txt  = trim( strip_tags( $m[3] ) );
+                    $after      = preg_replace( '/<br\s*\/?>\s*$/i', '', $m[4] );
+                    $outer_close= $m[5];
+
+                    $label = $inner_txt;
+                    if ( empty( $label ) && preg_match( '/href=["\']([^"\']+)["\']/i', $outer_open, $hm ) ) {
+                        $path = trim( parse_url( $hm[1], PHP_URL_PATH ) ?: '', '/' );
+                        $parts = explode( '/', $path );
+                        $slug = end( $parts );
+                        $label = ucwords( str_replace( array( '-', '_' ), ' ', $slug ) );
+                    }
+
+                    if ( ! empty( $label ) && ! preg_match( '/\baria-label\s*=/i', $outer_open ) ) {
+                        $outer_open = preg_replace( '/<a\b/i', '<a aria-label="' . esc_attr( $label ) . '"', $outer_open, 1 );
+                    }
+
+                    return $outer_open . $before . ( ! empty( $inner_txt ) ? $inner_txt : $label ) . $after . $outer_close;
+                },
+                $html
+            );
+
+            // Step 2: Ensure any remaining link has discernible name (aria-label or text)
             return preg_replace_callback( '/<a\s+([^>]*?)>(.*?)<\/a>/is', function( $matches ) {
                 $attrs = $matches[1];
                 $inner = $matches[2];
@@ -1158,6 +1215,11 @@
 
                 // If inner HTML contains an empty alt <img alt="">, give the image the label too
                 $fixed_inner = preg_replace( '/<img\s+([^>]*?)alt\s*=\s*["\']\s*["\']([^>]*?)>/i', '<img $1alt="' . esc_attr( $label ) . '"$2>', $inner );
+
+                // If e-paragraph-link-base has completely empty content, also supply visible text fallback
+                if ( preg_match( '/\be-paragraph-link-base\b/i', $attrs ) && empty( trim( strip_tags( $fixed_inner ) ) ) ) {
+                    $fixed_inner = esc_html( $label );
+                }
 
                 return '<a aria-label="' . esc_attr( $label ) . '" ' . $attrs . '>' . $fixed_inner . '</a>';
             }, $html );

@@ -467,41 +467,50 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
 
         .cmr-wwt-menu-item {
             display: flex; align-items: center; gap: 12px;
-            padding: 8px 0; cursor: pointer;
-            color: #d1d1d1;
-            transition: color 0.3s ease;
+            padding: 10px 0; cursor: pointer;
+            color: #b0b0b0;
+            transition: color 0.25s ease;
+            user-select: none;
         }
-        .cmr-wwt-menu-item:hover, .cmr-wwt-menu-item.cmr-wwt-on { color: #401083; }
+        .cmr-wwt-menu-item:hover { color: #6B3FA0; }
+        .cmr-wwt-menu-item.cmr-wwt-on { color: #401083; font-weight: 700; }
         
         .cmr-wwt-bullet {
             width: 10px; height: 10px; border-radius: 50%;
-            background: #d1d1d1; transition: background 0.3s ease;
+            background: #d1d1d1; transition: background 0.25s ease, transform 0.25s ease;
+            flex-shrink: 0;
         }
         .cmr-wwt-menu-label { font-size: 30px; font-weight: 600; letter-spacing: -1px; line-height: 1.2; }
 
-        .cmr-wwt-menu-item:hover .cmr-wwt-bullet,
-        .cmr-wwt-menu-item.cmr-wwt-on .cmr-wwt-bullet { background: #401083; }
+        .cmr-wwt-menu-item:hover .cmr-wwt-bullet { background: #6B3FA0; }
+        .cmr-wwt-menu-item.cmr-wwt-on .cmr-wwt-bullet { background: #401083; transform: scale(1.15); }
 
         .cmr-wwt-right-col { 
             flex: 1; 
             min-width: 0; 
             position: relative; 
-            min-height: 600px;
+            min-height: auto;
+        }
+
+        @keyframes cmrWwtFadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .cmr-wwt-slide {
-            position: absolute; top: 0; left: 0; width: 100%;
-            display: flex; gap: 24px;
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 1.5s ease, transform 1.5s ease;
-            pointer-events: none;
+            display: none;
+            width: 100%;
+            gap: 24px;
         }
-        .cmr-wwt-slide:first-child { position: relative; }
         .cmr-wwt-slide.cmr-wwt-show { 
-            opacity: 1; 
-            transform: translateY(0);
-            pointer-events: auto; 
+            display: flex;
+            animation: cmrWwtFadeSlideIn 0.35s cubic-bezier(0.2, 0, 0.2, 1) forwards;
         }
 
         @media (max-width: 1024px) {
@@ -672,84 +681,42 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
 
         <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Failsafe wait for GSAP
-            function initWWTScroll() {
-                if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
-                    setTimeout(initWWTScroll, 50);
-                    return;
-                }
-                
-                // If on mobile, ignore GSAP pinning entirely for better UX
-                if (window.innerWidth <= 768) {
-                    initMobileWWT();
-                    return;
-                }
-                
-                gsap.registerPlugin(ScrollTrigger);
-                
-                const wraps = document.querySelectorAll('.cmr-wwt-wrap');
-                
-                wraps.forEach(wrap => {
-                    const panel = wrap.querySelector('.cmr-wwt-panel');
-                    const rightCol = wrap.querySelector('.cmr-wwt-right-col');
-                    const slides = wrap.querySelectorAll('.cmr-wwt-slide');
-                    const menuItems = wrap.querySelectorAll('.cmr-wwt-menu-item');
-                    const totalSlides = slides.length;
-                    
-                    if (totalSlides <= 1) return; // No need to pin if only 1 slide
+            // Tab switching for desktop
+            const wraps = document.querySelectorAll('.cmr-wwt-wrap');
+            wraps.forEach(wrap => {
+                const menuItems = wrap.querySelectorAll('.cmr-wwt-menu-item');
+                const slides = wrap.querySelectorAll('.cmr-wwt-slide');
 
-                    // Dynamically calculate tallest slide height
-                    function syncColHeight() {
-                        let maxHeight = 0;
-                        slides.forEach(s => {
-                            if (s.scrollHeight > maxHeight) maxHeight = s.scrollHeight;
+                menuItems.forEach((item, idx) => {
+                    item.setAttribute('role', 'tab');
+                    item.setAttribute('tabindex', '0');
+                    item.setAttribute('aria-selected', idx === 0 ? 'true' : 'false');
+
+                    function activateTab() {
+                        menuItems.forEach((m, i) => {
+                            const isCurrent = (i === idx);
+                            m.classList.toggle('cmr-wwt-on', isCurrent);
+                            m.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
                         });
-                        if (maxHeight > 0 && rightCol) {
-                            rightCol.style.minHeight = (maxHeight + 20) + 'px';
-                        }
+                        slides.forEach((s, i) => {
+                            s.classList.toggle('cmr-wwt-show', i === idx);
+                        });
                     }
-                    syncColHeight();
-                    window.addEventListener('resize', syncColHeight);
-                    
-                    // Set scroll duration (amount of pinning)
-                    const scrollDuration = totalSlides * window.innerHeight;
-                    
-                    ScrollTrigger.create({
-                        trigger: wrap,
-                        start: "top top+=80", // Account for sticky headers if any
-                        end: "+=" + scrollDuration,
-                        pin: panel,
-                        pinSpacing: true,
-                        scrub: true,
-                        onUpdate: self => {
-                            // Calculate current active slide index based on progress
-                            let rawIndex = self.progress * totalSlides;
-                            let idx = Math.min(totalSlides - 1, Math.floor(rawIndex));
-                            
-                            // Prevent precision issues at the very end
-                            if (self.progress > 0.99) idx = totalSlides - 1;
-                            
-                            // Update active classes
-                            menuItems.forEach((m, i) => m.classList.toggle("cmr-wwt-on", i === idx));
-                            slides.forEach((s, i) => s.classList.toggle("cmr-wwt-show", i === idx));
+
+                    item.addEventListener('click', activateTab);
+                    item.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            activateTab();
                         }
-                    });
-                    
-                    // Click handlers for menu items to scroll smoothly to their respective points
-                    menuItems.forEach((item, i) => {
-                        item.addEventListener('click', function() {
-                            // Find the ScrollTrigger instance associated with this wrap
-                            const st = ScrollTrigger.getAll().find(t => t.trigger === wrap);
-                            if (st) {
-                                // Calculate pixel offset for the targeted slide
-                                const targetY = st.start + (i / totalSlides) * (st.end - st.start) + 10;
-                                window.scrollTo({ top: targetY, behavior: 'smooth' });
-                            }
-                        });
                     });
                 });
-            }
-            
+
+                slides.forEach((s, i) => {
+                    s.setAttribute('role', 'tabpanel');
+                });
+            });
+
             function initMobileWWT() {
                 const wraps = document.querySelectorAll('.cmr-wwt-wrap');
                 wraps.forEach(wrap => {
@@ -786,7 +753,6 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
                     if(activeItem) {
                         const content = activeItem.querySelector('.cmr-wwt-acc-content');
                         if(content) {
-                            // setTimeout to ensure DOM is fully rendered for scrollHeight
                             setTimeout(() => {
                                 content.style.maxHeight = content.scrollHeight + 'px';
                             }, 100);
@@ -794,8 +760,8 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
                     }
                 });
             }
-            
-            initWWTScroll();
+
+            initMobileWWT();
         });
         </script>
         <?php

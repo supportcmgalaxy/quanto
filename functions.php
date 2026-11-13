@@ -1505,6 +1505,9 @@ add_shortcode('cmr_footer', function() {
             
             // Prepend the inlined CSS so it loads with the HTML
             $cached_footer = $inline_css . $cached_footer;
+            if ( function_exists( 'quanto_fix_accessible_links' ) ) {
+                $cached_footer = quanto_fix_accessible_links( $cached_footer );
+            }
             
             // Cache for 7 days
             set_transient( $transient_key, $cached_footer, WEEK_IN_SECONDS );
@@ -1547,6 +1550,9 @@ add_shortcode('cmr_footer', function() {
                     }
 
                     $cached_footer = $inline_css . '<footer class="footer">' . $direct_content . '</footer>';
+                    if ( function_exists( 'quanto_fix_accessible_links' ) ) {
+                        $cached_footer = quanto_fix_accessible_links( $cached_footer );
+                    }
                     // Never poison cache with empty CSS: if CSS is present, cache for 7 days; otherwise only 60s
                     $ttl = ( ! empty( $inline_css ) ) ? WEEK_IN_SECONDS : 60;
                     set_transient( $transient_key, $cached_footer, $ttl );
@@ -1555,7 +1561,7 @@ add_shortcode('cmr_footer', function() {
         }
     }
     
-    return $cached_footer;
+    return function_exists( 'quanto_fix_accessible_links' ) ? quanto_fix_accessible_links( $cached_footer ) : $cached_footer;
 });
 
 // Safe helper to check if Elementor editor or preview is active

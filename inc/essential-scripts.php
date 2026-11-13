@@ -554,12 +554,32 @@ add_filter( 'elementor/widget/render_content', function( $content, $widget ) {
         );
     }
     // Unwrap accidental nested <a> inside Elementor atomic paragraph links (e.g. footer Enterprise/SMB/Channel Connect)
-    if ( is_string( $content ) && strpos( $content, 'e-paragraph-link-base' ) !== false ) {
-        $content = preg_replace(
-            '/(<a\b[^>]*class="[^"]*\be-paragraph-link-base\b[^"]*"[^>]*>)\s*<a\b[^>]*>(.*?)<\/a>\s*(<\/a>)/is',
-            '$1$2$3',
-            $content
-        );
+    if ( is_string( $content ) && ( strpos( $content, 'e-paragraph-link-base' ) !== false || strpos( $content, 'fotter' ) !== false ) ) {
+        if ( function_exists( 'quanto_fix_accessible_links' ) ) {
+            $content = quanto_fix_accessible_links( $content );
+        } else {
+            $content = preg_replace_callback(
+                '/(<a\b[^>]*class=["\'][^"\']*\be-paragraph-link-base\b[^"\']*["\'][^>]*>)((?:(?!<\/a>)[\s\S])*?)<a\b[^>]*>(.*?)<\/a>((?:(?!<\/a>)[\s\S])*?)(<\/a>)/i',
+                function( $m ) {
+                    $outer_a   = $m[1];
+                    $before    = $m[2];
+                    $inner_txt = trim( strip_tags( $m[3] ) );
+                    $after     = preg_replace( '/<br\s*\/?>\s*$/i', '', $m[4] );
+                    $closing_a = $m[5];
+                    $label     = $inner_txt;
+                    if ( empty( $label ) && preg_match( '/href=["\']([^"\']+)["\']/i', $outer_a, $hm ) ) {
+                        $path = trim( parse_url( $hm[1], PHP_URL_PATH ) ?: '', '/' );
+                        $slug = end( explode( '/', $path ) );
+                        $label = ucwords( str_replace( array( '-', '_' ), ' ', $slug ) );
+                    }
+                    if ( ! empty( $label ) && ! preg_match( '/\baria-label\s*=/i', $outer_a ) ) {
+                        $outer_a = preg_replace( '/<a\b/i', '<a aria-label="' . esc_attr( $label ) . '"', $outer_a, 1 );
+                    }
+                    return $outer_a . $before . ( ! empty( $inner_txt ) ? $inner_txt : $label ) . $after . $closing_a;
+                },
+                $content
+            );
+        }
     }
     return $content;
 }, 10, 2 );
@@ -762,13 +782,30 @@ add_action( 'wp_head', function() {
             document.querySelectorAll('.wcf-arrow-next:not([aria-label])').forEach(function(el) {
                 el.setAttribute('aria-label', 'Next slide');
             });
-            document.querySelectorAll('a.e-paragraph-link-base:not([aria-label])').forEach(function(el) {
+            document.querySelectorAll('a.e-paragraph-link-base, p#fotter a').forEach(function(el) {
                 var txt = (el.textContent || '').trim();
                 var hasAltImg = el.querySelector('img[alt]:not([alt=""])');
-                if (!txt && !hasAltImg && el.pathname) {
+                var label = '';
+                if (el.pathname) {
                     var slug = el.pathname.replace(/^\/+|\/+$/g, '').split('/').pop() || 'Link';
-                    var label = slug.replace(/[-_]+/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
-                    el.setAttribute('aria-label', label);
+                    label = slug.replace(/[-_]+/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+                }
+                if (!txt && !hasAltImg) {
+                    var next = el.nextElementSibling;
+                    if (next && next.tagName === 'A') {
+                        var nextTxt = (next.textContent || '').trim();
+                        if (nextTxt) {
+                            el.textContent = nextTxt;
+                            next.remove();
+                            txt = nextTxt;
+                        }
+                    } else if (label) {
+                        el.textContent = label;
+                        txt = label;
+                    }
+                }
+                if (!el.getAttribute('aria-label') && (label || txt)) {
+                    el.setAttribute('aria-label', label || txt);
                 }
             });
         }
