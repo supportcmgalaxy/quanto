@@ -471,12 +471,16 @@ add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
         'cmr-media-coverage-style',
         'fontawesome-style',
         'remixicon-style',
+        'remixicon',
+        'elementor-icons-remix-icons',
+        'elementor-icons-shared-0',
         'elementor-icons',
         'cmr-latest-insights',
         'odometer-style',
         'meanmenu-min-style',
         'cmr-modal-style',
         'cmr-sticky-nav-css',
+        'cmr-mobile-menu-css',
         'e-animation-fadeIn',
         'e-popup',
         'wcf--addons',
@@ -484,7 +488,13 @@ add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
         'tablepress-default',
         'contact-form-7',
     );
-    if ( in_array( $handle, $async_handles, true ) ) {
+    $is_async = in_array( $handle, $async_handles, true ) || (
+        is_string( $href ) && (
+            strpos( $href, 'remix-icon' ) !== false ||
+            strpos( $href, 'remixicon' ) !== false
+        )
+    );
+    if ( $is_async ) {
         $async_tag = str_replace( "media='all'", "media='print' onload=\"this.media='all'\"", $html );
         if ( $async_tag === $html ) {
             $async_tag = str_replace( 'media="all"', 'media="print" onload="this.media=\'all\'"', $html );
