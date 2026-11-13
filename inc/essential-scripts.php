@@ -607,13 +607,31 @@ add_filter( 'rocket_lrc_exclusions', function( $exclusions ) {
 } );
 
 /**
+ * Global Main Landmark Enforcer (Lighthouse Accessibility 100%)
+ * Semantically wraps primary content between header and footer with <main id="primary" role="main">
+ */
+add_action( 'quanto_before_content', function() {
+    if ( is_admin() || ( function_exists( 'quanto_is_elementor_edit' ) && quanto_is_elementor_edit() ) ) {
+        return;
+    }
+    echo '<main id="primary" class="site-main" role="main">' . "\n";
+}, 99 );
+
+add_action( 'quanto_footer_content', function() {
+    if ( is_admin() || ( function_exists( 'quanto_is_elementor_edit' ) && quanto_is_elementor_edit() ) ) {
+        return;
+    }
+    echo "\n" . '</main>' . "\n";
+}, 1 );
+
+/**
  * Preload primary web font and hero image for instant LCP rendering
  */
 add_action( 'wp_head', 'quanto_preload_critical_assets', 1 );
 function quanto_preload_critical_assets() {
     // Critical zero-FOUC popup/modal hide rules so Elementor & login popups never flash/overlap during page load
     if ( ! is_admin() && ! ( function_exists( 'quanto_is_elementor_edit' ) && quanto_is_elementor_edit() ) ) {
-        echo '<style id="cmr-critical-modal-hide">footer.footer[data-wpr-lazyrender]{content-visibility:visible !important;contain:none !important;}.elementor-location-popup:not(.dialog-widget-content *):not(.dialog-message *),.elementor-popup-modal[style*="display: none"],.elementor-popup-modal[style*="display:none"],.dialog-widget[style*="display: none"],.dialog-widget[style*="display:none"],.xoo-el-container.xoo-el-style-popup:not(.xoo-el-popup-active),.xoo-el-popup-notice:not(.xoo-el-notice-active),#cmr-review-modal-overlay:not(.cmr-open),#cmr-review-modal:not(.cmr-open),.cmr-vmodal-overlay:not(.active):not(.cmr-open){display:none !important;visibility:hidden !important;opacity:0 !important;pointer-events:none !important;}</style>' . "\n";
+        echo '<style id="cmr-critical-modal-hide">main#primary{display:block;width:100%;outline:none;}footer.footer[data-wpr-lazyrender]{content-visibility:visible !important;contain:none !important;}.elementor-location-popup:not(.dialog-widget-content *):not(.dialog-message *),.elementor-popup-modal[style*="display: none"],.elementor-popup-modal[style*="display:none"],.dialog-widget[style*="display: none"],.dialog-widget[style*="display:none"],.xoo-el-container.xoo-el-style-popup:not(.xoo-el-popup-active),.xoo-el-popup-notice:not(.xoo-el-notice-active),#cmr-review-modal-overlay:not(.cmr-open),#cmr-review-modal:not(.cmr-open),.cmr-vmodal-overlay:not(.active):not(.cmr-open){display:none !important;visibility:hidden !important;opacity:0 !important;pointer-events:none !important;}</style>' . "\n";
     }
     $font_url = get_theme_file_uri( '/assets/fonts/instrument-sans/instrument-sans-latin-normal.woff2' );
     echo '<link rel="preload" href="' . esc_url( $font_url ) . '" as="font" type="font/woff2" crossorigin>' . "\n";
@@ -1840,20 +1858,32 @@ add_action( 'wp_footer', function() {
                 });
             }
 
+            // Global Main Landmark Enforcer (Lighthouse Accessibility 100%)
+            function cmrEnsureMainLandmark() {
+                if (document.querySelector('main, [role="main"]')) return;
+                var mainTarget = document.querySelector('.elementor[data-elementor-type="wp-page"], .elementor[data-elementor-type="page"], #smooth-content, .site-content, .blog-page-sec, .quanto-page-section');
+                if (mainTarget) {
+                    mainTarget.setAttribute('role', 'main');
+                }
+            }
+
             cmrEnsureButtonAccessibleNames();
             cmrEnsureImageAltAttributes();
             cmrEnsureLinkAccessibleNames();
+            cmrEnsureMainLandmark();
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', function() {
                     cmrEnsureButtonAccessibleNames();
                     cmrEnsureImageAltAttributes();
                     cmrEnsureLinkAccessibleNames();
+                    cmrEnsureMainLandmark();
                 });
             }
             window.addEventListener('load', function() {
                 cmrEnsureButtonAccessibleNames();
                 cmrEnsureImageAltAttributes();
                 cmrEnsureLinkAccessibleNames();
+                cmrEnsureMainLandmark();
             });
         });
     })();
