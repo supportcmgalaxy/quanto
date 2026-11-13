@@ -106,8 +106,16 @@ if ( ! function_exists( 'cmr_live_podcast_carousel_shortcode' ) ) {
                 margin: 0;
             }
             .cmr-podcast-swiper {
-                overflow: visible !important;
-                clip-path: inset(-100px -100vw -100px 0);
+                position: relative;
+                width: 100%;
+                overflow: hidden !important;
+            }
+            .cmr-podcast-swiper .swiper-wrapper {
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                width: max-content !important;
+                transition: transform 0.45s ease-in-out;
             }
             .cmr-podcast-pagination {
                 display: flex;
@@ -153,8 +161,11 @@ if ( ! function_exists( 'cmr_live_podcast_carousel_shortcode' ) ) {
                 text-decoration: none;
             }
             .cmr-podcast-swiper .swiper-slide {
-                width: 910px;
-                max-width: 90vw;
+                flex-shrink: 0 !important;
+                width: 910px !important;
+                max-width: 90vw !important;
+                margin-right: 30px !important;
+                box-sizing: border-box;
             }
             .cmr-podcast-img-wrap {
                 position: relative;
@@ -383,30 +394,162 @@ if ( ! function_exists( 'cmr_live_podcast_carousel_shortcode' ) ) {
             </div>
         </div>
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                if (typeof Swiper !== 'undefined') {
-                    new Swiper('.cmr-podcast-swiper', {
-                        slidesPerView: 'auto',
-                        spaceBetween: 30,
-                        autoplay: {
-                            delay: 4000,
-                            disableOnInteraction: false,
-                        },
-                        pagination: {
-                            el: '.cmr-podcast-pagination',
-                            clickable: true,
-                        },
-                        breakpoints: {
-                            768: {
-                                slidesPerView: 'auto',
-                            },
-                            1024: {
-                                slidesPerView: 'auto',
+            (function() {
+                function initPodcastCarousel() {
+                    var container = document.querySelector('.cmr-podcast-swiper');
+                    if (!container || container._cmrInit) return;
+                    container._cmrInit = true;
+
+                    var wrapper = container.querySelector('.swiper-wrapper');
+                    var slides = container.querySelectorAll('.swiper-slide');
+                    var pagination = document.querySelector('.cmr-podcast-pagination');
+                    if (!wrapper || !slides.length) return;
+
+                    var currentIndex = 0;
+                    var total = slides.length;
+                    var autoTimer = null;
+                    var autoDelay = 4000;
+
+                    // Build pagination bullets
+                    if (pagination) {
+                        pagination.innerHTML = '';
+                        for (var i = 0; i < total; i++) {
+                            var b = document.createElement('span');
+                            b.className = 'swiper-pagination-bullet' + (i === 0 ? ' swiper-pagination-bullet-active' : '');
+                            b.setAttribute('data-index', i);
+                            b.setAttribute('role', 'button');
+                            b.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+                            b.style.cursor = 'pointer';
+                            (function(idx) {
+                                b.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    goToSlide(idx);
+                                    resetTimer();
+                                });
+                            })(i);
+                            pagination.appendChild(b);
+                        }
+                    }
+
+                    function updatePagination() {
+                        if (!pagination) return;
+                        var bullets = pagination.querySelectorAll('.swiper-pagination-bullet');
+                        bullets.forEach(function(b, idx) {
+                            if (idx === currentIndex) {
+                                b.classList.add('swiper-pagination-bullet-active');
+                            } else {
+                                b.classList.remove('swiper-pagination-bullet-active');
+                            }
+                        });
+                    }
+
+                    function getSlideWidth() {
+                        var slide = slides[0];
+                        var style = window.getComputedStyle(slide);
+                        var mr = parseFloat(style.marginRight) || 30;
+                        return slide.offsetWidth + mr;
+                    }
+
+                    function goToSlide(idx) {
+                        if (idx < 0) idx = 0;
+                        if (idx >= total) idx = 0;
+                        currentIndex = idx;
+                        var step = getSlideWidth();
+                        var offset = currentIndex * step;
+                        wrapper.style.transform = 'translate3d(-' + offset + 'px, 0, 0)';
+                        updatePagination();
+                    }
+
+                    function nextSlide() {
+                        goToSlide(currentIndex + 1);
+                    }
+
+                    function startTimer() {
+                        stopTimer();
+                        autoTimer = setInterval(nextSlide, autoDelay);
+                    }
+
+                    function stopTimer() {
+                        if (autoTimer) {
+                            clearInterval(autoTimer);
+                            autoTimer = null;
+                        }
+                    }
+
+                    function resetTimer() {
+                        startTimer();
+                    }
+
+                    // Hover pause
+                    container.addEventListener('mouseenter', stopTimer);
+                    container.addEventListener('mouseleave', startTimer);
+
+                    // Touch / Drag swipe
+                    var startX = 0, currentX = 0, isDragging = false;
+                    container.addEventListener('touchstart', function(e) {
+                        stopTimer();
+                        startX = e.touches[0].clientX;
+                        currentX = startX;
+                    }, { passive: true });
+
+                    container.addEventListener('touchmove', function(e) {
+                        currentX = e.touches[0].clientX;
+                    }, { passive: true });
+
+                    container.addEventListener('touchend', function() {
+                        var diff = startX - currentX;
+                        if (Math.abs(diff) > 40) {
+                            if (diff > 0) {
+                                goToSlide(currentIndex + 1);
+                            } else {
+                                goToSlide(currentIndex - 1);
                             }
                         }
+                        startTimer();
                     });
+
+                    // Mouse drag support
+                    container.addEventListener('mousedown', function(e) {
+                        stopTimer();
+                        isDragging = true;
+                        startX = e.clientX;
+                        currentX = startX;
+                        container.style.cursor = 'grabbing';
+                    });
+                    window.addEventListener('mousemove', function(e) {
+                        if (!isDragging) return;
+                        currentX = e.clientX;
+                    });
+                    window.addEventListener('mouseup', function() {
+                        if (!isDragging) return;
+                        isDragging = false;
+                        container.style.cursor = 'grab';
+                        var diff = startX - currentX;
+                        if (Math.abs(diff) > 40) {
+                            if (diff > 0) {
+                                goToSlide(currentIndex + 1);
+                            } else {
+                                goToSlide(currentIndex - 1);
+                            }
+                        }
+                        startTimer();
+                    });
+
+                    window.addEventListener('resize', function() {
+                        goToSlide(currentIndex);
+                    });
+
+                    goToSlide(0);
+                    startTimer();
                 }
-            });
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initPodcastCarousel);
+                } else {
+                    initPodcastCarousel();
+                }
+                window.addEventListener('load', initPodcastCarousel);
+            })();
         </script>
         <?php
         wp_reset_postdata();
@@ -1045,40 +1188,52 @@ if ( ! function_exists( 'cmr_trending_topview_shortcode' ) ) {
         </div>
         
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var topviewContainers = document.querySelectorAll('.cmr-topview-layout');
-                topviewContainers.forEach(function(container) {
-                    var listItems = container.querySelectorAll('.cmr-topview-list-item');
-                    var featLink = container.querySelector('.js-feat-link');
-                    var featImg = container.querySelector('.js-feat-img');
-                    var featDur = container.querySelector('.js-feat-dur');
-                    var featType = container.querySelector('.js-feat-type');
-                    var featCat = container.querySelector('.js-feat-cat');
-                    var featDate = container.querySelector('.js-feat-date');
-                    var featTitle = container.querySelector('.js-feat-title');
-                    
-                    if(!featLink) return;
-                    
-                    listItems.forEach(function(item) {
-                        item.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            
-                            // Update active state
-                            listItems.forEach(function(el) { el.classList.remove('active'); });
-                            this.classList.add('active');
-                            
-                            // Update featured area
-                            featLink.href = this.getAttribute('data-link');
-                            featImg.src = this.getAttribute('data-thumb');
-                            featDur.textContent = this.getAttribute('data-dur');
-                            featType.textContent = this.getAttribute('data-type');
-                            featCat.textContent = this.getAttribute('data-cat');
-                            featDate.textContent = this.getAttribute('data-date');
-                            featTitle.textContent = this.getAttribute('data-title');
+            (function() {
+                function initTopView() {
+                    var topviewContainers = document.querySelectorAll('.cmr-topview-layout');
+                    topviewContainers.forEach(function(container) {
+                        if (container._cmrInit) return;
+                        container._cmrInit = true;
+
+                        var listItems = container.querySelectorAll('.cmr-topview-list-item');
+                        var featLink = container.querySelector('.js-feat-link');
+                        var featImg = container.querySelector('.js-feat-img');
+                        var featDur = container.querySelector('.js-feat-dur');
+                        var featType = container.querySelector('.js-feat-type');
+                        var featCat = container.querySelector('.js-feat-cat');
+                        var featDate = container.querySelector('.js-feat-date');
+                        var featTitle = container.querySelector('.js-feat-title');
+                        
+                        if(!featLink) return;
+                        
+                        listItems.forEach(function(item) {
+                            item.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                
+                                // Update active state
+                                listItems.forEach(function(el) { el.classList.remove('active'); });
+                                this.classList.add('active');
+                                
+                                // Update featured area
+                                featLink.href = this.getAttribute('data-link');
+                                featImg.src = this.getAttribute('data-thumb');
+                                featDur.textContent = this.getAttribute('data-dur');
+                                featType.textContent = this.getAttribute('data-type');
+                                featCat.textContent = this.getAttribute('data-cat');
+                                featDate.textContent = this.getAttribute('data-date');
+                                featTitle.textContent = this.getAttribute('data-title');
+                            });
                         });
                     });
-                });
-            });
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initTopView);
+                } else {
+                    initTopView();
+                }
+                window.addEventListener('load', initTopView);
+            })();
         </script>
         <?php
         wp_reset_postdata();
@@ -1570,95 +1725,114 @@ if ( ! function_exists( 'cmr_browse_recently_updated_shortcode' ) ) {
         </div>
         
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var grid = document.getElementById('cmr-browse-grid');
-                var loadMoreBtn = document.getElementById('cmr-loadmore-btn');
-                var searchInput = document.getElementById('cmr-browse-search-input');
-                var searchBtn = document.getElementById('cmr-browse-search-btn');
-                var filterBtns = document.querySelectorAll('.cmr-filter-btn');
-                var loadingEl = document.getElementById('cmr-browse-loading');
-                
-                var currentPage = 1;
-                var currentType = 'all';
-                var currentSearch = '';
-                var maxPages = 1;
-                var ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
-                
-                function fetchMedia(reset = false) {
-                    if (reset) {
-                        currentPage = 1;
-                        grid.innerHTML = '';
+            (function() {
+                function initBrowseMedia() {
+                    var grid = document.getElementById('cmr-browse-grid');
+                    if (!grid || grid._cmrInit) return;
+                    grid._cmrInit = true;
+
+                    var loadMoreBtn = document.getElementById('cmr-loadmore-btn');
+                    var searchInput = document.getElementById('cmr-browse-search-input');
+                    var searchBtn = document.getElementById('cmr-browse-search-btn');
+                    var filterBtns = document.querySelectorAll('.cmr-filter-btn');
+                    var loadingEl = document.getElementById('cmr-browse-loading');
+                    
+                    var currentPage = 1;
+                    var currentType = 'all';
+                    var currentSearch = '';
+                    var maxPages = 1;
+                    var ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
+                    
+                    function fetchMedia(reset) {
+                        reset = (reset === true);
+                        if (reset) {
+                            currentPage = 1;
+                            grid.innerHTML = '';
+                        }
+                        
+                        if (loadingEl) loadingEl.style.display = 'block';
+                        if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+                        
+                        var formData = new FormData();
+                        formData.append('action', 'cmr_filter_recently_updated');
+                        formData.append('paged', currentPage);
+                        formData.append('type', currentType);
+                        formData.append('search', currentSearch);
+                        
+                        fetch(ajaxUrl, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(function(response) { return response.json(); })
+                        .then(function(data) {
+                            if (loadingEl) loadingEl.style.display = 'none';
+                            if (data.success) {
+                                if (reset) {
+                                    grid.innerHTML = data.data.html;
+                                } else {
+                                    grid.insertAdjacentHTML('beforeend', data.data.html);
+                                }
+                                maxPages = data.data.max_pages;
+                                
+                                if (loadMoreBtn && currentPage < maxPages) {
+                                    loadMoreBtn.style.display = 'inline-block';
+                                }
+                            }
+                        })
+                        .catch(function(error) {
+                            console.error('Error:', error);
+                            if (loadingEl) loadingEl.style.display = 'none';
+                        });
                     }
                     
-                    loadingEl.style.display = 'block';
-                    loadMoreBtn.style.display = 'none';
-                    
-                    var formData = new FormData();
-                    formData.append('action', 'cmr_filter_recently_updated');
-                    formData.append('paged', currentPage);
-                    formData.append('type', currentType);
-                    formData.append('search', currentSearch);
-                    
-                    fetch(ajaxUrl, {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        loadingEl.style.display = 'none';
-                        if (data.success) {
-                            if (reset) {
-                                grid.innerHTML = data.data.html;
-                            } else {
-                                grid.insertAdjacentHTML('beforeend', data.data.html);
-                            }
-                            maxPages = data.data.max_pages;
-                            
-                            if (currentPage < maxPages) {
-                                loadMoreBtn.style.display = 'inline-block';
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        loadingEl.style.display = 'none';
-                    });
-                }
-                
-                // Initial load
-                fetchMedia(true);
-                
-                // Load More click
-                loadMoreBtn.addEventListener('click', function() {
-                    currentPage++;
-                    fetchMedia();
-                });
-                
-                // Filter click
-                filterBtns.forEach(function(btn) {
-                    btn.addEventListener('click', function() {
-                        filterBtns.forEach(b => b.classList.remove('active'));
-                        this.classList.add('active');
-                        currentType = this.getAttribute('data-type');
-                        fetchMedia(true);
-                    });
-                });
-                
-                // Search
-                var searchTimeout;
-                searchInput.addEventListener('input', function() {
-                    clearTimeout(searchTimeout);
-                    currentSearch = this.value;
-                    searchTimeout = setTimeout(function() {
-                        fetchMedia(true);
-                    }, 500);
-                });
-                
-                searchBtn.addEventListener('click', function() {
-                    currentSearch = searchInput.value;
+                    // Initial load
                     fetchMedia(true);
-                });
-            });
+                    
+                    // Load More click
+                    if (loadMoreBtn) {
+                        loadMoreBtn.addEventListener('click', function() {
+                            currentPage++;
+                            fetchMedia();
+                        });
+                    }
+                    
+                    // Filter click
+                    filterBtns.forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            filterBtns.forEach(function(b) { b.classList.remove('active'); });
+                            this.classList.add('active');
+                            currentType = this.getAttribute('data-type');
+                            fetchMedia(true);
+                        });
+                    });
+                    
+                    // Search
+                    var searchTimeout;
+                    if (searchInput) {
+                        searchInput.addEventListener('input', function() {
+                            clearTimeout(searchTimeout);
+                            currentSearch = this.value;
+                            searchTimeout = setTimeout(function() {
+                                fetchMedia(true);
+                            }, 500);
+                        });
+                    }
+                    
+                    if (searchBtn && searchInput) {
+                        searchBtn.addEventListener('click', function() {
+                            currentSearch = searchInput.value;
+                            fetchMedia(true);
+                        });
+                    }
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initBrowseMedia);
+                } else {
+                    initBrowseMedia();
+                }
+                window.addEventListener('load', initBrowseMedia);
+            })();
         </script>
         <?php
         return ob_get_clean();
