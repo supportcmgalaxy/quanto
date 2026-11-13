@@ -2,14 +2,16 @@
 /**
  * CMR Common Horizontal Scroll-on-Scroll Slider
  *
- * Reusable, zero-dependency (no GSAP) sticky horizontal scroll animation.
- * Pins the parent section (keeping headings + cards together) and scrolls
- * the card track edge-to-edge across the full viewport without container clipping.
+ * Reusable, zero-dependency (no GSAP) horizontal scroll-on-scroll animation.
+ * Replicates the exact behavior of cmrindia.com's QuantoProcess:
+ * - The section heading ("Every industry is asking what's next...") scrolls UP naturally.
+ * - The cards track locks right in the VERTICAL CENTER of the viewport.
+ * - The cards slide edge-to-edge across the screen without being clipped by the 1280px container.
+ * - When the last card arrives, the pin immediately releases with ZERO bottom white space.
  *
  * Usage:
- * - Automatically enhances `.process-box-wrapper.horizontal-scroll` (pins its parent section).
- * - Reusable anywhere: add class `cmr-scroll-slider` to any Elementor section/container
- *   or slider wrapper (optionally add `cmr-scroll-track` on the moving row).
+ * - Automatically applies to `.process-box-wrapper.horizontal-scroll`.
+ * - Reusable on any other slider: add class `cmr-scroll-slider` to the slider container/widget.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -26,144 +28,167 @@ function cmr_render_common_scroll_slider_assets() {
     .cmr-hscroll-spacer {
         position: relative;
         width: 100%;
+        margin: 0;
+        padding: 0;
     }
     .cmr-hscroll-sticky {
         position: sticky;
-        top: 64px;
-        width: 100%;
-        overflow-x: clip;
-        overflow-y: visible;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        overflow: clip;
+        box-sizing: border-box;
+        z-index: 5;
+    }
+    .cmr-hscroll-inner {
+        width: max-content;
+        box-sizing: border-box;
     }
     .cmr-hscroll-track-ready {
         display: flex !important;
         flex-wrap: nowrap !important;
+        width: max-content !important;
         will-change: transform;
     }
-    .cmr-hscroll-unclip {
+    .cmr-hscroll-ancestor-visible {
         overflow: visible !important;
     }
-    @media (max-width: 991px) {
+    @media (max-width: 1199.98px) {
         .cmr-hscroll-spacer {
             height: auto !important;
         }
         .cmr-hscroll-sticky {
-            position: static;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+            position: static !important;
+            width: 100% !important;
+            margin-left: 0 !important;
+            overflow: visible !important;
+        }
+        .cmr-hscroll-inner {
+            width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
         }
         .cmr-hscroll-track-ready {
             transform: none !important;
+            width: auto !important;
         }
     }
     </style>
     <script id="cmr-scroll-slider-js">
     (function() {
-        var STICKY_TOP = 64;
-        var BREAKPOINT = 992;
+        var BREAKPOINT = 1200;
         var instances = [];
         var ticking = false;
 
-        function ensureStickyAncestors(el) {
+        function unclipAncestors(el) {
             var p = el.parentElement;
             while (p && p !== document.body && p !== document.documentElement) {
-                var cs = window.getComputedStyle(p);
-                if (cs.overflow === 'hidden' || cs.overflowY === 'hidden' || cs.overflowX === 'hidden') {
-                    p.style.overflow = 'clip';
-                }
+                p.classList.add('cmr-hscroll-ancestor-visible');
                 p = p.parentElement;
             }
         }
 
-        function unclipBetween(track, sticky) {
-            var p = track.parentElement;
-            while (p && p !== sticky) {
-                p.classList.add('cmr-hscroll-unclip');
-                p = p.parentElement;
+        function resolveTrack(root) {
+            if (root.matches('.process-box-wrapper, .cmr-scroll-track, .swiper-wrapper')) {
+                return root;
             }
+            return root.querySelector('.process-box-wrapper, .cmr-scroll-track, .swiper-wrapper, :scope > .e-con-inner') || root;
         }
 
-        function resolvePinTarget(target) {
-            // If target is an Elementor parent section/container, pin it directly
-            if (target.classList.contains('cmr-scroll-slider')) {
-                return target;
-            }
-            // For `.process-box-wrapper.horizontal-scroll`, pin its outer Elementor parent section
-            // so the section heading ("WHO WE SERVE") stays pinned with the cards
-            var parentSection = target.closest('.e-con.e-parent, .elementor-section');
-            return parentSection || target;
-        }
-
-        function resolveTrack(pinTarget, originalTarget) {
-            if (originalTarget && originalTarget !== pinTarget && originalTarget.matches('.cmr-scroll-track, .process-box-wrapper, .swiper-wrapper')) {
-                return originalTarget;
-            }
-            return pinTarget.querySelector('.cmr-scroll-track, .process-box-wrapper, .swiper-wrapper, :scope > .e-con-inner') || pinTarget;
-        }
-
-        function setupSlider(originalTarget) {
-            var pinTarget = resolvePinTarget(originalTarget);
-            if (pinTarget.dataset.cmrHscrollInit === '1') return;
-            if (pinTarget.closest('.cmr-hscroll-spacer')) return;
-            pinTarget.dataset.cmrHscrollInit = '1';
-
-            var track = resolveTrack(pinTarget, originalTarget);
+        function setupSlider(targetEl) {
+            var track = resolveTrack(targetEl);
+            if (!track || track.dataset.cmrHscrollInit === '1') return;
+            if (track.closest('.cmr-hscroll-spacer')) return;
+            track.dataset.cmrHscrollInit = '1';
 
             var spacer = document.createElement('div');
             spacer.className = 'cmr-hscroll-spacer';
+
             var sticky = document.createElement('div');
             sticky.className = 'cmr-hscroll-sticky';
 
-            pinTarget.parentNode.insertBefore(spacer, pinTarget);
-            sticky.appendChild(pinTarget);
+            var inner = document.createElement('div');
+            inner.className = 'cmr-hscroll-inner';
+
+            // Insert spacer exactly where track was, and move track into sticky inner
+            track.parentNode.insertBefore(spacer, track);
+            inner.appendChild(track);
+            sticky.appendChild(inner);
             spacer.appendChild(sticky);
 
             track.classList.add('cmr-hscroll-track-ready');
-            unclipBetween(track, sticky);
-            ensureStickyAncestors(spacer);
+            unclipAncestors(spacer);
 
             instances.push({
                 spacer: spacer,
                 sticky: sticky,
+                inner: inner,
                 track: track,
+                centerTop: 0,
                 maxScroll: 0,
-                scrollable: 0
+                scrollDistance: 0
             });
         }
 
         function measureAll() {
             var isDesktop = window.innerWidth >= BREAKPOINT;
+
             instances.forEach(function(inst) {
+                // Reset styles to measure clean native geometry
                 inst.track.style.transform = '';
                 inst.spacer.style.height = '';
+                inst.sticky.style.top = '';
+                inst.inner.style.paddingLeft = '';
+                inst.inner.style.paddingRight = '';
+
                 if (!isDesktop) {
                     inst.maxScroll = 0;
-                    inst.scrollable = 0;
+                    inst.scrollDistance = 0;
                     return;
                 }
-                var trackRect = inst.track.getBoundingClientRect();
-                var startLeft = Math.max(0, trackRect.left);
-                var viewportW = document.documentElement.clientWidth || window.innerWidth;
-                var maxScroll = Math.max(0, inst.track.scrollWidth - (viewportW - 2 * startLeft));
+
+                // 1. Calculate natural start offset from container
+                var containerRect = inst.spacer.parentElement.getBoundingClientRect();
+                var startLeft = Math.max(30, Math.round(containerRect.left));
+                inst.inner.style.paddingLeft = startLeft + 'px';
+                inst.inner.style.paddingRight = startLeft + 'px';
+
+                // 2. Vertically center the cards in the screen
+                var trackH = inst.track.offsetHeight;
+                var centerTop = Math.max(20, Math.round((window.innerHeight - trackH) / 2));
+                inst.centerTop = centerTop;
+                inst.sticky.style.top = centerTop + 'px';
+
+                // 3. Calculate horizontal scroll distance
+                var totalW = inst.track.scrollWidth;
+                var viewportW = window.innerWidth;
+                var maxScroll = Math.max(0, totalW - viewportW + (2 * startLeft));
                 inst.maxScroll = maxScroll;
+
                 if (maxScroll > 10) {
-                    var stickyH = inst.sticky.offsetHeight;
-                    inst.spacer.style.height = (stickyH + maxScroll) + 'px';
-                    inst.scrollable = maxScroll;
+                    // Match cmrindia.com pacing
+                    var scrollDistance = Math.round(maxScroll * 1.15);
+                    inst.scrollDistance = scrollDistance;
+                    inst.spacer.style.height = (trackH + scrollDistance) + 'px';
                 } else {
-                    inst.scrollable = 0;
+                    inst.scrollDistance = 0;
                 }
             });
+
             updateAll();
         }
 
         function updateAll() {
             ticking = false;
             if (window.innerWidth < BREAKPOINT) return;
+
             for (var i = 0; i < instances.length; i++) {
                 var inst = instances[i];
-                if (inst.scrollable <= 0) continue;
+                if (inst.scrollDistance <= 0) continue;
+
                 var rect = inst.spacer.getBoundingClientRect();
-                var progress = Math.min(1, Math.max(0, (STICKY_TOP - rect.top) / inst.scrollable));
+                var progress = (inst.centerTop - rect.top) / inst.scrollDistance;
+                progress = Math.min(1, Math.max(0, progress));
+
                 inst.track.style.transform = 'translate3d(' + (-progress * inst.maxScroll).toFixed(2) + 'px, 0, 0)';
             }
         }
@@ -176,7 +201,7 @@ function cmr_render_common_scroll_slider_assets() {
         }
 
         function initAll() {
-            var targets = document.querySelectorAll('.cmr-scroll-slider, .process-box-wrapper.horizontal-scroll');
+            var targets = document.querySelectorAll('.process-box-wrapper.horizontal-scroll, .cmr-scroll-slider');
             if (!targets.length) return;
             targets.forEach(setupSlider);
             measureAll();
