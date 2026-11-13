@@ -69,7 +69,7 @@ function cmr_hero_banner_shortcode($atts) {
     }
 
     /* =========================
-       CONTENT (Static Clean Alignment with Header)
+       CONTENT (Pure CSS Responsive Alignment with Header - Zero CLS / No JS Jump)
     ========================= */
     .hero-content {
       position: relative;
@@ -79,7 +79,7 @@ function cmr_hero_banner_shortcode($atts) {
       box-sizing: border-box !important;
       padding-top: 0 !important;
       padding-bottom: 0 !important;
-      padding-left: 265px;
+      padding-left: max(20px, calc((100% - 1280px) / 2 + 12px)) !important;
       padding-right: 20px;
       margin: 0 !important;
       max-width: 100% !important;
@@ -266,7 +266,7 @@ function cmr_hero_banner_shortcode($atts) {
     .hero-indicators {
       position: absolute !important;
       bottom: 40px !important;
-      right: 80px !important;
+      right: max(40px, calc((100% - 1280px) / 2 + 12px)) !important;
       z-index: 10 !important;
       display: flex !important;
       gap: 12px !important;
@@ -642,59 +642,12 @@ function cmr_hero_banner_shortcode($atts) {
         // No separate click handlers needed here.
       }
 
-      function alignHeroWithHeader() {
-        var hero = document.querySelector('.hero');
-        var heroIndicators = hero ? hero.querySelector('.hero-indicators') : null;
-
-        if (window.innerWidth <= 768) {
-          if (heroIndicators) {
-            heroIndicators.style.right = '';
-            heroIndicators.style.left = '';
-            heroIndicators.style.transform = '';
-          }
-          return;
-        }
-
-        if (heroIndicators) {
-          heroIndicators.style.left = '';
-          heroIndicators.style.transform = '';
-          var headerBtn = document.querySelector('#quanto-header-desktop .download-btn, #quanto-header-desktop .elementor-button, .header .download-btn, .header .elementor-button, #quanto-header-desktop .elementor-element-200fa94');
-          if (headerBtn) {
-            var btnRect = headerBtn.getBoundingClientRect();
-            var rightOffset = window.innerWidth - btnRect.right;
-            if (rightOffset > 0) {
-              var newRight = Math.round(rightOffset) + 'px';
-              if (heroIndicators.style.right !== newRight) {
-                heroIndicators.style.right = newRight;
-              }
-            }
-          }
-        }
-      }
-
-      var alignRaf = null;
-      function requestAlign() {
-        if (alignRaf) return;
-        alignRaf = requestAnimationFrame(function() {
-          alignRaf = null;
-          alignHeroWithHeader();
-        });
-      }
-
       if (document.readyState === 'interactive' || document.readyState === 'complete') {
         initHeroBannerSlider();
-        requestAlign();
       } else {
-        document.addEventListener('DOMContentLoaded', function() {
-          initHeroBannerSlider();
-          requestAlign();
-        });
+        document.addEventListener('DOMContentLoaded', initHeroBannerSlider);
       }
-      window.addEventListener('load', function() {
-        initHeroBannerSlider();
-        requestAlign();
-      });
-      window.addEventListener('resize', requestAlign);
+      window.addEventListener('load', initHeroBannerSlider);
     })();
     </script>
     <?php
