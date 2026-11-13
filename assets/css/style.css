@@ -11447,6 +11447,21 @@ ul.key-parts-list li {
   color: #6241ca !important;
 }
 
+/* Accessible Contrast for Footer NEW Badges (WCAG AAA Pass) */
+footer [data-id="1f8b798"],
+footer [data-id="2972e4f"],
+footer [data-id="4a1e42e"],
+footer [data-id="d6f5e6b"],
+footer [data-id="2ee91e9"],
+.elementor .e-1f8b798-41b9b29,
+.elementor .e-2972e4f-f710dbc,
+.elementor .e-4a1e42e-8dabe34,
+.elementor .e-d6f5e6b-7def891,
+.elementor .e-2ee91e9-89fcf0c {
+  color: #042e2b !important;
+  font-weight: 700 !important;
+}
+
 
 
 
