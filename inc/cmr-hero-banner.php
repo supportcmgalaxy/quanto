@@ -69,7 +69,7 @@ function cmr_hero_banner_shortcode($atts) {
     }
 
     /* =========================
-       CONTENT (Dynamic Real-Time Alignment with Header)
+       CONTENT (Static Clean Alignment with Header)
     ========================= */
     .hero-content {
       position: relative;
@@ -79,7 +79,7 @@ function cmr_hero_banner_shortcode($atts) {
       box-sizing: border-box !important;
       padding-top: 0 !important;
       padding-bottom: 0 !important;
-      padding-left: clamp(20px, 10vw, 220px);
+      padding-left: 265px;
       padding-right: 20px;
       margin: 0 !important;
       max-width: 100% !important;
@@ -644,13 +644,9 @@ function cmr_hero_banner_shortcode($atts) {
 
       function alignHeroWithHeader() {
         var hero = document.querySelector('.hero');
-        var heroContent = hero ? hero.querySelector('.hero-content') : null;
         var heroIndicators = hero ? hero.querySelector('.hero-indicators') : null;
-        if (!heroContent) return;
 
         if (window.innerWidth <= 768) {
-          heroContent.style.paddingLeft = '';
-          heroContent.style.paddingRight = '';
           if (heroIndicators) {
             heroIndicators.style.right = '';
             heroIndicators.style.left = '';
@@ -662,20 +658,6 @@ function cmr_hero_banner_shortcode($atts) {
         if (heroIndicators) {
           heroIndicators.style.left = '';
           heroIndicators.style.transform = '';
-        }
-
-        var headerLogo = document.querySelector('#quanto-header-desktop .header-logo, .header .header-logo, .header-logo img, .header-logo, .elementor-element-7ed4f5b');
-        if (headerLogo) {
-          var logoRect = headerLogo.getBoundingClientRect();
-          if (logoRect.left > 0) {
-            var newPad = Math.round(logoRect.left) + 'px';
-            if (heroContent.style.paddingLeft !== newPad) {
-              heroContent.style.paddingLeft = newPad;
-            }
-          }
-        }
-
-        if (heroIndicators) {
           var headerBtn = document.querySelector('#quanto-header-desktop .download-btn, #quanto-header-desktop .elementor-button, .header .download-btn, .header .elementor-button, #quanto-header-desktop .elementor-element-200fa94');
           if (headerBtn) {
             var btnRect = headerBtn.getBoundingClientRect();
