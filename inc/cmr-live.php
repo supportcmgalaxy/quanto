@@ -73,6 +73,7 @@ if ( ! function_exists( 'cmr_live_podcast_carousel_shortcode' ) ) {
                 padding: 60px 0;
                 color: #fff;
                 font-family: inherit;
+                overflow: hidden !important;
             }
             .cmr-podcast-carousel-inner {
                 max-width: 1280px;
@@ -108,7 +109,8 @@ if ( ! function_exists( 'cmr_live_podcast_carousel_shortcode' ) ) {
             .cmr-podcast-swiper {
                 position: relative;
                 width: 100%;
-                overflow: hidden !important;
+                overflow: visible !important;
+                clip-path: inset(-100px -100vw -100px 0);
             }
             .cmr-podcast-swiper .swiper-wrapper {
                 display: flex !important;
