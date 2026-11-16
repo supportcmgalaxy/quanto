@@ -499,7 +499,7 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
             display: flex; align-items: center; gap: 12px;
             padding: 10px 0; cursor: pointer;
             color: #b0b0b0;
-            transition: color 0.25s ease;
+            transition: color 0.4s ease;
             user-select: none;
         }
         .cmr-wwt-menu-item:hover { color: #6B3FA0; }
@@ -507,7 +507,7 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
         
         .cmr-wwt-bullet {
             width: 10px; height: 10px; border-radius: 50%;
-            background: #d1d1d1; transition: background 0.25s ease, transform 0.25s ease;
+            background: #d1d1d1; transition: background 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             flex-shrink: 0;
         }
         .cmr-wwt-menu-label { font-size: 30px; font-weight: 600; letter-spacing: -1px; line-height: 1.2; }
@@ -520,27 +520,31 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
             min-width: 0; 
             position: relative; 
             min-height: auto;
-        }
-
-        @keyframes cmrWwtFadeSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(14px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            display: grid;
+            grid-template-columns: 100%;
+            grid-template-rows: auto;
         }
 
         .cmr-wwt-slide {
-            display: none;
+            grid-column: 1;
+            grid-row: 1;
+            display: flex;
             width: 100%;
             gap: 24px;
+            align-self: start;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(28px);
+            transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), 
+                        transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                        visibility 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            pointer-events: none;
         }
         .cmr-wwt-slide.cmr-wwt-show { 
-            display: flex;
-            animation: cmrWwtFadeSlideIn 0.35s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
         }
 
         @media (max-width: 1024px) {

@@ -3511,10 +3511,19 @@ div[data-id="b4d41ec"] a.quanto-link-btn:hover span .arry1,
 }
 
 /* Process Box Card Smooth Transitions & Layering */
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"],
+html body div.elementor-element div.process-box.scroll-item[class*="elementor-repeater-item-"],
+html body .elementor-element [class*="elementor-repeater-item-"].process-box,
+html body [class*="elementor-repeater-item-"].process-box,
+html body .elementor-element .process-box,
+html body .process-box-wrapper .process-box,
+html body .process-box,
 .process-box {
     position: relative !important;
     overflow: hidden !important;
-    transition: background-color 0.35s ease-in-out, border-color 0.35s ease-in-out, box-shadow 0.35s ease-in-out !important;
+    background-image: none !important;
+    background-color: #191919;
+    transition: background-color 0.55s ease-in-out, border-color 0.55s ease-in-out, box-shadow 0.55s ease-in-out !important;
 }
 
 .process-box .process-card-bg-layer {
@@ -3525,11 +3534,11 @@ div[data-id="b4d41ec"] a.quanto-link-btn:hover span .arry1,
     z-index: 0 !important;
     pointer-events: none !important;
     border-radius: inherit !important;
-    transition: opacity 0.35s ease-in-out, transform 0.35s ease-in-out !important;
+    transition: opacity 0.55s ease-in-out, transform 0.55s ease-in-out !important;
     background-size: cover !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
-    opacity: 1;
+    opacity: 1 !important;
 }
 
 .process-box .process-card-overlay {
@@ -3540,7 +3549,8 @@ div[data-id="b4d41ec"] a.quanto-link-btn:hover span .arry1,
     z-index: 1 !important;
     pointer-events: none !important;
     border-radius: inherit !important;
-    transition: background 0.35s ease-in-out, opacity 0.35s ease-in-out !important;
+    transition: opacity 0.55s ease-in-out, background 0.55s ease-in-out !important;
+    opacity: 1 !important;
 }
 
 .process-box .process-number,
@@ -3552,7 +3562,7 @@ div[data-id="b4d41ec"] a.quanto-link-btn:hover span .arry1,
 .process-box .custom-btn {
     position: relative !important;
     z-index: 2 !important;
-    transition: color 0.35s ease-in-out, border-color 0.35s ease-in-out !important;
+    transition: color 0.5s ease-in-out, border-color 0.5s ease-in-out !important;
 }
 
 /* Process Box Card "Explore" Button */
@@ -3629,8 +3639,6 @@ html body .process-box:hover .process-card-bg-layer,
 div.process-box-wrapper .process-box:hover .process-card-bg-layer,
 body .elementor-element .process-box:hover .process-card-bg-layer {
     opacity: 0 !important;
-    visibility: hidden !important;
-    background-image: none !important;
 }
 
 html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .process-card-overlay,
@@ -3645,8 +3653,6 @@ html body .process-box:hover .process-card-overlay,
 div.process-box-wrapper .process-box:hover .process-card-overlay,
 body .elementor-element .process-box:hover .process-card-overlay {
     opacity: 0 !important;
-    visibility: hidden !important;
-    background: none !important;
 }
 
 html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .process-number,
