@@ -292,7 +292,7 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
             .cmr-wwt-panel {
                 position: -webkit-sticky !important;
                 position: sticky !important;
-                top: 90px !important;
+                top: 140px !important;
                 width: 100%;
                 min-height: auto;
                 height: auto;
@@ -300,8 +300,11 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
                 align-items: flex-start;
                 justify-content: center;
                 z-index: 10;
-                padding-top: 10px;
-                padding-bottom: 40px;
+                padding-top: 15px !important;
+                padding-bottom: 40px !important;
+            }
+            body.admin-bar .cmr-wwt-panel {
+                top: 172px !important;
             }
         }
 
@@ -755,7 +758,8 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
                             const panelH = panel ? panel.offsetHeight : 0;
                             const scrollable = rect.height - panelH;
                             const wrapTop = window.scrollY + rect.top;
-                            const stickyTop = 90;
+                            const isBar = document.body.classList.contains('admin-bar');
+                            const stickyTop = isBar ? 172 : 140;
                             
                             const targetY = wrapTop - stickyTop + (idx / Math.max(1, totalSlides - 1)) * scrollable + 5;
                             window.scrollTo({ top: targetY, behavior: 'smooth' });
@@ -792,7 +796,8 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
                         const scrollable = rect.height - panelH;
                         if (scrollable <= 0) return;
 
-                        const stickyTop = 90;
+                        const isBar = document.body.classList.contains('admin-bar');
+                        const stickyTop = isBar ? 172 : 140;
                         const scrolled = stickyTop - rect.top;
                         const progress = Math.max(0, Math.min(1, scrolled / scrollable));
 

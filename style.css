@@ -3599,6 +3599,59 @@ div[data-id="b4d41ec"] a.quanto-link-btn:hover span .arry1,
     transform: rotate(45deg) translate(2px, -2px) !important;
 }
 
+/* Process Box Card Hover State - White Background & Black Text */
+.process-box:hover,
+.process-box.scroll-item:hover,
+.process-box-wrapper .process-box:hover,
+div.process-box-wrapper .process-box:hover,
+body .elementor-element .process-box:hover {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    background-image: none !important;
+}
+
+.process-box:hover .process-card-bg-layer,
+.process-box.scroll-item:hover .process-card-bg-layer,
+.process-box-wrapper .process-box:hover .process-card-bg-layer,
+div.process-box-wrapper .process-box:hover .process-card-bg-layer,
+body .elementor-element .process-box:hover .process-card-bg-layer {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+.process-box:hover .process-card-overlay,
+.process-box.scroll-item:hover .process-card-overlay,
+.process-box-wrapper .process-box:hover .process-card-overlay,
+div.process-box-wrapper .process-box:hover .process-card-overlay,
+body .elementor-element .process-box:hover .process-card-overlay {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+.process-box:hover .process-number,
+.process-box:hover .process-title,
+.process-box:hover .process-description,
+.process-box:hover .text-color-white,
+.process-box:hover p,
+.process-box:hover a,
+.process-box:hover span,
+.process-box:hover h5,
+.process-box:hover .custom-btn {
+    color: #111111 !important;
+}
+
+.process-box:hover .custom-btn {
+    color: #111111 !important;
+    border-bottom: 1px solid #111111 !important;
+}
+
+.process-box:hover .custom-btn .arrow {
+    border-top-color: #111111 !important;
+    border-right-color: #111111 !important;
+    background: url('/wp-content/uploads/2026/04/Symbol-1.svg') no-repeat center !important;
+    background-size: contain !important;
+}
+
 /* ==========================================================================
    WHO WE SERVE (Process Box) - Mobile Horizontal Slide Carousel
    ========================================================================== */

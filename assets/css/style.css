@@ -7492,14 +7492,62 @@ body .elementor-element .process-box-wrapper {
   transition: all 0.5s ease;
 }
 
+.process-box:hover,
+.process-box.scroll-item:hover,
+.process-box-wrapper .process-box:hover,
+div.process-box-wrapper .process-box:hover,
+body .elementor-element .process-box:hover {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  background-image: none !important;
+}
+
+.process-box:hover .process-card-bg-layer,
+.process-box.scroll-item:hover .process-card-bg-layer,
+.process-box-wrapper .process-box:hover .process-card-bg-layer,
+div.process-box-wrapper .process-box:hover .process-card-bg-layer,
+body .elementor-element .process-box:hover .process-card-bg-layer {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+.process-box:hover .process-card-overlay,
+.process-box.scroll-item:hover .process-card-overlay,
+.process-box-wrapper .process-box:hover .process-card-overlay,
+div.process-box-wrapper .process-box:hover .process-card-overlay,
+body .elementor-element .process-box:hover .process-card-overlay {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
 .process-box:hover .process-number::before,
 .process-box:hover .process-number {
-  color: var(--color-primary);
+  color: #111111 !important;
 }
 
 .process-box:hover .process-info .process-title,
-.process-box:hover .process-info p {
-  color: var(--color-primary);
+.process-box:hover .process-info p,
+.process-box:hover .process-title,
+.process-box:hover .process-description,
+.process-box:hover .text-color-white,
+.process-box:hover p,
+.process-box:hover a,
+.process-box:hover span,
+.process-box:hover h5,
+.process-box:hover .custom-btn {
+  color: #111111 !important;
+}
+
+.process-box:hover .custom-btn {
+  color: #111111 !important;
+  border-bottom: 1px solid #111111 !important;
+}
+
+.process-box:hover .custom-btn .arrow {
+  border-top-color: #111111 !important;
+  border-right-color: #111111 !important;
+  background: url('/wp-content/uploads/2026/04/Symbol-1.svg') no-repeat center !important;
+  background-size: contain !important;
 }
 
 /*================================================
