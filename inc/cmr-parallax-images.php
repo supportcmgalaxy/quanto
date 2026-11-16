@@ -53,6 +53,17 @@ function cmr_parallax_images_script() {
         [data-id="3dc56d0"] .elementor-element {
             overflow: visible !important;
         }
+        /* Align left and right floating images with line 3 of center text on About Us page */
+        @media (min-width: 1025px) {
+            [data-id="3dc56d0"] .elementor-element-18dc9bb {
+                align-items: flex-start !important;
+            }
+            [data-id="3dc56d0"] .elementor-element-4b67977,
+            [data-id="3dc56d0"] .elementor-element-7cd0be3 {
+                align-self: flex-start !important;
+                margin-top: 68px !important;
+            }
+        }
     </style>
     <script id="cmr-parallax-js" data-no-minify="1" data-cfasync="false">
     (function() {

@@ -13918,3 +13918,18 @@ body.woocommerce-cart .cmr-cart-wrapper {
     margin-top: 20px !important;
 }
 
+/* ==========================================================================
+   About Us Page: Align Left & Right Images to 3rd Line of Center Text
+   ========================================================================== */
+@media (min-width: 1025px) {
+    [data-id="3dc56d0"] .elementor-element-18dc9bb {
+        align-items: flex-start !important;
+    }
+    [data-id="3dc56d0"] .elementor-element-4b67977,
+    [data-id="3dc56d0"] .elementor-element-7cd0be3 {
+        align-self: flex-start !important;
+        margin-top: 68px !important;
+    }
+}
+
+
