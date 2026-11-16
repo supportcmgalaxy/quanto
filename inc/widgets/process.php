@@ -159,7 +159,7 @@ class Quanto_Process extends Widget_Base {
                     'url' => '',
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} {{CURRENT_ITEM}}.process-box .process-card-bg-layer, {{WRAPPER}} {{CURRENT_ITEM}}.process-box' => 'background-image: url("{{URL}}") !important; background-size: cover !important; background-position: center center !important; background-repeat: no-repeat !important;',
+                    '{{WRAPPER}} {{CURRENT_ITEM}}.process-box .process-card-bg-layer' => 'background-image: url("{{URL}}") !important; background-size: cover !important; background-position: center center !important; background-repeat: no-repeat !important;',
                 ],
             ]
         );

@@ -7492,6 +7492,13 @@ body .elementor-element .process-box-wrapper {
   transition: all 0.5s ease;
 }
 
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover,
+html body div.elementor-element div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover,
+html body .elementor-element [class*="elementor-repeater-item-"].process-box:hover,
+html body [class*="elementor-repeater-item-"].process-box:hover,
+html body .elementor-element .process-box:hover,
+html body .process-box-wrapper .process-box:hover,
+html body .process-box:hover,
 .process-box:hover,
 .process-box.scroll-item:hover,
 .process-box-wrapper .process-box:hover,
@@ -7502,6 +7509,12 @@ body .elementor-element .process-box:hover {
   background-image: none !important;
 }
 
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .process-card-bg-layer,
+html body div.elementor-element div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .process-card-bg-layer,
+html body .elementor-element [class*="elementor-repeater-item-"].process-box:hover .process-card-bg-layer,
+html body [class*="elementor-repeater-item-"].process-box:hover .process-card-bg-layer,
+html body .elementor-element .process-box:hover .process-card-bg-layer,
+html body .process-box:hover .process-card-bg-layer,
 .process-box:hover .process-card-bg-layer,
 .process-box.scroll-item:hover .process-card-bg-layer,
 .process-box-wrapper .process-box:hover .process-card-bg-layer,
@@ -7509,8 +7522,15 @@ div.process-box-wrapper .process-box:hover .process-card-bg-layer,
 body .elementor-element .process-box:hover .process-card-bg-layer {
   opacity: 0 !important;
   visibility: hidden !important;
+  background-image: none !important;
 }
 
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .process-card-overlay,
+html body div.elementor-element div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .process-card-overlay,
+html body .elementor-element [class*="elementor-repeater-item-"].process-box:hover .process-card-overlay,
+html body [class*="elementor-repeater-item-"].process-box:hover .process-card-overlay,
+html body .elementor-element .process-box:hover .process-card-overlay,
+html body .process-box:hover .process-card-overlay,
 .process-box:hover .process-card-overlay,
 .process-box.scroll-item:hover .process-card-overlay,
 .process-box-wrapper .process-box:hover .process-card-overlay,
@@ -7518,13 +7538,29 @@ div.process-box-wrapper .process-box:hover .process-card-overlay,
 body .elementor-element .process-box:hover .process-card-overlay {
   opacity: 0 !important;
   visibility: hidden !important;
+  background: none !important;
 }
 
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .process-number,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .process-title,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .process-description,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .text-color-white,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover p,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover a,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover span,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover h5,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .custom-btn,
+html body .elementor-element .process-box:hover .process-number,
+html body .elementor-element .process-box:hover .process-title,
+html body .elementor-element .process-box:hover .process-description,
+html body .elementor-element .process-box:hover .text-color-white,
+html body .elementor-element .process-box:hover p,
+html body .elementor-element .process-box:hover a,
+html body .elementor-element .process-box:hover span,
+html body .elementor-element .process-box:hover h5,
+html body .elementor-element .process-box:hover .custom-btn,
 .process-box:hover .process-number::before,
-.process-box:hover .process-number {
-  color: #111111 !important;
-}
-
+.process-box:hover .process-number,
 .process-box:hover .process-info .process-title,
 .process-box:hover .process-info p,
 .process-box:hover .process-title,
@@ -7538,11 +7574,15 @@ body .elementor-element .process-box:hover .process-card-overlay {
   color: #111111 !important;
 }
 
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .custom-btn,
+html body .elementor-element .process-box:hover .custom-btn,
 .process-box:hover .custom-btn {
   color: #111111 !important;
   border-bottom: 1px solid #111111 !important;
 }
 
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .custom-btn .arrow,
+html body .elementor-element .process-box:hover .custom-btn .arrow,
 .process-box:hover .custom-btn .arrow {
   border-top-color: #111111 !important;
   border-right-color: #111111 !important;
