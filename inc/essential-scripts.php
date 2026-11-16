@@ -487,6 +487,10 @@ add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
         'mas-animation-ex',
         'tablepress-default',
         'contact-form-7',
+        'quanto-helping-style',
+        'quanto-widget-style',
+        'quanto-mehdi-css',
+        'aae-a-testimonial',
     );
     $is_async = in_array( $handle, $async_handles, true ) || (
         is_string( $href ) && (
@@ -502,7 +506,7 @@ add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
         if ( $async_tag === $html ) {
             $async_tag = str_replace( '/>', ' media="print" onload="this.media=\'all\'" />', $html );
         }
-        return $async_tag . '<noscript><link rel="stylesheet" href="' . esc_url( $href ) . '"></noscript>' . "\n";
+        return $async_tag . "\n";
     }
 
     return $html;
