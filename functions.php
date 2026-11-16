@@ -151,6 +151,7 @@ require_once get_theme_file_path( 'inc/cmr-connect.php' );
 require_once get_theme_file_path( 'inc/cmr-form-rate-limiter.php' );
 require_once get_theme_file_path( 'inc/cmr-video-modal.php' );
 require_once get_theme_file_path( 'inc/cmr-parallax-images.php' );
+require_once get_theme_file_path( 'inc/cmr-responsive-images.php' );
 function cmr_get_unique_smb_post_ids() {
     global $wpdb;
     $results = $wpdb->get_results("
