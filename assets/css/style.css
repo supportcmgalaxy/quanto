@@ -4444,6 +4444,7 @@ html body .quanto-service-box4:hover,
   padding-bottom: 2px !important;
   margin-top: 0 !important;
   opacity: 1 !important;
+  transition: color 0.3s ease, border-color 0.3s ease !important;
 }
 
 .quanto-service-box4 .service-info a *,
@@ -4453,13 +4454,34 @@ html body .quanto-service-box4:hover,
   text-decoration-line: none !important;
 }
 
+html body div.elementor-element.elementor-widget-quanto_services .quanto-service-box4:hover .quanto-link-btn,
+html body div.elementor-element.elementor-widget-quanto_services .quanto-service-box4:hover .service-info a,
+html body .quanto-service-box4:hover .quanto-link-btn,
+html body .quanto-service-box4:hover .service-info a,
 .quanto-service-box4:hover .service-info a,
 .quanto-service-box4:hover .quanto-link-btn,
-.quanto-service-box4:hover a {
+.quanto-service-box4:hover a,
+.quanto-service-box4 .quanto-link-btn:hover {
   opacity: 1 !important;
-  color: #000 !important;
+  color: #6241CA !important;
+  border-bottom-color: #6241CA !important;
   text-decoration: none !important;
   text-decoration-line: none !important;
+}
+
+html body div.elementor-element.elementor-widget-quanto_services .quanto-service-box4:hover .quanto-link-btn span i,
+html body div.elementor-element.elementor-widget-quanto_services .quanto-service-box4:hover .quanto-link-btn i,
+html body .quanto-service-box4:hover .quanto-link-btn span i,
+html body .quanto-service-box4:hover .quanto-link-btn i,
+.quanto-service-box4:hover .quanto-link-btn span i,
+.quanto-service-box4:hover .quanto-link-btn i,
+.quanto-service-box4:hover .quanto-link-btn svg,
+.quanto-service-box4 .quanto-link-btn:hover span i,
+.quanto-service-box4 .quanto-link-btn:hover i,
+.quanto-service-box4 .quanto-link-btn:hover svg {
+  color: #6241CA !important;
+  fill: #6241CA !important;
+  transition: color 0.3s ease, fill 0.3s ease !important;
 }
 
 /* MOBILE VIEW (max-width: 991.98px) - Clean Card Layout */
