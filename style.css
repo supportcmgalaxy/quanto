@@ -3702,6 +3702,32 @@ html body .elementor-element .process-box:hover .custom-btn .arrow,
 }
 
 /* ==========================================================================
+   Parallax Floating Images: Disable Hover Scale & Allow Full Vertical Travel
+   ========================================================================== */
+.quanto-project-thumb:hover img,
+.cmr-parallax-target img,
+.cmr-parallax-target:hover img,
+.cmr-parallax-target .quanto-project-thumb img,
+.cmr-parallax-target .quanto-project-thumb:hover img,
+[data-id="03fdb2b"] .quanto-project-thumb img,
+[data-id="03fdb2b"] .quanto-project-thumb:hover img,
+[data-id="03fdb2b"] img:hover,
+[data-id="3dc56d0"] .quanto-project-thumb img,
+[data-id="3dc56d0"] .quanto-project-thumb:hover img,
+[data-id="3dc56d0"] img:hover {
+    transform: none !important;
+    transition: none !important;
+}
+
+[data-id="03fdb2b"] .elementor-element-6b0820f,
+[data-id="03fdb2b"] .elementor-element-a0908f6,
+[data-id="03fdb2b"] .elementor-element-8261e71,
+[data-id="03fdb2b"] .elementor-element-763b7b6,
+[data-id="3dc56d0"] .elementor-element {
+    overflow: visible !important;
+}
+
+/* ==========================================================================
    WHO WE SERVE (Process Box) - Mobile Horizontal Slide Carousel
    ========================================================================== */
 @media (max-width: 768px) {

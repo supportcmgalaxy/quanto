@@ -28,24 +28,46 @@ function cmr_parallax_images_script() {
         @media (min-width: 769px) {
             .cmr-parallax-target {
                 will-change: transform;
-                transition: transform 0.12s cubic-bezier(0.25, 1, 0.5, 1);
+                transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1);
             }
         }
+        /* Disable hover zoom/scale on floating parallax images */
+        .cmr-parallax-target img,
+        .cmr-parallax-target:hover img,
+        .cmr-parallax-target .quanto-project-thumb img,
+        .cmr-parallax-target .quanto-project-thumb:hover img,
+        [data-id="03fdb2b"] .quanto-project-thumb img,
+        [data-id="03fdb2b"] .quanto-project-thumb:hover img,
+        [data-id="03fdb2b"] img:hover,
+        [data-id="3dc56d0"] .quanto-project-thumb img,
+        [data-id="3dc56d0"] .quanto-project-thumb:hover img,
+        [data-id="3dc56d0"] img:hover {
+            transform: none !important;
+            transition: none !important;
+        }
+        /* Ensure parent columns do not clip vertical floating travel */
+        [data-id="03fdb2b"] .elementor-element-6b0820f,
+        [data-id="03fdb2b"] .elementor-element-a0908f6,
+        [data-id="03fdb2b"] .elementor-element-8261e71,
+        [data-id="03fdb2b"] .elementor-element-763b7b6,
+        [data-id="3dc56d0"] .elementor-element {
+            overflow: visible !important;
+        }
     </style>
-    <script id="cmr-parallax-js">
+    <script id="cmr-parallax-js" data-no-minify="1" data-cfasync="false">
     (function() {
         function initParallax() {
             if (window.innerWidth < 769) return;
 
-            // Define targets per page
+            // Define targets per page with enhanced vertical travel speeds
             var config = [];
 
             // 1. Home Page Targets (2 images in section 03fdb2b)
             config.push({
                 container: '[data-id="03fdb2b"]',
                 items: [
-                    { sel: '.elementor-element-b30bc68', speed: -0.22 }, // Left image (Team/laptop)
-                    { sel: '.elementor-element-8c4ff94', speed: 0.32 }   // Right image (Pink blazer)
+                    { sel: '.elementor-element-b30bc68', speed: -0.65 }, // Left image (Team/laptop) floats up
+                    { sel: '.elementor-element-8c4ff94', speed: 0.75 }   // Right image (Pink blazer) floats down
                 ]
             });
 
@@ -53,9 +75,9 @@ function cmr_parallax_images_script() {
             config.push({
                 container: '[data-id="3dc56d0"]',
                 items: [
-                    { sel: '.elementor-element-8cd6469', speed: -0.22 }, // Left image (Laptop)
-                    { sel: '.elementor-element-f7f45dd', speed: 0.34 },  // Center-bottom image (Pink blazer)
-                    { sel: '.elementor-element-3a628c6', speed: -0.14 }  // Right image (Whiteboard)
+                    { sel: '.elementor-element-8cd6469', speed: -0.60 }, // Left image (Laptop)
+                    { sel: '.elementor-element-f7f45dd', speed: 0.70 },  // Center-bottom image (Pink blazer)
+                    { sel: '.elementor-element-3a628c6', speed: -0.45 }  // Right image (Whiteboard)
                 ]
             });
 
@@ -132,7 +154,7 @@ function cmr_parallax_images_script() {
                     var delta = progress - 0.5;
 
                     sec.items.forEach(function(item) {
-                        var y = delta * item.speed * 200;
+                        var y = delta * item.speed * 280;
                         item.el.style.setProperty('transform', 'translate3d(0, ' + y.toFixed(1) + 'px, 0)', 'important');
                     });
                 });

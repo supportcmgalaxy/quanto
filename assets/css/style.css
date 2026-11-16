@@ -3859,7 +3859,7 @@ ins {
 }
 
 .quanto-project-thumb:hover img {
-  transform: scale(1.1);
+  transform: none;
 }
 
 .quanto-project-content {
