@@ -403,8 +403,8 @@ max-width:512px !important ;
   margin-bottom: 0 !important;
   background-color: transparent !important;
   box-shadow: none !important;
-  transition: all 0.2s linear !important;
-  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
+  will-change: transform;
 }
 
 .quanto-service-box4:last-child,
@@ -416,7 +416,7 @@ max-width:512px !important ;
 }
 
 .quanto-service-box4:hover {
-  transform: none !important;
+  transform: translateY(-8px) !important;
   box-shadow: none !important;
 }
 

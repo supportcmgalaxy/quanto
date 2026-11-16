@@ -4344,6 +4344,8 @@ ins {
 }
 
 /* WHAT WE DO - Service Box 4 (Desktop Row Layout) */
+html body div.elementor-element.elementor-widget-quanto_services .quanto-service-box4,
+html body .quanto-service-box4,
 .quanto-service-box4 {
   display: flex !important;
   flex-direction: row !important;
@@ -4369,6 +4371,8 @@ ins {
   margin-bottom: 0 !important;
 }
 
+html body div.elementor-element.elementor-widget-quanto_services .quanto-service-box4:hover,
+html body .quanto-service-box4:hover,
 .quanto-service-box4:hover {
   transform: translateY(-8px) !important;
   box-shadow: none !important;
