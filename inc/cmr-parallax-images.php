@@ -1,0 +1,155 @@
+<?php
+/**
+ * Lightweight, 60fps GPU-Accelerated Parallax Scroll Effect for Images
+ * Supports:
+ * - Home Page (2 images in Built on Research section)
+ * - About Us Page (3 images in Overview section)
+ *
+ * Zero external libraries (no GSAP/ScrollSmoother required), 0 PageSpeed penalty.
+ * Runs on IntersectionObserver + requestAnimationFrame.
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+add_action( 'wp_footer', 'cmr_parallax_images_script', 90 );
+
+function cmr_parallax_images_script() {
+    $uri = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '';
+    $is_home  = is_front_page() || is_home() || $uri === '/' || strpos( $uri, 'home' ) !== false;
+    $is_about = is_page( 'about-us' ) || is_page( 13499 ) || strpos( $uri, 'about-us' ) !== false;
+
+    if ( ! $is_home && ! $is_about ) {
+        return;
+    }
+    ?>
+    <style id="cmr-parallax-css">
+        @media (min-width: 769px) {
+            .cmr-parallax-target {
+                will-change: transform;
+                transition: transform 0.12s cubic-bezier(0.25, 1, 0.5, 1);
+            }
+        }
+    </style>
+    <script id="cmr-parallax-js">
+    (function() {
+        function initParallax() {
+            if (window.innerWidth < 769) return;
+
+            // Define targets per page
+            var config = [];
+
+            // 1. Home Page Targets (2 images in section 03fdb2b)
+            config.push({
+                container: '[data-id="03fdb2b"]',
+                items: [
+                    { sel: '.elementor-element-b30bc68', speed: -0.22 }, // Left image (Team/laptop)
+                    { sel: '.elementor-element-8c4ff94', speed: 0.32 }   // Right image (Pink blazer)
+                ]
+            });
+
+            // 2. About Us Page Targets (3 images in section 3dc56d0)
+            config.push({
+                container: '[data-id="3dc56d0"]',
+                items: [
+                    { sel: '.elementor-element-8cd6469', speed: -0.22 }, // Left image (Laptop)
+                    { sel: '.elementor-element-f7f45dd', speed: 0.34 },  // Center-bottom image (Pink blazer)
+                    { sel: '.elementor-element-3a628c6', speed: -0.14 }  // Right image (Whiteboard)
+                ]
+            });
+
+            var activeSections = [];
+
+            config.forEach(function(cfg) {
+                var container = document.querySelector(cfg.container);
+                if (!container) return;
+
+                var boundItems = [];
+                cfg.items.forEach(function(item) {
+                    var el = container.querySelector(item.sel) || document.querySelector(item.sel);
+                    if (el) {
+                        el.classList.add('cmr-parallax-target');
+                        boundItems.push({ el: el, speed: item.speed });
+                    }
+                });
+
+                if (boundItems.length) {
+                    var secData = {
+                        container: container,
+                        items: boundItems,
+                        inView: false
+                    };
+                    activeSections.push(secData);
+
+                    // IntersectionObserver: Only compute transforms when section is visible
+                    if ('IntersectionObserver' in window) {
+                        var observer = new IntersectionObserver(function(entries) {
+                            entries.forEach(function(entry) {
+                                secData.inView = entry.isIntersecting;
+                                if (entry.isIntersecting) {
+                                    requestTick();
+                                }
+                            });
+                        }, { rootMargin: '100px 0px 100px 0px' });
+                        observer.observe(container);
+                    } else {
+                        secData.inView = true;
+                    }
+                }
+            });
+
+            if (!activeSections.length) return;
+
+            var ticking = false;
+
+            function requestTick() {
+                if (!ticking) {
+                    window.requestAnimationFrame(update);
+                    ticking = true;
+                }
+            }
+
+            function update() {
+                ticking = false;
+                if (window.innerWidth < 769) {
+                    activeSections.forEach(function(sec) {
+                        sec.items.forEach(function(item) {
+                            item.el.style.removeProperty('transform');
+                        });
+                    });
+                    return;
+                }
+
+                var vh = window.innerHeight || 800;
+
+                activeSections.forEach(function(sec) {
+                    if (!sec.inView) return;
+                    var rect = sec.container.getBoundingClientRect();
+                    var total = vh + rect.height;
+                    var current = vh - rect.top;
+                    var progress = current / total;
+                    var delta = progress - 0.5;
+
+                    sec.items.forEach(function(item) {
+                        var y = delta * item.speed * 200;
+                        item.el.style.setProperty('transform', 'translate3d(0, ' + y.toFixed(1) + 'px, 0)', 'important');
+                    });
+                });
+            }
+
+            window.addEventListener('scroll', requestTick, { passive: true });
+            window.addEventListener('resize', requestTick, { passive: true });
+            requestTick();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initParallax);
+        } else {
+            initParallax();
+        }
+        window.addEventListener('load', initParallax);
+    })();
+    </script>
+    <?php
+}

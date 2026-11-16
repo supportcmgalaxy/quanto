@@ -285,16 +285,43 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
             padding-top: 70px;
         }
 
-        .cmr-wwt-panel {
-            width: 100%;
-            min-height: auto;
-            height: auto;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            z-index: 2;
-            padding-top: 10px;
-            padding-bottom: 80px;
+        @media (min-width: 769px) {
+            .cmr-wwt-wrap {
+                height: 250vh !important;
+            }
+            .cmr-wwt-panel {
+                position: -webkit-sticky !important;
+                position: sticky !important;
+                top: 90px !important;
+                width: 100%;
+                min-height: auto;
+                height: auto;
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+                z-index: 10;
+                padding-top: 10px;
+                padding-bottom: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .cmr-wwt-wrap {
+                height: auto !important;
+            }
+            .cmr-wwt-panel {
+                position: relative !important;
+                top: auto !important;
+                width: 100%;
+                min-height: auto;
+                height: auto;
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+                z-index: 2;
+                padding-top: 10px;
+                padding-bottom: 40px;
+            }
         }
 
         .cmr-wwt-inner {
@@ -680,53 +707,113 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
         </div>
 
         <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Tab switching for desktop
-            const wraps = document.querySelectorAll('.cmr-wwt-wrap');
-            wraps.forEach(wrap => {
-                const menuItems = wrap.querySelectorAll('.cmr-wwt-menu-item');
-                const slides = wrap.querySelectorAll('.cmr-wwt-slide');
+        (function() {
+            function initWWT() {
+                const wraps = document.querySelectorAll('.cmr-wwt-wrap');
+                if (!wraps.length) return;
 
-                menuItems.forEach((item, idx) => {
-                    item.setAttribute('role', 'tab');
-                    item.setAttribute('tabindex', '0');
-                    item.setAttribute('aria-selected', idx === 0 ? 'true' : 'false');
+                wraps.forEach(wrap => {
+                    if (wrap._cmrInit) return;
+                    wrap._cmrInit = true;
 
-                    function activateTab() {
+                    const panel = wrap.querySelector('.cmr-wwt-panel');
+                    const slides = wrap.querySelectorAll('.cmr-wwt-slide');
+                    const menuItems = wrap.querySelectorAll('.cmr-wwt-menu-item');
+                    const totalSlides = slides.length;
+                    let currentActive = 0;
+
+                    function setActiveSlide(idx) {
+                        if (idx < 0) idx = 0;
+                        if (idx >= totalSlides) idx = totalSlides - 1;
+                        if (currentActive === idx && menuItems[idx].classList.contains('cmr-wwt-on')) return;
+                        currentActive = idx;
+
                         menuItems.forEach((m, i) => {
-                            const isCurrent = (i === idx);
-                            m.classList.toggle('cmr-wwt-on', isCurrent);
-                            m.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
+                            const isCur = (i === idx);
+                            m.classList.toggle('cmr-wwt-on', isCur);
+                            m.setAttribute('aria-selected', isCur ? 'true' : 'false');
                         });
                         slides.forEach((s, i) => {
                             s.classList.toggle('cmr-wwt-show', i === idx);
                         });
                     }
 
-                    item.addEventListener('click', activateTab);
-                    item.addEventListener('keydown', function(e) {
-                        if (e.key === 'Enter' || e.key === ' ') {
+                    // Accessibility setup
+                    menuItems.forEach((item, idx) => {
+                        item.setAttribute('role', 'tab');
+                        item.setAttribute('tabindex', '0');
+                        item.setAttribute('aria-selected', idx === 0 ? 'true' : 'false');
+
+                        // Click navigation (scrolls to the slide position smoothly)
+                        item.addEventListener('click', function(e) {
                             e.preventDefault();
-                            activateTab();
-                        }
+                            if (window.innerWidth <= 768) {
+                                setActiveSlide(idx);
+                                return;
+                            }
+                            const rect = wrap.getBoundingClientRect();
+                            const panelH = panel ? panel.offsetHeight : 0;
+                            const scrollable = rect.height - panelH;
+                            const wrapTop = window.scrollY + rect.top;
+                            const stickyTop = 90;
+                            
+                            const targetY = wrapTop - stickyTop + (idx / Math.max(1, totalSlides - 1)) * scrollable + 5;
+                            window.scrollTo({ top: targetY, behavior: 'smooth' });
+                            setActiveSlide(idx);
+                        });
+
+                        item.addEventListener('keydown', function(e) {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                item.click();
+                            }
+                        });
                     });
-                });
 
-                slides.forEach((s, i) => {
-                    s.setAttribute('role', 'tabpanel');
-                });
-            });
+                    slides.forEach((s) => {
+                        s.setAttribute('role', 'tabpanel');
+                    });
 
-            function initMobileWWT() {
-                const wraps = document.querySelectorAll('.cmr-wwt-wrap');
-                wraps.forEach(wrap => {
+                    // Scroll progress engine for Desktop
+                    let ticking = false;
+                    function requestUpdate() {
+                        if (!ticking) {
+                            window.requestAnimationFrame(updateScrollProgress);
+                            ticking = true;
+                        }
+                    }
+
+                    function updateScrollProgress() {
+                        ticking = false;
+                        if (window.innerWidth <= 768 || totalSlides <= 1 || !panel) return;
+
+                        const rect = wrap.getBoundingClientRect();
+                        const panelH = panel.offsetHeight;
+                        const scrollable = rect.height - panelH;
+                        if (scrollable <= 0) return;
+
+                        const stickyTop = 90;
+                        const scrolled = stickyTop - rect.top;
+                        const progress = Math.max(0, Math.min(1, scrolled / scrollable));
+
+                        // Determine slide based on scroll percentage
+                        let idx = Math.min(totalSlides - 1, Math.floor(progress * totalSlides));
+                        if (progress >= 0.98) idx = totalSlides - 1;
+
+                        setActiveSlide(idx);
+                    }
+
+                    window.addEventListener('scroll', requestUpdate, { passive: true });
+                    window.addEventListener('resize', requestUpdate, { passive: true });
+                    requestUpdate();
+
+                    // Mobile Accordion functionality
                     const accItems = wrap.querySelectorAll('.cmr-wwt-acc-item');
-                    
                     accItems.forEach((item) => {
                         const header = item.querySelector('.cmr-wwt-acc-header');
                         const content = item.querySelector('.cmr-wwt-acc-content');
                         
-                        if(header && content) {
+                        if (header && content) {
                             header.addEventListener('click', function() {
                                 const isActive = item.classList.contains('active');
                                 
@@ -734,25 +821,25 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
                                 accItems.forEach(acc => {
                                     acc.classList.remove('active');
                                     const accContent = acc.querySelector('.cmr-wwt-acc-content');
-                                    if(accContent) {
+                                    if (accContent) {
                                         accContent.style.maxHeight = '0px';
                                     }
                                 });
                                 
-                                // Open this one if it wasn't active
-                                if(!isActive) {
+                                // Open this one if it was not active
+                                if (!isActive) {
                                     item.classList.add('active');
                                     content.style.maxHeight = content.scrollHeight + 'px';
                                 }
                             });
                         }
                     });
-                    
-                    // On initial load, calculate height for the already active item
-                    const activeItem = wrap.querySelector('.cmr-wwt-acc-item.active');
-                    if(activeItem) {
-                        const content = activeItem.querySelector('.cmr-wwt-acc-content');
-                        if(content) {
+
+                    // Set initial height for active mobile item
+                    const activeMobileItem = wrap.querySelector('.cmr-wwt-acc-item.active');
+                    if (activeMobileItem) {
+                        const content = activeMobileItem.querySelector('.cmr-wwt-acc-content');
+                        if (content) {
                             setTimeout(() => {
                                 content.style.maxHeight = content.scrollHeight + 'px';
                             }, 100);
@@ -761,8 +848,13 @@ if ( ! function_exists( 'cmr_what_we_think_shortcode' ) ) {
                 });
             }
 
-            initMobileWWT();
-        });
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initWWT);
+            } else {
+                initWWT();
+            }
+            window.addEventListener('load', initWWT);
+        })();
         </script>
         <?php
         return ob_get_clean();
