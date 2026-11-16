@@ -7611,6 +7611,57 @@ html body .elementor-element .process-box:hover .custom-btn .arrow,
   background-size: contain !important;
 }
 
+/* Card Hover: Turn icon (img / svg) inside card/button to dark */
+.process-box .custom-btn img,
+.process-box a img,
+.process-box .process-description img,
+.custom-btn img {
+  display: inline-block !important;
+  vertical-align: middle !important;
+  margin-left: 4px !important;
+  transition: filter 0.4s ease-in-out, transform 0.4s ease-in-out !important;
+}
+
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item:hover .custom-btn img,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .custom-btn img,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item:hover .process-description img,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .process-description img,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item:hover a img,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover a img,
+html body .elementor-element .process-box:hover .custom-btn img,
+html body .elementor-element .process-box:hover .process-description img,
+html body .elementor-element .process-box:hover a img,
+.process-box:hover .custom-btn img,
+.process-box:hover .process-description img,
+.process-box:hover a img,
+.custom-btn:hover img {
+  filter: brightness(0) !important;
+  transform: translate(2px, -2px) !important;
+}
+
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item:hover .custom-btn svg,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .custom-btn svg,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item:hover .process-description svg,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .process-description svg,
+html body .elementor-element .process-box:hover .custom-btn svg,
+html body .elementor-element .process-box:hover .process-description svg,
+html body .elementor-element .process-box:hover a svg,
+.process-box:hover .custom-btn svg,
+.process-box:hover a svg,
+.process-box:hover .process-description svg,
+.custom-btn:hover svg {
+  fill: #111111 !important;
+  color: #111111 !important;
+  transform: translate(2px, -2px) !important;
+}
+
+/* Process Box Title Typography */
+.elementor-14 .elementor-element.elementor-element-85d6744 .process-title,
+.elementor-element-85d6744 .process-title {
+  font-size: 24px !important;
+  font-weight: 600 !important;
+}
+
 /*================================================
 25. Error css
 =================================================*/

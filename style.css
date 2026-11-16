@@ -3701,6 +3701,88 @@ html body .elementor-element .process-box:hover .custom-btn .arrow,
     background-size: contain !important;
 }
 
+/* Card Hover: Turn icon (img / svg) inside card/button to dark */
+.process-box .custom-btn img,
+.process-box a img,
+.process-box .process-description img,
+.custom-btn img {
+    display: inline-block !important;
+    vertical-align: middle !important;
+    margin-left: 4px !important;
+    transition: filter 0.4s ease-in-out, transform 0.4s ease-in-out !important;
+}
+
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item:hover .custom-btn img,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .custom-btn img,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item:hover .process-description img,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .process-description img,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item:hover a img,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover a img,
+html body .elementor-element .process-box:hover .custom-btn img,
+html body .elementor-element .process-box:hover .process-description img,
+html body .elementor-element .process-box:hover a img,
+.process-box:hover .custom-btn img,
+.process-box:hover .process-description img,
+.process-box:hover a img,
+.custom-btn:hover img {
+    filter: brightness(0) !important;
+    transform: translate(2px, -2px) !important;
+}
+
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item:hover .custom-btn svg,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .custom-btn svg,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item:hover .process-description svg,
+html body div.elementor-element.elementor-widget-quanto_process div.process-box.scroll-item[class*="elementor-repeater-item-"]:hover .process-description svg,
+html body .elementor-element .process-box:hover .custom-btn svg,
+html body .elementor-element .process-box:hover .process-description svg,
+html body .elementor-element .process-box:hover a svg,
+.process-box:hover .custom-btn svg,
+.process-box:hover a svg,
+.process-box:hover .process-description svg,
+.custom-btn:hover svg {
+    fill: #111111 !important;
+    color: #111111 !important;
+    transform: translate(2px, -2px) !important;
+}
+
+/* Process Box Title Typography */
+.elementor-14 .elementor-element.elementor-element-85d6744 .process-title,
+.elementor-element-85d6744 .process-title {
+    font-size: 24px !important;
+    font-weight: 600 !important;
+}
+
+/* ==========================================================================
+   Universal SVG Icon Helper Classes
+   Use: <img src="URL_TO_SVG" class="cmr-svg-icon" />
+   Automatically turns Black (#000000) on hover of the image, button, link, or card.
+   ========================================================================== */
+.cmr-svg-icon,
+.svg-hover-black {
+    display: inline-block !important;
+    vertical-align: middle !important;
+    margin-left: 5px !important;
+    transition: filter 0.35s ease-in-out, transform 0.35s ease-in-out !important;
+}
+
+.cmr-svg-icon:hover,
+.svg-hover-black:hover,
+a:hover .cmr-svg-icon,
+a:hover .svg-hover-black,
+button:hover .cmr-svg-icon,
+button:hover .svg-hover-black,
+.custom-btn:hover .cmr-svg-icon,
+.custom-btn:hover .svg-hover-black,
+.process-box:hover .cmr-svg-icon,
+.process-box:hover .svg-hover-black,
+.elementor-element:hover .cmr-svg-icon,
+.elementor-element:hover .svg-hover-black,
+.scroll-item:hover .cmr-svg-icon,
+.scroll-item:hover .svg-hover-black {
+    filter: brightness(0) !important;
+    transform: translate(2px, -2px) !important;
+}
+
 /* ==========================================================================
    Parallax Floating Images: Disable Hover Scale & Allow Full Vertical Travel
    ========================================================================== */
