@@ -115,31 +115,42 @@ if ( ! function_exists( 'cmr_explore_sectors_custom_shortcode' ) ) {
                 .elementor-shortcode:has(#<?php echo esc_attr( $unique_id ); ?>_section) {
                     overflow: visible !important;
                 }
+                #<?php echo esc_attr( $unique_id ); ?>_section {
+                    overflow: hidden !important;
+                    position: relative !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                    background-color: #F8F9FA !important;
+                    padding: 70px 0 !important;
+                }
                 @media (min-width: 769px) {
                     #<?php echo esc_attr( $unique_id ); ?>_section {
                         position: sticky !important;
-                        top: 0 !important;
-                        height: 100vh !important;
-                        min-height: 100vh !important;
-                        max-height: 100vh !important;
-                        display: flex !important;
-                        flex-direction: column !important;
-                        justify-content: center !important;
                         z-index: 5;
-                        padding: 0 !important;
                     }
+                }
+                #<?php echo esc_attr( $unique_id ); ?>_section .explore-sectors-container {
+                    width: 100% !important;
+                    max-width: 1280px !important;
+                    margin: 0 auto 35px auto !important;
+                    padding: 0 20px !important;
+                    box-sizing: border-box !important;
+                    text-align: left !important;
+                }
+                #<?php echo esc_attr( $unique_id ); ?>_section .explore-sectors-title {
+                    text-align: left !important;
+                    margin: 0 !important;
+                    font-size: 42px !important;
+                    font-weight: 600 !important;
+                    color: #111 !important;
+                    line-height: 1.2 !important;
+                    letter-spacing: -1px !important;
                 }
                 .cmr-explore-sectors-anchor,
                 #our-offerings,
                 #<?php echo esc_attr( $anchor_id ); ?>,
                 #<?php echo esc_attr( $unique_id ); ?>_section {
                     scroll-margin-top: 100px !important;
-                }
-                #<?php echo esc_attr( $unique_id ); ?>_section {
-                    overflow: hidden !important;
-                    position: relative !important;
-                    width: 100% !important;
-                    box-sizing: border-box !important;
                 }
                 #<?php echo esc_attr( $unique_id ); ?>_section .explore-sectors-track-wrapper {
                     width: 100% !important;
@@ -154,6 +165,8 @@ if ( ! function_exists( 'cmr_explore_sectors_custom_shortcode' ) ) {
                     will-change: transform;
                     gap: 20px !important;
                     box-sizing: border-box !important;
+                    padding-left: max(20px, calc((100vw - 1280px) / 2 + 20px)) !important;
+                    padding-right: max(40px, calc((100vw - 1280px) / 2 + 20px)) !important;
                 }
                 #<?php echo esc_attr( $unique_id ); ?>_track .explore-sector-card {
                     flex: 0 0 323px !important;
@@ -292,6 +305,7 @@ if ( ! function_exists( 'cmr_explore_sectors_custom_shortcode' ) ) {
                 var section = null;
                 var track = null;
                 var wrapper = null;
+                var centerTop = 0;
                 var maxScroll = 0;
                 var scrollDistance = 0;
                 var ticking = false;
@@ -316,6 +330,7 @@ if ( ! function_exists( 'cmr_explore_sectors_custom_shortcode' ) ) {
 
                     if (window.innerWidth <= 768) {
                         spacer.style.height = 'auto';
+                        section.style.top = '';
                         track.style.transform = '';
                         maxScroll = 0;
                         scrollDistance = 0;
@@ -324,15 +339,21 @@ if ( ! function_exists( 'cmr_explore_sectors_custom_shortcode' ) ) {
 
                     // Reset transform to accurately calculate scrollWidth
                     track.style.transform = '';
+                    spacer.style.height = '';
 
-                    var containerWidth = wrapper.clientWidth || window.innerWidth;
+                    // Center the section vertically in the viewport while scrolling
+                    var sectionH = section.offsetHeight;
+                    centerTop = Math.max(10, Math.round((window.innerHeight - sectionH) / 2));
+                    section.style.top = centerTop + 'px';
+
+                    var viewportW = window.innerWidth;
                     var totalWidth = track.scrollWidth;
-                    var diff = totalWidth - containerWidth;
+                    var diff = totalWidth - viewportW;
 
                     if (diff > 0) {
                         maxScroll = diff;
-                        scrollDistance = Math.round(diff * 1.05);
-                        spacer.style.height = (window.innerHeight + scrollDistance) + 'px';
+                        scrollDistance = Math.round(diff * 1.15);
+                        spacer.style.height = (sectionH + scrollDistance) + 'px';
                     } else {
                         maxScroll = 0;
                         scrollDistance = 0;
@@ -347,7 +368,7 @@ if ( ! function_exists( 'cmr_explore_sectors_custom_shortcode' ) ) {
                     if (window.innerWidth <= 768 || scrollDistance <= 0 || !spacer || !track) return;
 
                     var rect = spacer.getBoundingClientRect();
-                    var progress = -rect.top / scrollDistance;
+                    var progress = (centerTop - rect.top) / scrollDistance;
                     progress = Math.min(1, Math.max(0, progress));
 
                     var x = -progress * maxScroll;
