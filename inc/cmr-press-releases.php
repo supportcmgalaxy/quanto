@@ -14,19 +14,41 @@ function cmr_render_press_releases_shortcode( $atts ) {
     ob_start();
     ?>
     <style>
+        .cmr-pr-scroll-spacer {
+            position: relative;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         .cmr-pr-section {
             background-color: #000 !important;
             color: #fff !important;
             padding: 60px 0 !important;
-            min-height: 100vh !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: center !important;
             font-family: 'Instrument Sans', -apple-system, sans-serif;
             overflow: hidden !important;
             position: relative !important;
             width: 100% !important;
             box-sizing: border-box !important;
+        }
+
+        @media (min-width: 769px) {
+            .cmr-pr-section {
+                position: sticky !important;
+                top: 0 !important;
+                height: 100vh !important;
+                min-height: 100vh !important;
+                max-height: 100vh !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                z-index: 5;
+            }
+        }
+
+        .cmr-pr-ancestor-visible {
+            overflow: visible !important;
         }
 
         /* Ensure parent Elementor container does not restrict full width or add outer margin */
@@ -41,6 +63,7 @@ function cmr_render_press_releases_shortcode( $atts ) {
             padding-left: 0 !important;
             padding-right: 0 !important;
             box-sizing: border-box !important;
+            overflow: visible !important;
         }
 
         .cmr-pr-container {
@@ -220,8 +243,14 @@ function cmr_render_press_releases_shortcode( $atts ) {
         }
 
         @media (max-width: 768px) {
+            .cmr-pr-scroll-spacer {
+                height: auto !important;
+            }
             .cmr-pr-section {
+                position: static !important;
+                height: auto !important;
                 min-height: auto !important;
+                max-height: none !important;
                 padding: 50px 0 !important;
             }
             .cmr-pr-header {
@@ -242,6 +271,7 @@ function cmr_render_press_releases_shortcode( $atts ) {
                 padding-bottom: 20px !important;
             }
             .cmr-pr-cards-track {
+                transform: none !important;
                 padding-left: 20px !important;
                 padding-right: 20px !important;
                 gap: 20px !important;
@@ -272,6 +302,7 @@ function cmr_render_press_releases_shortcode( $atts ) {
     ?>
 
     <div id="press-release"></div>
+    <div class="cmr-pr-scroll-spacer" id="cmr-pr-scroll-spacer">
     <div class="cmr-pr-section" id="cmr-pr-section">
         <div class="cmr-pr-container">
             <div class="cmr-pr-header">
@@ -353,88 +384,102 @@ function cmr_render_press_releases_shortcode( $atts ) {
             </div>
         </div>
     </div>
+    </div>
 
-    <!-- Init GSAP ScrollTrigger for horizontal scroll -->
+    <!-- Pure Vanilla JS scroll-on-scroll pinning slider (Zero external GSAP dependency) -->
     <script>
     (function() {
-        function initPressReleasesScroll() {
-            let track   = document.getElementById("cmr-pr-track");
-            let section = document.getElementById("cmr-pr-section");
-            let wrapper = section ? section.querySelector('.cmr-pr-track-wrapper') : null;
-            if (!track || !section || !wrapper) return;
+        var spacer = null;
+        var section = null;
+        var track = null;
+        var wrapper = null;
+        var maxScroll = 0;
+        var scrollDistance = 0;
+        var ticking = false;
 
-            // Kill any pre-existing ScrollTrigger on this section to avoid duplicates
-            if (typeof ScrollTrigger !== 'undefined') {
-                ScrollTrigger.getAll().forEach(function(st) {
-                    if (st.trigger === section) st.kill(true);
-                });
+        function unclipAncestors(el) {
+            var p = el ? el.parentElement : null;
+            while (p && p !== document.body && p !== document.documentElement) {
+                p.classList.add('cmr-pr-ancestor-visible');
+                p = p.parentElement;
             }
+        }
 
-            // Mobile view: disable GSAP pinning to prevent layout break and let native swipe work
+        function measure() {
+            spacer  = document.getElementById('cmr-pr-scroll-spacer');
+            section = document.getElementById('cmr-pr-section');
+            track   = document.getElementById('cmr-pr-track');
+            wrapper = section ? section.querySelector('.cmr-pr-track-wrapper') : null;
+
+            if (!spacer || !section || !track || !wrapper) return;
+
+            unclipAncestors(spacer);
+
             if (window.innerWidth <= 768) {
-                if (typeof gsap !== 'undefined') {
-                    gsap.set(track, { clearProps: "all" });
-                }
+                spacer.style.height = 'auto';
                 track.style.transform = '';
+                maxScroll = 0;
+                scrollDistance = 0;
                 return;
             }
 
-            // Desktop view: GSAP horizontal scroll with pinning
-            if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
-                setTimeout(initPressReleasesScroll, 100);
-                return;
+            // Reset transform to measure accurate scrollWidth
+            track.style.transform = '';
+
+            var containerWidth = wrapper.clientWidth || window.innerWidth;
+            var totalWidth = track.scrollWidth;
+            var diff = totalWidth - containerWidth;
+
+            if (diff > 0) {
+                maxScroll = diff;
+                // Scroll distance: comfortable 1:1 scroll speed
+                scrollDistance = Math.round(diff * 1.05);
+                spacer.style.height = (window.innerHeight + scrollDistance) + 'px';
+            } else {
+                maxScroll = 0;
+                scrollDistance = 0;
+                spacer.style.height = 'auto';
             }
-            gsap.registerPlugin(ScrollTrigger);
 
-            gsap.set(track, { clearProps: "transform,x" });
+            updateScroll();
+        }
 
-            function getScrollAmount() {
-                let containerWidth = wrapper.clientWidth || window.innerWidth;
-                let diff = track.scrollWidth - containerWidth;
-                return diff > 0 ? -diff : 0;
+        function updateScroll() {
+            ticking = false;
+            if (window.innerWidth <= 768 || scrollDistance <= 0 || !spacer || !track) return;
+
+            var rect = spacer.getBoundingClientRect();
+            // rect.top is 0 when top of spacer hits top of viewport; goes negative as user scrolls down
+            var progress = -rect.top / scrollDistance;
+            progress = Math.min(1, Math.max(0, progress));
+
+            var x = -progress * maxScroll;
+            track.style.transform = 'translate3d(' + x.toFixed(2) + 'px, 0, 0)';
+        }
+
+        function onScroll() {
+            if (!ticking) {
+                ticking = true;
+                window.requestAnimationFrame(updateScroll);
             }
+        }
 
-            const tween = gsap.to(track, {
-                x: () => getScrollAmount(),
-                ease: "none",
-                invalidateOnRefresh: true
-            });
-
-            ScrollTrigger.create({
-                trigger: section,
-                start: "top top",
-                end: () => "+=" + Math.abs(getScrollAmount()),
-                pin: true,
-                pinSpacing: true,
-                animation: tween,
-                scrub: 0.6,
-                invalidateOnRefresh: true,
-                anticipatePin: 1
-            });
+        function init() {
+            measure();
+            window.addEventListener('scroll', onScroll, { passive: true });
+            window.addEventListener('resize', measure, { passive: true });
+            window.addEventListener('load', measure);
         }
 
         if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initPressReleasesScroll);
+            document.addEventListener('DOMContentLoaded', init);
         } else {
-            initPressReleasesScroll();
+            init();
         }
-
-        window.addEventListener('load', function() {
-            initPressReleasesScroll();
-            if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
-        });
-
-        window.addEventListener('resize', function() {
-            initPressReleasesScroll();
-            if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
-        });
 
         if (window.jQuery) {
             jQuery(window).on('elementor/frontend/init', function() {
-                setTimeout(function() {
-                    initPressReleasesScroll();
-                    if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
-                }, 300);
+                setTimeout(measure, 300);
             });
         }
     })();
