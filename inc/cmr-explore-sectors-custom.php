@@ -84,6 +84,7 @@ if ( ! function_exists( 'cmr_explore_sectors_custom_shortcode' ) ) {
         <?php if ( $anchor_id !== 'our-offerings' ) : ?>
             <div id="our-offerings" class="cmr-explore-sectors-anchor" style="position: relative; top: -30px; scroll-margin-top: 100px;"></div>
         <?php endif; ?>
+        <div class="cmr-explore-scroll-spacer" id="<?php echo esc_attr( $unique_id ); ?>_spacer">
         <div class="cmr-explore-sectors-section" id="<?php echo esc_attr( $unique_id ); ?>_section" style="scroll-margin-top: 100px;">
             <div class="explore-sectors-container">
                 <!-- Section Title: Aap title ko yahan se edit kar sakte hain -->
@@ -94,6 +95,39 @@ if ( ! function_exists( 'cmr_explore_sectors_custom_shortcode' ) ) {
             <style>
                 html {
                     scroll-behavior: smooth;
+                }
+                .cmr-explore-scroll-spacer {
+                    position: relative;
+                    width: 100%;
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+                .cmr-explore-ancestor-visible {
+                    overflow: visible !important;
+                }
+                .elementor-element:has(#<?php echo esc_attr( $unique_id ); ?>_section),
+                .e-con:has(#<?php echo esc_attr( $unique_id ); ?>_section),
+                .e-con-boxed:has(#<?php echo esc_attr( $unique_id ); ?>_section),
+                .e-con-inner:has(#<?php echo esc_attr( $unique_id ); ?>_section),
+                .elementor-widget:has(#<?php echo esc_attr( $unique_id ); ?>_section),
+                .elementor-widget-container:has(#<?php echo esc_attr( $unique_id ); ?>_section),
+                .elementor-shortcode:has(#<?php echo esc_attr( $unique_id ); ?>_section) {
+                    overflow: visible !important;
+                }
+                @media (min-width: 769px) {
+                    #<?php echo esc_attr( $unique_id ); ?>_section {
+                        position: sticky !important;
+                        top: 0 !important;
+                        height: 100vh !important;
+                        min-height: 100vh !important;
+                        max-height: 100vh !important;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        justify-content: center !important;
+                        z-index: 5;
+                        padding: 0 !important;
+                    }
                 }
                 .cmr-explore-sectors-anchor,
                 #our-offerings,
@@ -135,6 +169,9 @@ if ( ! function_exists( 'cmr_explore_sectors_custom_shortcode' ) ) {
                 }
 
                 @media (max-width: 768px) {
+                    .cmr-explore-scroll-spacer {
+                        height: auto !important;
+                    }
                     .elementor-element.elementor-element-4fc6cfd,
                     .elementor-element[data-id="4fc6cfd"],
                     .elementor-element.elementor-element-4fc6cfd > .e-con-inner,
@@ -164,6 +201,10 @@ if ( ! function_exists( 'cmr_explore_sectors_custom_shortcode' ) ) {
                     }
 
                     #<?php echo esc_attr( $unique_id ); ?>_section {
+                        position: static !important;
+                        height: auto !important;
+                        min-height: auto !important;
+                        max-height: none !important;
                         padding: 40px 0 !important;
                         width: 100% !important;
                         max-width: 100vw !important;
@@ -246,73 +287,96 @@ if ( ! function_exists( 'cmr_explore_sectors_custom_shortcode' ) ) {
             </div>
             
             <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                function initExploreCustomScroll() {
-                    let track   = document.getElementById("<?php echo esc_js( $unique_id ); ?>_track");
-                    let section = document.getElementById("<?php echo esc_js( $unique_id ); ?>_section");
-                    let wrapper = section ? section.querySelector('.explore-sectors-track-wrapper') : null;
-                    if (!track || !section || !wrapper) return;
+            (function() {
+                var spacer = null;
+                var section = null;
+                var track = null;
+                var wrapper = null;
+                var maxScroll = 0;
+                var scrollDistance = 0;
+                var ticking = false;
 
-                    // Kill any existing ScrollTrigger instance on this section
-                    if (typeof ScrollTrigger !== 'undefined') {
-                        ScrollTrigger.getAll().forEach(function(st) {
-                            if (st.trigger === section) st.kill(true);
-                        });
+                function unclipAncestors(el) {
+                    var p = el ? el.parentElement : null;
+                    while (p && p !== document.body && p !== document.documentElement) {
+                        p.classList.add('cmr-explore-ancestor-visible');
+                        p = p.parentElement;
                     }
+                }
 
-                    // Mobile view: disable GSAP pinning to prevent horizontal layout break & black space
+                function measure() {
+                    spacer  = document.getElementById("<?php echo esc_js( $unique_id ); ?>_spacer");
+                    section = document.getElementById("<?php echo esc_js( $unique_id ); ?>_section");
+                    track   = document.getElementById("<?php echo esc_js( $unique_id ); ?>_track");
+                    wrapper = section ? section.querySelector('.explore-sectors-track-wrapper') : null;
+
+                    if (!spacer || !section || !track || !wrapper) return;
+
+                    unclipAncestors(spacer);
+
                     if (window.innerWidth <= 768) {
-                        if (typeof gsap !== 'undefined') {
-                            gsap.set(track, { clearProps: "all" });
-                        }
+                        spacer.style.height = 'auto';
                         track.style.transform = '';
+                        maxScroll = 0;
+                        scrollDistance = 0;
                         return;
                     }
 
-                    // Desktop view: GSAP horizontal scroll with pinning
-                    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-                    gsap.registerPlugin(ScrollTrigger);
+                    // Reset transform to accurately calculate scrollWidth
+                    track.style.transform = '';
 
-                    gsap.set(track, { clearProps: "transform,x" });
+                    var containerWidth = wrapper.clientWidth || window.innerWidth;
+                    var totalWidth = track.scrollWidth;
+                    var diff = totalWidth - containerWidth;
 
-                    function getScrollAmount() {
-                        return -(track.scrollWidth - wrapper.clientWidth);
+                    if (diff > 0) {
+                        maxScroll = diff;
+                        scrollDistance = Math.round(diff * 1.05);
+                        spacer.style.height = (window.innerHeight + scrollDistance) + 'px';
+                    } else {
+                        maxScroll = 0;
+                        scrollDistance = 0;
+                        spacer.style.height = 'auto';
                     }
 
-                    const tween = gsap.to(track, {
-                        x: () => getScrollAmount(),
-                        ease: "none",
-                        invalidateOnRefresh: true
-                    });
-
-                    ScrollTrigger.create({
-                        trigger: section,
-                        start: "center center",
-                        end: () => `+=${Math.abs(getScrollAmount())}`,
-                        pin: true,
-                        pinSpacing: true,
-                        animation: tween,
-                        scrub: 0.5,
-                        invalidateOnRefresh: true,
-                        anticipatePin: 1
-                    });
+                    updateScroll();
                 }
 
-                initExploreCustomScroll();
-                window.addEventListener('load', function() {
-                    initExploreCustomScroll();
-                    if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
-                });
-                window.addEventListener('resize', function() {
-                    initExploreCustomScroll();
-                    if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
-                });
+                function updateScroll() {
+                    ticking = false;
+                    if (window.innerWidth <= 768 || scrollDistance <= 0 || !spacer || !track) return;
+
+                    var rect = spacer.getBoundingClientRect();
+                    var progress = -rect.top / scrollDistance;
+                    progress = Math.min(1, Math.max(0, progress));
+
+                    var x = -progress * maxScroll;
+                    track.style.transform = 'translate3d(' + x.toFixed(2) + 'px, 0, 0)';
+                }
+
+                function onScroll() {
+                    if (!ticking) {
+                        ticking = true;
+                        window.requestAnimationFrame(updateScroll);
+                    }
+                }
+
+                function init() {
+                    measure();
+                    window.addEventListener('scroll', onScroll, { passive: true });
+                    window.addEventListener('resize', measure, { passive: true });
+                    window.addEventListener('load', measure);
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', init);
+                } else {
+                    init();
+                }
+
                 if (window.jQuery) {
                     jQuery(window).on('elementor/frontend/init', function() {
-                        setTimeout(function() {
-                            initExploreCustomScroll();
-                            if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
-                        }, 300);
+                        setTimeout(measure, 300);
                     });
                 }
 
@@ -368,8 +432,9 @@ if ( ! function_exists( 'cmr_explore_sectors_custom_shortcode' ) ) {
                         }
                     }, 400);
                 }
-            });
+            })();
             </script>
+        </div>
         </div>
         <?php
         return ob_get_clean();

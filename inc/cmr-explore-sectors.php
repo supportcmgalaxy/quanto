@@ -69,6 +69,7 @@ if ( ! function_exists( 'cmr_explore_sectors_shortcode' ) ) {
 
         ob_start();
         ?>
+        <div class="cmr-explore-scroll-spacer" id="cmr-explore-spacer">
         <div class="cmr-explore-sectors-section" id="cmr-explore-section">
             <div class="explore-sectors-container">
                 <?php if ( ! empty( $atts['tagline'] ) ) : ?>
@@ -79,6 +80,39 @@ if ( ! function_exists( 'cmr_explore_sectors_shortcode' ) ) {
             
 
             <style>
+                .cmr-explore-scroll-spacer {
+                    position: relative;
+                    width: 100%;
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+                .cmr-explore-ancestor-visible {
+                    overflow: visible !important;
+                }
+                .elementor-element:has(#cmr-explore-section),
+                .e-con:has(#cmr-explore-section),
+                .e-con-boxed:has(#cmr-explore-section),
+                .e-con-inner:has(#cmr-explore-section),
+                .elementor-widget:has(#cmr-explore-section),
+                .elementor-widget-container:has(#cmr-explore-section),
+                .elementor-shortcode:has(#cmr-explore-section) {
+                    overflow: visible !important;
+                }
+                @media (min-width: 769px) {
+                    #cmr-explore-section {
+                        position: sticky !important;
+                        top: 0 !important;
+                        height: 100vh !important;
+                        min-height: 100vh !important;
+                        max-height: 100vh !important;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        justify-content: center !important;
+                        z-index: 5;
+                        padding: 0 !important;
+                    }
+                }
                 #cmr-explore-section {
                     overflow: hidden !important;
                     position: relative !important;
@@ -107,6 +141,9 @@ if ( ! function_exists( 'cmr_explore_sectors_shortcode' ) ) {
                 }
 
                 @media (max-width: 768px) {
+                    .cmr-explore-scroll-spacer {
+                        height: auto !important;
+                    }
                     /* Ensure outer Elementor containers don't create horizontal scroll or white/black margin */
                     .elementor-element:has(#cmr-explore-section),
                     .e-con:has(#cmr-explore-section),
@@ -237,77 +274,101 @@ if ( ! function_exists( 'cmr_explore_sectors_shortcode' ) ) {
             </div>
             
             <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                function initExploreScroll() {
-                    let track   = document.getElementById("cmr-explore-track");
-                    let section = document.getElementById("cmr-explore-section");
-                    let wrapper = section ? section.querySelector('.explore-sectors-track-wrapper') : null;
-                    if (!track || !section || !wrapper) return;
+            (function() {
+                var spacer = null;
+                var section = null;
+                var track = null;
+                var wrapper = null;
+                var maxScroll = 0;
+                var scrollDistance = 0;
+                var ticking = false;
 
-                    // Kill any pre-existing ScrollTrigger on this section to avoid duplicates
-                    if (typeof ScrollTrigger !== 'undefined') {
-                        ScrollTrigger.getAll().forEach(function(st) {
-                            if (st.trigger === section) st.kill(true);
-                        });
+                function unclipAncestors(el) {
+                    var p = el ? el.parentElement : null;
+                    while (p && p !== document.body && p !== document.documentElement) {
+                        p.classList.add('cmr-explore-ancestor-visible');
+                        p = p.parentElement;
                     }
+                }
 
-                    // Mobile view: disable GSAP pinning to prevent horizontal layout break & black space
+                function measure() {
+                    spacer  = document.getElementById("cmr-explore-spacer");
+                    section = document.getElementById("cmr-explore-section");
+                    track   = document.getElementById("cmr-explore-track");
+                    wrapper = section ? section.querySelector('.explore-sectors-track-wrapper') : null;
+
+                    if (!spacer || !section || !track || !wrapper) return;
+
+                    unclipAncestors(spacer);
+
                     if (window.innerWidth <= 768) {
-                        if (typeof gsap !== 'undefined') {
-                            gsap.set(track, { clearProps: "all" });
-                        }
+                        spacer.style.height = 'auto';
                         track.style.transform = '';
+                        maxScroll = 0;
+                        scrollDistance = 0;
                         return;
                     }
 
-                    // Desktop view: GSAP horizontal scroll with pinning
-                    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-                    gsap.registerPlugin(ScrollTrigger);
+                    // Reset transform to accurately calculate scrollWidth
+                    track.style.transform = '';
 
-                    gsap.set(track, { clearProps: "transform,x" });
+                    var containerWidth = wrapper.clientWidth || window.innerWidth;
+                    var totalWidth = track.scrollWidth;
+                    var diff = totalWidth - containerWidth;
 
-                    function getScrollAmount() {
-                        return -(track.scrollWidth - wrapper.clientWidth);
+                    if (diff > 0) {
+                        maxScroll = diff;
+                        scrollDistance = Math.round(diff * 1.05);
+                        spacer.style.height = (window.innerHeight + scrollDistance) + 'px';
+                    } else {
+                        maxScroll = 0;
+                        scrollDistance = 0;
+                        spacer.style.height = 'auto';
                     }
 
-                    const tween = gsap.to(track, {
-                        x: () => getScrollAmount(),
-                        ease: "none",
-                        invalidateOnRefresh: true
-                    });
-
-                    ScrollTrigger.create({
-                        trigger: section,
-                        start: "center center",
-                        end: () => `+=${Math.abs(getScrollAmount())}`,
-                        pin: true,
-                        pinSpacing: true,
-                        animation: tween,
-                        scrub: 0.5,
-                        invalidateOnRefresh: true,
-                        anticipatePin: 1
-                    });
+                    updateScroll();
                 }
 
-                initExploreScroll();
-                window.addEventListener('load', function() {
-                    initExploreScroll();
-                    if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
-                });
-                window.addEventListener('resize', function() {
-                    initExploreScroll();
-                    if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
-                });
+                function updateScroll() {
+                    ticking = false;
+                    if (window.innerWidth <= 768 || scrollDistance <= 0 || !spacer || !track) return;
+
+                    var rect = spacer.getBoundingClientRect();
+                    var progress = -rect.top / scrollDistance;
+                    progress = Math.min(1, Math.max(0, progress));
+
+                    var x = -progress * maxScroll;
+                    track.style.transform = 'translate3d(' + x.toFixed(2) + 'px, 0, 0)';
+                }
+
+                function onScroll() {
+                    if (!ticking) {
+                        ticking = true;
+                        window.requestAnimationFrame(updateScroll);
+                    }
+                }
+
+                function init() {
+                    measure();
+                    window.addEventListener('scroll', onScroll, { passive: true });
+                    window.addEventListener('resize', measure, { passive: true });
+                    window.addEventListener('load', measure);
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', init);
+                } else {
+                    init();
+                }
+
                 if (window.jQuery) {
                     jQuery(window).on('elementor/frontend/init', function() {
-                        setTimeout(function() {
-                            initExploreScroll();
-                            if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
-                        }, 300);
+                        setTimeout(measure, 300);
                     });
                 }
-            });
+            })();
             </script>
+        </div>
         </div>
         <?php
         return ob_get_clean();

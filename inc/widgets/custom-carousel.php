@@ -490,9 +490,12 @@ class Quanto_Custom_Carousel_Widget extends \Elementor\Widget_Base {
                     overflow: hidden;
                 }
                 #<?php echo esc_attr($uid); ?> .swiper-wrapper {
-                    display: flex;
+                    display: flex !important;
+                    flex-wrap: nowrap !important;
                     width: 100% !important;
                     height: 100% !important;
+                    will-change: transform;
+                    transition: transform <?php echo intval($speed); ?>ms cubic-bezier(0.25, 1, 0.5, 1);
                 }
                 #<?php echo esc_attr($uid); ?> .swiper-slide,
                 #<?php echo esc_attr($uid); ?> .quanto-single-slide {
@@ -594,7 +597,12 @@ class Quanto_Custom_Carousel_Widget extends \Elementor\Widget_Base {
                     border-radius: 50%;
                     margin: 0 4px;
                     cursor: pointer;
+                    background: rgba(255, 255, 255, 0.45);
                     transition: all 0.25s ease;
+                }
+                #<?php echo esc_attr($uid); ?> .swiper-pagination-bullet-active {
+                    background: #ffffff !important;
+                    transform: scale(1.25);
                 }
             </style>
 
@@ -646,88 +654,190 @@ class Quanto_Custom_Carousel_Widget extends \Elementor\Widget_Base {
             <?php if ($is_slider): ?>
             <script>
             (function() {
-                var swiperInstance = null;
-
-                function initSwiper_<?php echo $uid_safe; ?>() {
+                function initCarousel_<?php echo $uid_safe; ?>() {
                     var container = document.getElementById("<?php echo esc_js($uid); ?>");
-                    if (!container) return;
+                    if (!container || container._quantoInit) return;
+                    container._quantoInit = true;
 
-                    if (typeof Swiper !== 'undefined') {
-                        try {
-                            if (container.swiper) {
-                                container.swiper.destroy(true, true);
-                            }
+                    var wrapper = container.querySelector('.swiper-wrapper');
+                    var slides  = container.querySelectorAll('.swiper-slide');
+                    if (!wrapper || !slides.length) return;
 
-                            var swiperOptions = {
-                                slidesPerView: 1,
-                                spaceBetween: 0,
-                                effect: <?php echo json_encode($effect); ?>,
-                                speed: <?php echo intval($speed); ?>,
-                                loop: <?php echo $loop ? 'true' : 'false'; ?>,
-                                watchOverflow: true,
-                                observer: true,
-                                observeParents: true,
-                                observeSlideChildren: true,
-                                resizeObserver: true,
-                                autoHeight: false,
-                            };
+                    var total = slides.length;
+                    var currentIndex = 0;
+                    var isLoop = <?php echo $loop ? 'true' : 'false'; ?>;
+                    var autoDelay = <?php echo intval($delay); ?>;
+                    var isAutoplay = <?php echo $autoplay ? 'true' : 'false'; ?>;
+                    var pauseOnHover = <?php echo $hover ? 'true' : 'false'; ?>;
+                    var speed = <?php echo intval($speed); ?>;
+                    var autoTimer = null;
+                    var isPaused = false;
 
-                            <?php if ($autoplay): ?>
-                            swiperOptions.autoplay = {
-                                delay: <?php echo intval($delay); ?>,
-                                disableOnInteraction: false,
-                                <?php if ($hover): ?>
-                                pauseOnMouseEnter: true,
-                                <?php endif; ?>
-                            };
-                            <?php endif; ?>
-
-                            <?php if ($show_arrows): ?>
-                            var prevBtn = container.querySelector('.quanto-carousel-prev');
-                            var nextBtn = container.querySelector('.quanto-carousel-next');
-                            if (prevBtn && nextBtn) {
-                                swiperOptions.navigation = {
-                                    prevEl: prevBtn,
-                                    nextEl: nextBtn,
-                                };
-                            }
-                            <?php endif; ?>
-
-                            <?php if ($show_dots): ?>
-                            var paginationEl = container.querySelector('.swiper-pagination');
-                            if (paginationEl) {
-                                swiperOptions.pagination = {
-                                    el: paginationEl,
-                                    clickable: true,
-                                };
-                            }
-                            <?php endif; ?>
-
-                            swiperInstance = new Swiper(container, swiperOptions);
-
-                            // Force swiper to update slide dimensions
-                            setTimeout(function() {
-                                if (swiperInstance && swiperInstance.update) {
-                                    swiperInstance.update();
-                                }
-                            }, 100);
-                        } catch(err) {
-                            console.error('Swiper Init Error:', err);
+                    // Setup pagination dots
+                    var pagination = container.querySelector('.swiper-pagination');
+                    if (pagination) {
+                        pagination.innerHTML = '';
+                        for (var i = 0; i < total; i++) {
+                            var dot = document.createElement('span');
+                            dot.className = 'swiper-pagination-bullet' + (i === 0 ? ' swiper-pagination-bullet-active' : '');
+                            dot.setAttribute('data-index', i);
+                            dot.setAttribute('role', 'button');
+                            dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+                            (function(idx) {
+                                dot.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    goToSlide(idx);
+                                    resetTimer();
+                                });
+                            })(i);
+                            pagination.appendChild(dot);
                         }
                     }
+
+                    function updatePagination() {
+                        if (!pagination) return;
+                        var dots = pagination.querySelectorAll('.swiper-pagination-bullet');
+                        dots.forEach(function(d, idx) {
+                            if (idx === currentIndex) {
+                                d.classList.add('swiper-pagination-bullet-active');
+                            } else {
+                                d.classList.remove('swiper-pagination-bullet-active');
+                            }
+                        });
+                    }
+
+                    function goToSlide(idx) {
+                        if (idx < 0) {
+                            idx = isLoop ? total - 1 : 0;
+                        } else if (idx >= total) {
+                            idx = isLoop ? 0 : total - 1;
+                        }
+                        currentIndex = idx;
+                        wrapper.style.transition = 'transform ' + speed + 'ms cubic-bezier(0.25, 1, 0.5, 1)';
+                        wrapper.style.transform = 'translate3d(' + (-currentIndex * 100) + '%, 0, 0)';
+                        updatePagination();
+                    }
+
+                    function nextSlide() {
+                        goToSlide(currentIndex + 1);
+                    }
+
+                    function prevSlide() {
+                        goToSlide(currentIndex - 1);
+                    }
+
+                    // Navigation buttons
+                    var prevBtn = container.querySelector('.quanto-carousel-prev');
+                    var nextBtn = container.querySelector('.quanto-carousel-next');
+
+                    if (prevBtn) {
+                        prevBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            prevSlide();
+                            resetTimer();
+                        });
+                    }
+
+                    if (nextBtn) {
+                        nextBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            nextSlide();
+                            resetTimer();
+                        });
+                    }
+
+                    // Autoplay timer
+                    function startTimer() {
+                        if (!isAutoplay || total <= 1 || isPaused) return;
+                        stopTimer();
+                        autoTimer = setInterval(nextSlide, Math.max(1000, autoDelay));
+                    }
+
+                    function stopTimer() {
+                        if (autoTimer) {
+                            clearInterval(autoTimer);
+                            autoTimer = null;
+                        }
+                    }
+
+                    function resetTimer() {
+                        stopTimer();
+                        startTimer();
+                    }
+
+                    if (pauseOnHover) {
+                        container.addEventListener('mouseenter', function() {
+                            isPaused = true;
+                            stopTimer();
+                        });
+                        container.addEventListener('mouseleave', function() {
+                            isPaused = false;
+                            startTimer();
+                        });
+                    }
+
+                    document.addEventListener('visibilitychange', function() {
+                        if (document.hidden) {
+                            isPaused = true;
+                            stopTimer();
+                        } else {
+                            isPaused = false;
+                            startTimer();
+                        }
+                    });
+
+                    // Touch swipe
+                    var touchStartX = 0, touchEndX = 0, isTouching = false;
+                    container.addEventListener('touchstart', function(e) {
+                        if (e.touches && e.touches.length > 0) {
+                            touchStartX = e.touches[0].clientX;
+                            touchEndX = touchStartX;
+                            isTouching = true;
+                            stopTimer();
+                        }
+                    }, { passive: true });
+
+                    container.addEventListener('touchmove', function(e) {
+                        if (isTouching && e.touches && e.touches.length > 0) {
+                            touchEndX = e.touches[0].clientX;
+                        }
+                    }, { passive: true });
+
+                    container.addEventListener('touchend', function() {
+                        if (!isTouching) return;
+                        isTouching = false;
+                        var diff = touchStartX - touchEndX;
+                        if (Math.abs(diff) > 40) {
+                            if (diff > 0) {
+                                nextSlide();
+                            } else {
+                                prevSlide();
+                            }
+                        }
+                        startTimer();
+                    });
+
+                    // Initial state
+                    goToSlide(0);
+                    startTimer();
                 }
 
                 if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', initSwiper_<?php echo $uid_safe; ?>);
+                    document.addEventListener('DOMContentLoaded', initCarousel_<?php echo $uid_safe; ?>);
                 } else {
-                    initSwiper_<?php echo $uid_safe; ?>();
+                    initCarousel_<?php echo $uid_safe; ?>();
                 }
+                window.addEventListener('load', initCarousel_<?php echo $uid_safe; ?>);
 
                 if (window.jQuery) {
                     jQuery(window).on('elementor/frontend/init', function() {
+                        setTimeout(initCarousel_<?php echo $uid_safe; ?>, 200);
                         if (window.elementorFrontend && elementorFrontend.hooks) {
                             elementorFrontend.hooks.addAction('frontend/element_ready/quanto_custom_carousel.default', function() {
-                                initSwiper_<?php echo $uid_safe; ?>();
+                                initCarousel_<?php echo $uid_safe; ?>();
                             });
                         }
                     });
