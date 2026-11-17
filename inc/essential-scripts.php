@@ -521,17 +521,14 @@ add_filter( 'script_loader_tag', function( $tag, $handle, $src ) {
     }
     // Hide/disable animation & slider JS across all frontend pages (Admin & Elementor editor bypass above)
     $blocked_anim_handles = array(
-        'gsap', 'gsap-script',
         'scrollSmoother', 'gsap-scroll-smoother-script', 'scroll-smoother',
         'scrollTo', 'gsap-scroll-to-plugin-script',
-        'scrollTrigger', 'gsap-scroll-trigger-script',
         'split-text', 'gsap-split-text-script',
         'mixitup', 'jquery-mixitup',
         'mas-animation',
         'wcf--addons', 'wcf--slider',
         'odometer-min-script', 'viewport-jquery-script',
         'swiper-bundle', 'swiper',
-        'quanto-addon-script',
     );
     if ( in_array( $handle, $blocked_anim_handles, true ) ) {
         return '';
@@ -542,8 +539,7 @@ add_filter( 'script_loader_tag', function( $tag, $handle, $src ) {
         strpos( $src, 'odometer.min.js' ) !== false ||
         strpos( $src, 'viewport.jquery.js' ) !== false ||
         strpos( $src, 'swiper-bundle.min.js' ) !== false ||
-        strpos( $src, 'swiper.min.js' ) !== false ||
-        strpos( $src, 'quanto-addon.js' ) !== false
+        strpos( $src, 'swiper.min.js' ) !== false
     ) ) {
         return '';
     }

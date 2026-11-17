@@ -14056,6 +14056,10 @@ html body .elementor-element.elementor-element-5e656d6 {
     left: 0 !important;
     right: 0 !important;
     background-color: #0F0F0F !important;
+    min-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
     overflow: hidden !important;
 }
 
