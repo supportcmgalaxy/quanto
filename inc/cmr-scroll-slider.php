@@ -33,8 +33,7 @@ function cmr_render_common_scroll_slider_assets() {
     }
     .cmr-hscroll-sticky {
         position: sticky;
-        width: 100vw;
-        margin-left: calc(-50vw + 50%);
+        width: 100%;
         overflow: clip;
         box-sizing: border-box;
         z-index: 5;
@@ -146,9 +145,20 @@ function cmr_render_common_scroll_slider_assets() {
                     return;
                 }
 
-                // 1. Calculate natural start offset from container
-                var containerRect = inst.spacer.parentElement.getBoundingClientRect();
-                var startLeft = Math.max(30, Math.round(containerRect.left));
+                // 1. Calculate natural start offset to align with section heading
+                var startLeft = 30;
+                var parentSection = inst.spacer.closest ? inst.spacer.closest('.elementor-element-5e656d6, section, .e-con') : null;
+                var headingTitle = parentSection ? parentSection.querySelector('.elementor-heading-title') : document.querySelector('.elementor-element-5e656d6 .elementor-heading-title');
+                if (headingTitle) {
+                    var titleRect = headingTitle.getBoundingClientRect();
+                    if (titleRect.left > 10) {
+                        startLeft = Math.round(titleRect.left);
+                    }
+                } else {
+                    var containerRect = inst.spacer.parentElement.getBoundingClientRect();
+                    startLeft = Math.max(30, Math.round(containerRect.left));
+                }
+                startLeft = Math.max(24, Math.min(startLeft, 120));
                 inst.inner.style.paddingLeft = startLeft + 'px';
                 inst.inner.style.paddingRight = startLeft + 'px';
 
