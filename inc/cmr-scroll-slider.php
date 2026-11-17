@@ -150,11 +150,10 @@ function cmr_render_common_scroll_slider_assets() {
                 var baseMargin = Math.max(0, Math.round((window.innerWidth - containerWidth) / 2));
                 var startLeft = baseMargin + 35;
 
-                var parentSection = inst.spacer.closest ? inst.spacer.closest('.elementor-element-5e656d6, section, .e-con') : null;
-                var headingTitle = parentSection ? parentSection.querySelector('.elementor-heading-title') : document.querySelector('.elementor-element-5e656d6 .elementor-heading-title');
+                var headingTitle = document.querySelector('.elementor-element-5e656d6 .elementor-heading-title, .elementor-element-dfa83ba .elementor-heading-title, .elementor-element-585fce9 .elementor-heading-title');
                 if (headingTitle) {
                     var titleRect = headingTitle.getBoundingClientRect();
-                    if (titleRect.left > 35) {
+                    if (titleRect.left > 20) {
                         startLeft = Math.round(titleRect.left);
                     }
                 }
