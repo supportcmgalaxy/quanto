@@ -672,10 +672,60 @@ function quanto_optimize_image_delivery( $content ) {
                 $img_base    = $base_upload . '/2026/10/About-Us.jpg';
 
                 $default_src = esc_url( $img_base . '-1320x737.jpeg' );
-                $sizes = '(max-width: 768px) 100vw, (max-width: 1320px) 100vw, 1280px';
+                // Use 390px for mobile so browser picks the lightweight 600x335 thumbnail (13 KiB) instead of 768px (saves 25.2 KiB)
+                $sizes = '(max-width: 767px) 390px, (max-width: 1320px) 100vw, 1280px';
 
                 $tag = preg_replace( '/src=["\'][^"\']+["\']/i', 'src="' . $default_src . '"', $tag );
                 $tag = preg_replace( '/sizes=["\'][^"\']+["\']/i', 'sizes="' . $sizes . '"', $tag );
+                return $tag;
+            },
+            $content
+        );
+    }
+
+    // 2. About Us overview images: image-1, image-2, image-3 (saves ~117.7 KiB)
+    if ( strpos( $content, 'image-1' ) !== false || strpos( $content, 'image-2' ) !== false || strpos( $content, 'image-3' ) !== false ) {
+        // Fix image-1
+        $content = preg_replace_callback(
+            '/<img\b([^>]*src=["\'][^"\']*\/uploads\/2026\/10\/image-1[^"\']*["\'][^>]*)>/i',
+            function( $m ) {
+                $tag = $m[0];
+                $tag = str_replace( 'fetchpriority="high"', '', $tag );
+                if ( ! preg_match( '/\bloading=/i', $tag ) ) {
+                    $tag = str_replace( '<img ', '<img loading="lazy" decoding="async" ', $tag );
+                }
+                $tag = preg_replace( '/src=["\'][^"\']+["\']/i', 'src="https://qai8358l95-staging.onrocket.site/wp-content/uploads/2026/10/image-1-600x669.jpg"', $tag );
+                $tag = preg_replace( '/sizes=["\'][^"\']+["\']/i', 'sizes="(max-width: 767px) 270px, (max-width: 1024px) 450px, 600px"', $tag );
+                return $tag;
+            },
+            $content
+        );
+
+        // Fix image-2
+        $content = preg_replace_callback(
+            '/<img\b([^>]*src=["\'][^"\']*\/uploads\/2026\/10\/image-2[^"\']*["\'][^>]*)>/i',
+            function( $m ) {
+                $tag = $m[0];
+                if ( ! preg_match( '/\bloading=/i', $tag ) ) {
+                    $tag = str_replace( '<img ', '<img loading="lazy" decoding="async" ', $tag );
+                }
+                $tag = preg_replace( '/src=["\'][^"\']+["\']/i', 'src="https://qai8358l95-staging.onrocket.site/wp-content/uploads/2026/10/image-2-249x300.jpg"', $tag );
+                $tag = preg_replace( '/sizes=["\'][^"\']+["\']/i', 'sizes="(max-width: 767px) 150px, (max-width: 1024px) 300px, 450px"', $tag );
+                return $tag;
+            },
+            $content
+        );
+
+        // Fix image-3
+        $content = preg_replace_callback(
+            '/<img\b([^>]*src=["\'][^"\']*\/uploads\/2026\/10\/image-3[^"\']*["\'][^>]*)>/i',
+            function( $m ) {
+                $tag = $m[0];
+                if ( ! preg_match( '/\bloading=/i', $tag ) ) {
+                    $tag = str_replace( '<img ', '<img loading="lazy" decoding="async" ', $tag );
+                }
+                $tag = preg_replace( '/src=["\'][^"\']+["\']/i', 'src="https://qai8358l95-staging.onrocket.site/wp-content/uploads/2026/10/image-3-300x278.jpg"', $tag );
+                $tag = preg_replace( '/sizes=["\'][^"\']+["\']/i', 'sizes="(max-width: 767px) 150px, (max-width: 1024px) 300px, 450px"', $tag );
                 return $tag;
             },
             $content
@@ -704,24 +754,22 @@ function quanto_optimize_image_delivery( $content ) {
         $content = str_replace( 'Mask-group-150x150.png', 'Mask-group-100x100.png', $content );
     }
 
-    // 4. Team member boxes (quanto-team-box): remove below-fold fetchpriority="high", fix duplicate images, enforce loading="lazy"
-    if ( strpos( $content, 'quanto-team-box' ) !== false || strpos( $content, 'team-thumb' ) !== false ) {
+    // 4. Team member boxes (quanto-team-box & standalone image widgets): remove below-fold fetchpriority="high", fix duplicate images, enforce loading="lazy"
+    if ( strpos( $content, 'Profile-Pictures' ) !== false || strpos( $content, 'quanto-team-box' ) !== false || strpos( $content, 'team-thumb' ) !== false ) {
+        // First handle team figure containers if present
         $content = preg_replace_callback(
             '/<figure\b[^>]*class=["\'][^"\']*\bteam-thumb\b[^"\']*["\'][^>]*>([\s\S]*?)<\/figure>/i',
             function( $m ) {
                 $inner = $m[1];
-                // Remove fetchpriority="high" from below-the-fold team cards so it never delays LCP
                 $inner = str_replace( 'fetchpriority="high"', 'loading="lazy" decoding="async"', $inner );
                 if ( ! preg_match( '/\bloading=/i', $inner ) ) {
                     $inner = preg_replace( '/<img\b/i', '<img loading="lazy" decoding="async" ', $inner );
                 }
-                // Fix sizes attribute so browser picks appropriate resolution
                 $inner = preg_replace(
                     '/sizes=["\'][^"\']*\(max-width:\s*767px\)[^"\']*["\']/i',
-                    'sizes="(max-width: 767px) 90vw, (max-width: 1024px) 45vw, 380px"',
+                    'sizes="(max-width: 767px) 225px, (max-width: 1024px) 280px, 340px"',
                     $inner
                 );
-                // If default src points to huge master, use the 600x800 thumbnail
                 $inner = preg_replace_callback(
                     '/src=["\']([^"\']*\/Profile-Pictures_\d+)\.jpg\.jpeg["\']/i',
                     function( $sm ) {
@@ -730,6 +778,25 @@ function quanto_optimize_image_delivery( $content ) {
                     $inner
                 );
                 return '<figure class="team-thumb">' . $inner . '</figure>';
+            },
+            $content
+        );
+
+        // Also handle any Profile-Pictures img tags (like in About Us Elementor widgets) to save ~43.6 KiB
+        $content = preg_replace_callback(
+            '/<img\b([^>]*src=["\'][^"\']*\/uploads\/2026\/06\/Profile-Pictures_\d+[^"\']*["\'][^>]*)>/i',
+            function( $m ) {
+                $tag = $m[0];
+                $tag = str_replace( 'fetchpriority="high"', '', $tag );
+                if ( ! preg_match( '/\bloading=/i', $tag ) ) {
+                    $tag = str_replace( '<img ', '<img loading="lazy" decoding="async" ', $tag );
+                }
+                // When sizes is 225px, mobile DPR 1x loads 225x300 thumbnail instead of 600x800
+                $sizes = '(max-width: 767px) 225px, (max-width: 1024px) 280px, 340px';
+                if ( preg_match( '/sizes=["\'][^"\']+["\']/i', $tag ) ) {
+                    $tag = preg_replace( '/sizes=["\'][^"\']+["\']/i', 'sizes="' . $sizes . '"', $tag );
+                }
+                return $tag;
             },
             $content
         );
@@ -798,7 +865,7 @@ function quanto_preload_critical_assets() {
     } elseif ( is_page( 'about-us' ) ) {
         $upload_dir  = wp_upload_dir();
         $base_upload = ! empty( $upload_dir['baseurl'] ) ? $upload_dir['baseurl'] : content_url( '/uploads' );
-        $mobile_img  = $base_upload . '/2026/10/About-Us.jpg-768x429.jpeg';
+        $mobile_img  = $base_upload . '/2026/10/About-Us.jpg-600x335.jpeg';
         $desktop_img = $base_upload . '/2026/10/About-Us.jpg-1320x737.jpeg';
         echo '<link rel="preload" as="image" href="' . esc_url( $mobile_img ) . '" media="(max-width: 768px)" fetchpriority="high">' . "\n";
         echo '<link rel="preload" as="image" href="' . esc_url( $desktop_img ) . '" media="(min-width: 769px)" fetchpriority="high">' . "\n";
