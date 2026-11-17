@@ -11648,7 +11648,7 @@ ul.key-parts-list li {
 }
 
 /* ==========================================================================
-   Homepage: Fix WHO WE SERVE Full-Width Section (Eliminate Left/Right Gaps)
+   Homepage: WHO WE SERVE Section (Full-Width Black & 1280px Alignment)
    ========================================================================== */
 html body .elementor-14 .elementor-element.elementor-element-5e656d6,
 html body .elementor-element.elementor-element-5e656d6 {
@@ -11663,17 +11663,10 @@ html body .elementor-element.elementor-element-5e656d6 {
     left: 0 !important;
     right: 0 !important;
     background-color: #0F0F0F !important;
-    min-height: 100vh !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    overflow: hidden !important;
 }
 
 html body .elementor-14 .elementor-element.elementor-element-5e656d6 > .elementor-element-dfa83ba,
-html body .elementor-element.elementor-element-5e656d6 > .elementor-element-dfa83ba,
-html body .elementor-14 .elementor-element.elementor-element-5e656d6 > .elementor-element-f0b0e67,
-html body .elementor-element.elementor-element-5e656d6 > .elementor-element-f0b0e67 {
+html body .elementor-element.elementor-element-5e656d6 > .elementor-element-dfa83ba {
     width: 100% !important;
     max-width: 1280px !important;
     margin-left: auto !important;
@@ -11681,6 +11674,21 @@ html body .elementor-element.elementor-element-5e656d6 > .elementor-element-f0b0
     padding-left: 35px !important;
     padding-right: 35px !important;
     box-sizing: border-box !important;
+}
+
+html body .elementor-14 .elementor-element.elementor-element-5e656d6 > .elementor-element-f0b0e67,
+html body .elementor-element.elementor-element-5e656d6 > .elementor-element-f0b0e67 {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Ensure .hover-overlay never obscures process box images */
+.process-box .hover-overlay {
+    display: none !important;
 }
 
 
