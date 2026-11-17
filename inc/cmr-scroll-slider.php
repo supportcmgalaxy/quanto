@@ -145,20 +145,19 @@ function cmr_render_common_scroll_slider_assets() {
                     return;
                 }
 
-                // 1. Calculate natural start offset to align with section heading
-                var startLeft = 30;
+                // 1. Calculate natural start offset (matching 1280px site container & cmrindia.com)
+                var containerWidth = 1280;
+                var baseMargin = Math.max(0, Math.round((window.innerWidth - containerWidth) / 2));
+                var startLeft = baseMargin + 35;
+
                 var parentSection = inst.spacer.closest ? inst.spacer.closest('.elementor-element-5e656d6, section, .e-con') : null;
                 var headingTitle = parentSection ? parentSection.querySelector('.elementor-heading-title') : document.querySelector('.elementor-element-5e656d6 .elementor-heading-title');
                 if (headingTitle) {
                     var titleRect = headingTitle.getBoundingClientRect();
-                    if (titleRect.left > 10) {
+                    if (titleRect.left > 35) {
                         startLeft = Math.round(titleRect.left);
                     }
-                } else {
-                    var containerRect = inst.spacer.parentElement.getBoundingClientRect();
-                    startLeft = Math.max(30, Math.round(containerRect.left));
                 }
-                startLeft = Math.max(24, Math.min(startLeft, 120));
                 inst.inner.style.paddingLeft = startLeft + 'px';
                 inst.inner.style.paddingRight = startLeft + 'px';
 

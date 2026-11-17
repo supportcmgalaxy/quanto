@@ -14061,9 +14061,11 @@ html body .elementor-element.elementor-element-5e656d6 {
 html body .elementor-14 .elementor-element.elementor-element-5e656d6 > .elementor-element-dfa83ba,
 html body .elementor-element.elementor-element-5e656d6 > .elementor-element-dfa83ba {
     width: 100% !important;
-    max-width: 100% !important;
-    padding-left: clamp(24px, 4.5vw, 60px) !important;
-    padding-right: clamp(24px, 4.5vw, 60px) !important;
+    max-width: 1280px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 35px !important;
+    padding-right: 35px !important;
     box-sizing: border-box !important;
 }
 
