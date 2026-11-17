@@ -607,6 +607,140 @@ add_filter( 'elementor/widget/render_content', function( $content, $widget ) {
 }, 10, 2 );
 
 /**
+ * Optimize image delivery for Lighthouse 100% score (Est savings ~511 KiB)
+ * - Serves properly sized responsive images for Leadership hero (saves 264 KiB)
+ * - Downsizes oversized partner logos to 150x150 thumbnails (saves 60 KiB)
+ * - Enforces lazy loading on below-fold team cards, fixes oversized sizes attribute (saves 170+ KiB)
+ * - Optimizes Mask group PNG thumbnail (saves 5 KiB)
+ */
+function quanto_optimize_image_delivery( $content ) {
+    if ( ! is_string( $content ) || empty( $content ) ) {
+        return $content;
+    }
+
+    // 1. Leadership & About-Us hero images: replace 2560px uncompressed master with responsive 1320px / srcset
+    if ( strpos( $content, 'Leadership.jpg' ) !== false ) {
+        $content = preg_replace_callback(
+            '/<img\b([^>]*src=["\'][^"\']*\/uploads\/2026\/10\/Leadership\.jpg(?:-scaled)?\.jpeg["\'][^>]*)>/i',
+            function( $m ) {
+                $tag = $m[0];
+                $upload_dir  = wp_upload_dir();
+                $base_upload = ! empty( $upload_dir['baseurl'] ) ? $upload_dir['baseurl'] : content_url( '/uploads' );
+                $img_base    = $base_upload . '/2026/10/Leadership.jpg';
+
+                $srcset = esc_url( $img_base . '-600x257.jpeg' ) . ' 600w, '
+                        . esc_url( $img_base . '-768x329.jpeg' ) . ' 768w, '
+                        . esc_url( $img_base . '-1024x439.jpeg' ) . ' 1024w, '
+                        . esc_url( $img_base . '-1320x565.jpeg' ) . ' 1320w, '
+                        . esc_url( $img_base . '-1536x658.jpeg' ) . ' 1536w, '
+                        . esc_url( $img_base . '-2048x877.jpeg' ) . ' 2048w';
+
+                $sizes = '(max-width: 768px) 100vw, (max-width: 1320px) 100vw, 1280px';
+                $default_src = esc_url( $img_base . '-1320x565.jpeg' );
+
+                // Replace src with properly sized 1320x565 image (125 KB instead of 348 KB)
+                $tag = preg_replace( '/src=["\'][^"\']+["\']/i', 'src="' . $default_src . '"', $tag );
+                // Add or replace srcset
+                if ( preg_match( '/srcset=["\'][^"\']+["\']/i', $tag ) ) {
+                    $tag = preg_replace( '/srcset=["\'][^"\']+["\']/i', 'srcset="' . $srcset . '"', $tag );
+                } else {
+                    $tag = str_replace( '<img ', '<img srcset="' . $srcset . '" ', $tag );
+                }
+                // Add or replace sizes
+                if ( preg_match( '/sizes=["\'][^"\']+["\']/i', $tag ) ) {
+                    $tag = preg_replace( '/sizes=["\'][^"\']+["\']/i', 'sizes="' . $sizes . '"', $tag );
+                } else {
+                    $tag = str_replace( '<img ', '<img sizes="' . $sizes . '" ', $tag );
+                }
+                // Add dimensions
+                if ( ! preg_match( '/\bwidth=/i', $tag ) ) {
+                    $tag = str_replace( '<img ', '<img width="1256" height="538" ', $tag );
+                }
+                return $tag;
+            },
+            $content
+        );
+    }
+
+    if ( strpos( $content, 'About-Us.jpg' ) !== false ) {
+        $content = preg_replace_callback(
+            '/<img\b([^>]*src=["\'][^"\']*\/uploads\/2026\/10\/About-Us\.jpg(?:-scaled)?\.jpeg["\'][^>]*)>/i',
+            function( $m ) {
+                $tag = $m[0];
+                $upload_dir  = wp_upload_dir();
+                $base_upload = ! empty( $upload_dir['baseurl'] ) ? $upload_dir['baseurl'] : content_url( '/uploads' );
+                $img_base    = $base_upload . '/2026/10/About-Us.jpg';
+
+                $default_src = esc_url( $img_base . '-1320x737.jpeg' );
+                $sizes = '(max-width: 768px) 100vw, (max-width: 1320px) 100vw, 1280px';
+
+                $tag = preg_replace( '/src=["\'][^"\']+["\']/i', 'src="' . $default_src . '"', $tag );
+                $tag = preg_replace( '/sizes=["\'][^"\']+["\']/i', 'sizes="' . $sizes . '"', $tag );
+                return $tag;
+            },
+            $content
+        );
+    }
+
+    // 2. Partner/Client logos (cisco-1, aujas-1, colortokens-1, amd-1) - replace 300x300 with 150x150 thumbnail
+    if ( strpos( $content, 'cisco-1.jpg' ) !== false || strpos( $content, 'aujas-1.jpg' ) !== false || strpos( $content, 'colortokens-1.jpg' ) !== false || strpos( $content, 'amd-1.jpg' ) !== false ) {
+        $content = preg_replace_callback(
+            '/<img\b([^>]*src=["\']([^"\']*\/uploads\/2026\/07\/(cisco-1|aujas-1|colortokens-1|amd-1))\.jpg["\'][^>]*)>/i',
+            function( $m ) {
+                $tag = $m[0];
+                $thumb_url = $m[2] . '-150x150.jpg';
+                $tag = str_replace( $m[2] . '.jpg', $thumb_url, $tag );
+                if ( ! preg_match( '/\bwidth=/i', $tag ) ) {
+                    $tag = str_replace( '<img ', '<img width="96" height="96" loading="lazy" decoding="async" ', $tag );
+                }
+                return $tag;
+            },
+            $content
+        );
+    }
+
+    // 3. Mask group png thumbnail
+    if ( strpos( $content, 'Mask-group-150x150.png' ) !== false ) {
+        $content = str_replace( 'Mask-group-150x150.png', 'Mask-group-100x100.png', $content );
+    }
+
+    // 4. Team member boxes (quanto-team-box): remove below-fold fetchpriority="high", fix duplicate images, enforce loading="lazy"
+    if ( strpos( $content, 'quanto-team-box' ) !== false || strpos( $content, 'team-thumb' ) !== false ) {
+        $content = preg_replace_callback(
+            '/<figure\b[^>]*class=["\'][^"\']*\bteam-thumb\b[^"\']*["\'][^>]*>([\s\S]*?)<\/figure>/i',
+            function( $m ) {
+                $inner = $m[1];
+                // Remove fetchpriority="high" from below-the-fold team cards so it never delays LCP
+                $inner = str_replace( 'fetchpriority="high"', 'loading="lazy" decoding="async"', $inner );
+                if ( ! preg_match( '/\bloading=/i', $inner ) ) {
+                    $inner = preg_replace( '/<img\b/i', '<img loading="lazy" decoding="async" ', $inner );
+                }
+                // Fix sizes attribute so browser picks appropriate resolution
+                $inner = preg_replace(
+                    '/sizes=["\'][^"\']*\(max-width:\s*767px\)[^"\']*["\']/i',
+                    'sizes="(max-width: 767px) 90vw, (max-width: 1024px) 45vw, 380px"',
+                    $inner
+                );
+                // If default src points to huge master, use the 600x800 thumbnail
+                $inner = preg_replace_callback(
+                    '/src=["\']([^"\']*\/Profile-Pictures_\d+)\.jpg\.jpeg["\']/i',
+                    function( $sm ) {
+                        return 'src="' . $sm[1] . '.jpg-600x800.jpeg"';
+                    },
+                    $inner
+                );
+                return '<figure class="team-thumb">' . $inner . '</figure>';
+            },
+            $content
+        );
+    }
+
+    return $content;
+}
+add_filter( 'elementor/widget/render_content', 'quanto_optimize_image_delivery', 50 );
+add_filter( 'the_content', 'quanto_optimize_image_delivery', 50 );
+
+/**
  * Exclude footer from WP Rocket Lazy Render (content-visibility: auto) so negative-margin card overlap renders identically for logged-out users
  */
 add_filter( 'rocket_lrc_exclusions', function( $exclusions ) {
@@ -652,6 +786,20 @@ function quanto_preload_critical_assets() {
         $base_upload = ! empty( $upload_dir['baseurl'] ) ? $upload_dir['baseurl'] : content_url( '/uploads' );
         $mobile_img  = $base_upload . '/2026/10/CMR-Lead-Slider-1.jpg-2-768x432.jpeg';
         $desktop_img = $base_upload . '/2026/10/CMR-Lead-Slider-1.jpg-2.jpeg';
+        echo '<link rel="preload" as="image" href="' . esc_url( $mobile_img ) . '" media="(max-width: 768px)" fetchpriority="high">' . "\n";
+        echo '<link rel="preload" as="image" href="' . esc_url( $desktop_img ) . '" media="(min-width: 769px)" fetchpriority="high">' . "\n";
+    } elseif ( is_page( 'leadership' ) ) {
+        $upload_dir  = wp_upload_dir();
+        $base_upload = ! empty( $upload_dir['baseurl'] ) ? $upload_dir['baseurl'] : content_url( '/uploads' );
+        $mobile_img  = $base_upload . '/2026/10/Leadership.jpg-768x329.jpeg';
+        $desktop_img = $base_upload . '/2026/10/Leadership.jpg-1320x565.jpeg';
+        echo '<link rel="preload" as="image" href="' . esc_url( $mobile_img ) . '" media="(max-width: 768px)" fetchpriority="high">' . "\n";
+        echo '<link rel="preload" as="image" href="' . esc_url( $desktop_img ) . '" media="(min-width: 769px)" fetchpriority="high">' . "\n";
+    } elseif ( is_page( 'about-us' ) ) {
+        $upload_dir  = wp_upload_dir();
+        $base_upload = ! empty( $upload_dir['baseurl'] ) ? $upload_dir['baseurl'] : content_url( '/uploads' );
+        $mobile_img  = $base_upload . '/2026/10/About-Us.jpg-768x429.jpeg';
+        $desktop_img = $base_upload . '/2026/10/About-Us.jpg-1320x737.jpeg';
         echo '<link rel="preload" as="image" href="' . esc_url( $mobile_img ) . '" media="(max-width: 768px)" fetchpriority="high">' . "\n";
         echo '<link rel="preload" as="image" href="' . esc_url( $desktop_img ) . '" media="(min-width: 769px)" fetchpriority="high">' . "\n";
     }
