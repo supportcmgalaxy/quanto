@@ -108,10 +108,11 @@ if ( ! function_exists( 'cmr_featured_intelligence_carousel_shortcode' ) ) {
         while ( $featured_query->have_posts() ) {
             $featured_query->the_post();
             
-            $thumbnail_url = get_the_post_thumbnail_url( get_the_ID(), 'full' );
+            $thumbnail_url = get_the_post_thumbnail_url( get_the_ID(), 'large' );
             if ( ! $thumbnail_url ) {
                 $thumbnail_url = quanto_get_placeholder_image_uri();
             }
+            $thumb_small_url = get_the_post_thumbnail_url( get_the_ID(), 'thumbnail' ) ?: get_the_post_thumbnail_url( get_the_ID(), 'medium' ) ?: $thumbnail_url;
             
             // Categories & Badges
             $category_name = 'Industry Intelligence';
@@ -160,6 +161,7 @@ if ( ! function_exists( 'cmr_featured_intelligence_carousel_shortcode' ) ) {
                 'title'       => get_the_title(),
                 'link'        => get_permalink(),
                 'image'       => $thumbnail_url,
+                'thumb'       => $thumb_small_url,
                 'category'    => $category_name,
                 'badge'       => $badge_name,
                 'read_time'   => $read_time,
@@ -475,7 +477,7 @@ if ( ! function_exists( 'cmr_featured_intelligence_carousel_shortcode' ) ) {
             <div class="cmr-fi-thumbs">
                 <?php foreach ( $posts_data as $index => $post ) : ?>
                     <div class="cmr-fi-thumb <?php echo $index === 0 ? 'active' : ''; ?>" data-slide="<?php echo esc_attr($index); ?>">
-                        <img src="<?php echo esc_url( $post['image'] ); ?>" alt="Thumb">
+                        <img src="<?php echo esc_url( ! empty( $post['thumb'] ) ? $post['thumb'] : $post['image'] ); ?>" alt="Thumb" loading="lazy" decoding="async" width="56" height="56">
                     </div>
                 <?php endforeach; ?>
             </div>

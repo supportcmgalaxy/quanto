@@ -405,7 +405,13 @@ if ( ! function_exists( 'cmr_featured_insight_shortcode' ) ) {
                 } else {
                     $thumb_id = get_post_thumbnail_id( $p->ID );
                     if ( $thumb_id ) {
-                        $poster = wp_get_attachment_image_url( $thumb_id, 'full' );
+                        $poster = wp_get_attachment_image_url( $thumb_id, 'large' ) ?: wp_get_attachment_image_url( $thumb_id, 'full' );
+                        $poster_img_html = wp_get_attachment_image( $thumb_id, 'large', false, array(
+                            'class'         => 'cmr-fvi-poster-img',
+                            'fetchpriority' => 'high',
+                            'decoding'      => 'async',
+                            'sizes'         => '(max-width: 767px) 100vw, 680px',
+                        ) );
                     }
                 }
 
@@ -439,9 +445,13 @@ if ( ! function_exists( 'cmr_featured_insight_shortcode' ) ) {
                 <div class="cmr-fvi-video-wrap">
                     <?php if ( ! empty( $video_embed ) ) : ?>
                         <?php echo $video_embed; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                    <?php elseif ( ! empty( $poster_img_html ) ) : ?>
+                        <a href="<?php echo esc_url( $link ); ?>" class="cmr-fvi-poster-link" <?php echo ( $target === '_blank' ) ? 'target="_blank" rel="noopener noreferrer"' : ''; ?>>
+                            <?php echo $poster_img_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                        </a>
                     <?php elseif ( ! empty( $poster ) ) : ?>
                         <a href="<?php echo esc_url( $link ); ?>" class="cmr-fvi-poster-link" <?php echo ( $target === '_blank' ) ? 'target="_blank" rel="noopener noreferrer"' : ''; ?>>
-                            <img src="<?php echo esc_url( $poster ); ?>" alt="<?php echo esc_attr( $title ); ?>" class="cmr-fvi-poster-img">
+                            <img src="<?php echo esc_url( $poster ); ?>" alt="<?php echo esc_attr( $title ); ?>" class="cmr-fvi-poster-img" fetchpriority="high" decoding="async">
                         </a>
                     <?php else : ?>
                         <!-- Default Embedded Demo Video -->

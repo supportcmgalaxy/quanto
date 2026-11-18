@@ -391,7 +391,7 @@ function cmr_mega_menu_connect_shortcode($atts) {
                     ?>
                         <a href="<?php echo esc_url( get_permalink( $post->ID ) ); ?>" class="cmr-mmc-post-card">
                             <div class="cmr-mmc-post-img">
-                                <img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php echo esc_attr( get_the_title( $post->ID ) ); ?>">
+                                <img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php echo esc_attr( get_the_title( $post->ID ) ); ?>" loading="lazy" decoding="async">
                             </div>
                             <div class="cmr-mmc-post-content">
                                 <div class="cmr-mmc-post-date"><?php echo get_the_date( 'M j, Y', $post->ID ); ?></div>

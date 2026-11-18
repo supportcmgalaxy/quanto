@@ -373,7 +373,16 @@ class Quanto_Featured_Video_Insight_Widget extends \Elementor\Widget_Base {
 
         $video_url = isset( $settings['video_url'] ) ? $settings['video_url'] : '';
         $poster    = '';
-        if ( ! empty( $settings['video_poster']['url'] ) ) {
+        $poster_img_html = '';
+        if ( ! empty( $settings['video_poster']['id'] ) ) {
+            $poster = wp_get_attachment_image_url( $settings['video_poster']['id'], 'large' ) ?: wp_get_attachment_image_url( $settings['video_poster']['id'], 'full' );
+            $poster_img_html = wp_get_attachment_image( $settings['video_poster']['id'], 'large', false, array(
+                'class'         => 'cmr-fvi-poster-img',
+                'fetchpriority' => 'high',
+                'decoding'      => 'async',
+                'sizes'         => '(max-width: 767px) 100vw, 680px',
+            ) );
+        } elseif ( ! empty( $settings['video_poster']['url'] ) ) {
             $poster = $settings['video_poster']['url'];
         }
 
@@ -408,9 +417,13 @@ class Quanto_Featured_Video_Insight_Widget extends \Elementor\Widget_Base {
                 <div class="cmr-fvi-video-wrap">
                     <?php if ( ! empty( $video_embed ) ) : ?>
                         <?php echo $video_embed; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                    <?php elseif ( ! empty( $poster_img_html ) ) : ?>
+                        <a href="<?php echo esc_url( $link_url ); ?>" class="cmr-fvi-poster-link" target="<?php echo esc_attr( $target ); ?>" <?php echo esc_attr( $nofollow ); ?>>
+                            <?php echo $poster_img_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                        </a>
                     <?php elseif ( ! empty( $poster ) ) : ?>
                         <a href="<?php echo esc_url( $link_url ); ?>" class="cmr-fvi-poster-link" target="<?php echo esc_attr( $target ); ?>" <?php echo esc_attr( $nofollow ); ?>>
-                            <img src="<?php echo esc_url( $poster ); ?>" alt="<?php echo esc_attr( $title ); ?>" class="cmr-fvi-poster-img">
+                            <img src="<?php echo esc_url( $poster ); ?>" alt="<?php echo esc_attr( $title ); ?>" class="cmr-fvi-poster-img" fetchpriority="high" decoding="async">
                         </a>
                     <?php else : ?>
                         <iframe src="https://www.youtube.com/embed/ScMzIvxBSi4?rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>

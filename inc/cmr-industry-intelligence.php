@@ -129,7 +129,8 @@ if ( ! function_exists( 'cmr_industry_intelligence_shortcode' ) ) {
                     foreach ( $unique_posts as $insight_post ) :
                         $post_title = get_the_title( $insight_post );
                         $post_link = get_permalink( $insight_post );
-                        $thumbnail_url = get_the_post_thumbnail_url( $insight_post->ID, 'full' );
+                        $card_thumb_id = get_post_thumbnail_id( $insight_post->ID );
+                        $thumbnail_url = $card_thumb_id ? wp_get_attachment_image_url( $card_thumb_id, 'medium_large' ) : quanto_get_placeholder_image_uri();
                         if ( ! $thumbnail_url ) {
                             $thumbnail_url = quanto_get_placeholder_image_uri();
                         }
@@ -158,7 +159,16 @@ if ( ! function_exists( 'cmr_industry_intelligence_shortcode' ) ) {
                         <div class="intel-card" style="text-align: left; align-items: flex-start;">
                             <div class="intel-card-img" style="width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; margin-bottom: 14px; text-align: left; margin-left: 0; margin-right: auto; display: block;">
                                 <a href="<?php echo esc_url( $post_link ); ?>" style="display: block; width: 100%; height: 100%; text-align: left; margin: 0; padding: 0;">
-                                    <img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php echo esc_attr( $post_title ); ?>" style="width: 100%; height: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: center left; display: block; border-radius: 8px; margin: 0; margin-left: 0; margin-right: auto;" />
+                                    <?php if ( $card_thumb_id ) : ?>
+                                        <?php echo wp_get_attachment_image( $card_thumb_id, 'medium_large', false, array(
+                                            'loading'  => 'lazy',
+                                            'decoding' => 'async',
+                                            'sizes'    => '(max-width: 767px) 100vw, 400px',
+                                            'style'    => 'width: 100%; height: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: center left; display: block; border-radius: 8px; margin: 0; margin-left: 0; margin-right: auto;',
+                                        ) ); ?>
+                                    <?php else : ?>
+                                        <img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php echo esc_attr( $post_title ); ?>" loading="lazy" decoding="async" style="width: 100%; height: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: center left; display: block; border-radius: 8px; margin: 0; margin-left: 0; margin-right: auto;" />
+                                    <?php endif; ?>
                                 </a>
                             </div>
                             <div class="intel-card-content">

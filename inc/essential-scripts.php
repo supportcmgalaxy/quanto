@@ -802,6 +802,25 @@ function quanto_optimize_image_delivery( $content ) {
         );
     }
 
+    // 5. Featured Video / Insight poster image (LCP element on industry-intelligence)
+    if ( strpos( $content, 'cmr-fvi-poster-img' ) !== false ) {
+        $content = preg_replace_callback(
+            '/<img\b([^>]*\bclass=["\'][^"\']*\bcmr-fvi-poster-img\b[^"\']*["\'][^>]*)>/i',
+            function( $m ) {
+                $tag = $m[0];
+                $tag = str_replace( 'loading="lazy"', '', $tag );
+                if ( strpos( $tag, 'fetchpriority' ) === false ) {
+                    $tag = str_replace( '<img ', '<img fetchpriority="high" ', $tag );
+                }
+                if ( strpos( $tag, 'decoding' ) === false ) {
+                    $tag = str_replace( '<img ', '<img decoding="async" ', $tag );
+                }
+                return $tag;
+            },
+            $content
+        );
+    }
+
     return $content;
 }
 add_filter( 'elementor/widget/render_content', 'quanto_optimize_image_delivery', 50 );
@@ -869,6 +888,14 @@ function quanto_preload_critical_assets() {
         $desktop_img = $base_upload . '/2026/10/About-Us.jpg-1320x737.jpeg';
         echo '<link rel="preload" as="image" href="' . esc_url( $mobile_img ) . '" media="(max-width: 768px)" fetchpriority="high">' . "\n";
         echo '<link rel="preload" as="image" href="' . esc_url( $desktop_img ) . '" media="(min-width: 769px)" fetchpriority="high">' . "\n";
+    } elseif ( is_page( 'industry-intelligence' ) ) {
+        echo '<meta name="description" content="Discover actionable industry intelligence, market trends, and research-backed analysis driving strategic business decisions with CyberMedia Research (CMR).">' . "\n";
+        $upload_dir  = wp_upload_dir();
+        $base_upload = ! empty( $upload_dir['baseurl'] ) ? $upload_dir['baseurl'] : content_url( '/uploads' );
+        $mob_url     = $base_upload . '/2026/09/Amid-Sharp-NAND-Price-768x384.jpg';
+        $desk_url    = $base_upload . '/2026/09/Amid-Sharp-NAND-Price-1024x512.jpg';
+        echo '<link rel="preload" as="image" href="' . esc_url( $mob_url ) . '" media="(max-width: 768px)" fetchpriority="high">' . "\n";
+        echo '<link rel="preload" as="image" href="' . esc_url( $desk_url ) . '" media="(min-width: 769px)" fetchpriority="high">' . "\n";
     }
 }
 
