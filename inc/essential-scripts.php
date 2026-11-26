@@ -498,6 +498,31 @@ add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
             strpos( $href, 'remixicon' ) !== false
         )
     );
+
+    // Industry Intelligence page-only CSS optimizations (do not affect other templates)
+    if ( is_page( 'industry-intelligence' ) ) {
+        $ii_async_handles = array(
+            'bootstrap-style',
+            'quanto-core-style',
+            'quanto-main-style',
+            'widget-woocommerce-products',
+            'elementor-widget-woocommerce-products',
+            'widget-icon-list',
+            'elementor-widget-icon-list',
+        );
+        if ( in_array( $handle, $ii_async_handles, true ) || (
+            is_string( $href ) && (
+                strpos( $href, 'bootstrap.min.css' ) !== false ||
+                strpos( $href, '/assets/css/style.css' ) !== false ||
+                strpos( $href, '/assets/css/core.css' ) !== false ||
+                strpos( $href, 'widget-woocommerce-products' ) !== false ||
+                strpos( $href, 'widget-icon-list' ) !== false
+            )
+        ) ) {
+            $is_async = true;
+        }
+    }
+
     if ( $is_async ) {
         $async_tag = str_replace( "media='all'", "media='print' onload=\"this.media='all'\"", $html );
         if ( $async_tag === $html ) {
@@ -507,6 +532,19 @@ add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
             $async_tag = str_replace( '/>', ' media="print" onload="this.media=\'all\'" />', $html );
         }
         return $async_tag . "\n";
+    }
+
+    // Scope Elementor device-specific CSS ONLY on Industry Intelligence page
+    if ( is_page( 'industry-intelligence' ) && is_string( $href ) ) {
+        if ( strpos( $href, '-desktop.css' ) !== false ) {
+            return str_replace( array( "media='all'", 'media="all"' ), 'media="(min-width: 1025px)"', $html );
+        }
+        if ( strpos( $href, '-mobile.css' ) !== false ) {
+            return str_replace( array( "media='all'", 'media="all"' ), 'media="(max-width: 767px)"', $html );
+        }
+        if ( strpos( $href, '-tablet.css' ) !== false ) {
+            return str_replace( array( "media='all'", 'media="all"' ), 'media="(max-width: 1024px)"', $html );
+        }
     }
 
     return $html;
