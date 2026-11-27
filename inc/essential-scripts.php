@@ -529,11 +529,9 @@ add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
         return $async_tag . "\n";
     }
 
-    // Scope Elementor device-specific CSS ONLY on Industry Intelligence page
+    // Scope mobile/tablet Elementor CSS ONLY on Industry Intelligence page
+    // Note: *-desktop.css is Elementor's base stylesheet for ALL screen sizes (mobile-inclusive), so keep it media="all"
     if ( is_page( 'industry-intelligence' ) && is_string( $href ) ) {
-        if ( strpos( $href, '-desktop.css' ) !== false ) {
-            return str_replace( array( "media='all'", 'media="all"' ), 'media="(min-width: 1025px)"', $html );
-        }
         if ( strpos( $href, '-mobile.css' ) !== false ) {
             return str_replace( array( "media='all'", 'media="all"' ), 'media="(max-width: 767px)"', $html );
         }
