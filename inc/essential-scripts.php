@@ -500,18 +500,43 @@ add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
     );
 
     // Industry Intelligence page-only CSS optimizations (do not affect other templates)
-    // Keep bootstrap-style, quanto-main-style, quanto-core-style sync so above-the-fold CLS stays 0
+    // Keep bootstrap-style, quanto-main-style, quanto-core-style, quanto-style sync so above-the-fold CLS stays 0
     if ( is_page( 'industry-intelligence' ) ) {
         $ii_async_handles = array(
             'widget-woocommerce-products',
             'elementor-widget-woocommerce-products',
             'widget-icon-list',
             'elementor-widget-icon-list',
+            'widget-spacer',
+            'elementor-widget-spacer',
+            'widget-divider',
+            'elementor-widget-divider',
+            'widget-image',
+            'elementor-widget-image',
+            'cmr-industry-intelligence',
+            'quanto-fonts',
+            'elementor-post-8920',
+            'elementor-post-52927',
+            'elementor-post-23190',
+            'elementor-post-23198',
+            'elementor-post-23165',
+            'elementor-post-7637',
         );
         if ( in_array( $handle, $ii_async_handles, true ) || (
             is_string( $href ) && (
                 strpos( $href, 'widget-woocommerce-products' ) !== false ||
-                strpos( $href, 'widget-icon-list' ) !== false
+                strpos( $href, 'widget-icon-list' ) !== false ||
+                strpos( $href, 'widget-spacer' ) !== false ||
+                strpos( $href, 'widget-divider' ) !== false ||
+                strpos( $href, 'widget-image' ) !== false ||
+                strpos( $href, 'cmr-industry-intelligence.css' ) !== false ||
+                strpos( $href, 'instrument-sans.css' ) !== false ||
+                strpos( $href, 'post-8920.css' ) !== false ||
+                strpos( $href, 'post-52927.css' ) !== false ||
+                strpos( $href, 'post-23190.css' ) !== false ||
+                strpos( $href, 'post-23198.css' ) !== false ||
+                strpos( $href, 'post-23165.css' ) !== false ||
+                strpos( $href, 'post-7637.css' ) !== false
             )
         ) ) {
             $is_async = true;
@@ -898,6 +923,9 @@ function quanto_preload_critical_assets() {
     }
     $font_url = get_theme_file_uri( '/assets/fonts/instrument-sans/instrument-sans-latin-normal.woff2' );
     echo '<link rel="preload" href="' . esc_url( $font_url ) . '" as="font" type="font/woff2" crossorigin>' . "\n";
+    if ( is_page( 'industry-intelligence' ) ) {
+        echo '<style id="cmr-ii-critical-font">@font-face{font-family:\'Instrument Sans\';font-style:normal;font-weight:400 700;font-stretch:100%;font-display:swap;src:url(\'' . esc_url( $font_url ) . '\') format(\'woff2\');}</style>' . "\n";
+    }
     if ( is_front_page() || is_home() ) {
         $upload_dir  = wp_upload_dir();
         $base_upload = ! empty( $upload_dir['baseurl'] ) ? $upload_dir['baseurl'] : content_url( '/uploads' );
