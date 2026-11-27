@@ -500,11 +500,9 @@ add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
     );
 
     // Industry Intelligence page-only CSS optimizations (do not affect other templates)
+    // Keep bootstrap-style, quanto-main-style, quanto-core-style sync so above-the-fold CLS stays 0
     if ( is_page( 'industry-intelligence' ) ) {
         $ii_async_handles = array(
-            'bootstrap-style',
-            'quanto-core-style',
-            'quanto-main-style',
             'widget-woocommerce-products',
             'elementor-widget-woocommerce-products',
             'widget-icon-list',
@@ -512,9 +510,6 @@ add_filter( 'style_loader_tag', function( $html, $handle, $href, $media ) {
         );
         if ( in_array( $handle, $ii_async_handles, true ) || (
             is_string( $href ) && (
-                strpos( $href, 'bootstrap.min.css' ) !== false ||
-                strpos( $href, '/assets/css/style.css' ) !== false ||
-                strpos( $href, '/assets/css/core.css' ) !== false ||
                 strpos( $href, 'widget-woocommerce-products' ) !== false ||
                 strpos( $href, 'widget-icon-list' ) !== false
             )
